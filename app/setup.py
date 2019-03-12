@@ -42,11 +42,11 @@ CACHE_HEADERS = {
 }
 
 CSP_POLICY = {
-    'default-src': ["'self'", 'https://cdn.ons.gov.uk'],
-    'font-src': ["'self'", 'data:', 'https://cdn.ons.gov.uk'],
-    'script-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk'],
-    'connect-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk'],
-    'img-src': ["'self'", 'data:', 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk'],
+    'default-src': ["'self'", 'https://cdn.ons.gov.uk', 'localhost:3030'],
+    'font-src': ["'self'", 'data:', 'https://cdn.ons.gov.uk', 'localhost:3030'],
+    'script-src': ["'self' 'unsafe-eval'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', 'localhost:3030'],
+    'connect-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', 'localhost:3030', 'ws://localhost:3030'],
+    'img-src': ["'self'", 'data:', 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk', 'localhost:3030'],
 }
 
 cache = Cache()
@@ -155,6 +155,7 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
 
     # pylint: disable=no-member
     application.jinja_env.globals['theme'] = flask_theme_cache.get_global_theme_template(cache)
+    application.jinja_env.add_extension('jinja2.ext.do')
 
     @application.before_request
     def before_request():  # pylint: disable=unused-variable

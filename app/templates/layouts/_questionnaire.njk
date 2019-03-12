@@ -1,0 +1,54 @@
+{% extends 'layouts/_base.njk' %}
+{% import 'macros/helpers.html' as helpers %}
+{% from "components/button/_macro.njk" import onsButton %}
+
+{% set block = content.block %}
+{% set form = content.form %}
+
+{% block content %}
+    {% do page.footer | setAttributes({
+        "cols": [],
+        "rows": [
+            {
+                "itemsList": [
+                    {
+                        "text": 'Contact us',
+                        "url": '/contact-us'
+                    },
+                    {
+                        "text": 'Cookies and privacy',
+                        "url": '/cookies-privacy'
+                    }
+                ]
+            }
+        ]
+    }) %}
+    {% if previous_location %}
+        <div class="u-mb-s">
+            <a class="u-mb-s"
+            {{ helpers.track('click', 'Navigation', 'Previous link click', position )}}
+            href="{{previous_location}}" id="{{position}}-previous">{{ _("Previous") }}</a>
+        </div>
+    {% endif %}
+
+    {% block form_errors %}{% endblock %}
+
+    {% block form_content %}
+        <div class="group" id="{{current_location.group_id}}">
+            {% include 'partials/block.html' %}
+        </div>
+    {% endblock %}
+
+    {% block submit_button %}
+        {{
+            onsButton({
+                "text": continue_button_text | default(_("Save and continue")),
+                "name": "action[save_continue]",
+                "classes": "u-mt-m",
+                "attributes": {
+                    "data-qa": "btn-submit"
+                }
+            })
+        }}
+    {% endblock %}
+{% endblock %}

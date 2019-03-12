@@ -1,0 +1,197 @@
+{% extends "layouts2/_template.njk" %}
+
+{% set form = {
+  "attributes": {
+    "autocomplete": "off",
+    "novalidate": null
+  }
+} %}
+
+{% set _page = {
+  "title": survey_title,
+  "assetsURL": "http://localhost:3030",
+  "footer": {
+    "assetsURL": "http://localhost:3030",
+    "cols": [
+        {
+            "title": _("Legal information"),
+            "itemsList": [
+                {
+                    "text": _("Cookies and privacy"),
+                    "url": "/cookies-privacy",
+                    "target": "_blank"
+                }
+            ]
+        },
+        {
+            "title": _("About ONS"),
+            "itemsList": [
+                {
+                    "text": _("What we do"),
+                    "url": "https://www.ons.gov.uk/aboutus/whatwedo",
+                    "target": "_blank"
+                },
+                {
+                    "text": _("Contact us"),
+                    "url": "/contact-us",
+                    "target": "_blank"
+                },
+                {
+                    "text": _("Accessibility"),
+                    "url": "https://www.ons.gov.uk/help/accessibility",
+                    "target": "_blank"
+                }
+            ]
+        },
+        {
+            "title": _("Statistics"),
+            "itemsList": [
+                {
+                    "text": _("UK Statistics Authority"),
+                    "url": "https://www.statisticsauthority.gov.uk/about-the-authority/",
+                    "target": "_blank"
+                },
+                {
+                    "text": _("Release calendar"),
+                    "url": "https://www.ons.gov.uk/releasecalendar",
+                    "target": "_blank"
+                },
+                {
+                    "text": _("News"),
+                    "url": "https://www.ons.gov.uk/news",
+                    "target": "_blank"
+                }
+            ]
+        }
+    ],
+    "OGLLink": {
+        "pre":  _("All content is available under the"),
+        "link": _("Open Government Licence v3.0"),
+        "url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+        "post": _(", except where otherwise stated")
+    }
+  },
+  "feedback": {
+    "id": "feedback",
+    "title": _("Give feedback and help us improve this service"),
+    "closeButton": {
+      "text": _("I don't want to provide feedback"),
+      "attributes": {
+         "data-ga": "click",
+         "data-ga-category": "feedback",
+         "data-qa": "a-feedback-close",
+         "data-ga-action": "Cancel",
+         "data-ga-label": "Feedback cancelled"
+      }
+    },
+    "summaryAttributes": {
+      "data-qa": "a-feedback-open",
+      "data-ga": "click",
+      "data-ga-category": "feedback",
+      "data-ga-action": "Open panel",
+      "data-ga-label": "Feedback"
+    },
+    "action": "/feedback",
+    "textarea": {
+      "id": "feedback-message",
+      "label": {
+        "text": _("How can we improve this survey")
+      },
+      "name": "message",
+      "maxlength": 2000,
+      "charCountSingular": _("You have {x} character remaining"),
+      "charCountPlural": _("You have {x} characters remaining")
+    },
+    "name": {
+      "name": "name",
+      "label": {
+        "text": _("Name (optional)"),
+        "description": _("Please include your name and email address if you’re interested in taking part in further research to improve this survey")
+      }
+    },
+    "email": {
+      "name": "email",
+      "label": {
+        "text": _("Email address (optional)")
+      }
+    },
+    "sendButton": {
+      "text": _("Send feedback"),
+      "attributes": {
+        "name": "action[send_feedback]",
+        "data-qa": "btn-feedback-submit",
+        "data-ga": "click",
+        "data-ga-category": "Feedback",
+        "data-ga-action": "Send"
+      }
+    },
+    "thankYouMessage": _("Thanks for your feedback"),
+    "errorMessage": _("There was an error sending your feedback.\n(Error code: {x})")
+  }
+} %}
+
+{# My Account button  #}
+{% if account_service_url %}
+    {% do _page | setAttribute("serviceLinks", {
+        "ariaLabel": "Site services menu",
+        "ariaListLabel": "Navigation menu",
+        "itemsList": [
+            {
+                "text": _("My account"),
+                "url": account_service_url
+            }
+        ]
+    }) %}
+{% endif %}
+
+{# Signout Button #}
+{% if current_user.is_authenticated %}
+  {% if account_service_log_out_url %}
+    {% if save_on_signout %}
+        {% do _page | setAttribute("signoutButton", {
+            "text": _("Save and sign out"),
+            "name": "action[save_sign_out]",
+            "classes": "js-btn-save",
+            "attributes": {
+                "data-qa": "btn-save-sign-out",
+                "data-ga": "click",
+                "data-ga-category": "Navigation",
+                "data-ga-action": "Save and sign out click"
+            }
+        }) %}
+    {% else %}
+        {% do _page | setAttribute("signoutButton", {
+            "text": _("Sign out"),
+            "name": "action[sign_out]",
+            "attributes": {
+                "data-qa": "btn-sign-out",
+                "data-ga": "click",
+                "data-ga-category": "Navigation",
+                "data-ga-action": "Sign out click"
+            }
+        }) %}
+    {% endif %}
+  {% else %}
+    {% if save_on_signout %}
+        {% do _page | setAttribute("signoutButton", {
+            "text": _("Save and complete later"),
+            "name": "action[save_sign_out]",
+            "classes": "js-btn-save",
+            "attributes": {
+                "data-qa": "btn-save-sign-out",
+                "data-ga": "click",
+                "data-ga-category": "Navigation",
+                "data-ga-action": "Save and sign out click"
+            }
+        }) %}
+    {% endif %}
+  {% endif %}
+{% endif %}
+
+{% set page = page | setAttributes(_page) if page else _page %}
+{% set data = page %}
+
+{% block preHeader %}
+  <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+  <button class="u-vh" tabindex="-1" type="submit" name="action[save_continue]">{{_("Save and continue")}}</button>
+{% endblock %}

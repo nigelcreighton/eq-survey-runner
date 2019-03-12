@@ -1,6 +1,7 @@
 # coding: utf-8
 import re
 import string
+import json
 from datetime import datetime
 
 import flask
@@ -489,7 +490,6 @@ def get_answer_label(context, answer_id, question_id):
                 return answer['label']
             return get_question_title(context, question_id)
 
-
 @blueprint.app_context_processor
 def get_question_title_processor():
     return dict(get_question_title=get_question_title)
@@ -559,3 +559,22 @@ def mark_safe(context, value):
     if context.autoescape:
         value = Markup(value)
     return value
+
+@blueprint.app_template_filter()
+def dump(value):
+    return json.dumps(value)
+
+@blueprint.app_template_filter()
+def typeof(value):
+    return type(value).__name__
+
+@blueprint.app_template_filter()
+def setAttribute(dictionary, key, value):
+    dictionary[key] = value
+    return dictionary
+
+@blueprint.app_template_filter()
+def setAttributes(dictionary, attributes):
+    for key in attributes:
+        dictionary[key] = attributes[key]
+    return dictionary
