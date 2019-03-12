@@ -17,7 +17,7 @@
         {% endif %}
       </h2>
 
-      <p class="u-fs-r" data-qa="details-changed-title">{{ _("If the company details or structure have changed contact us on %(telephone_number)s or email %(email_address)s",
+      <p data-qa="details-changed-title">{{ _("If the company details or structure have changed contact us on %(telephone_number)s or email %(email_address)s",
               telephone_number = helpers.telephone_number(),
               email_address = helpers.email_address(subject="Change of details reference " + metadata.ru_ref)
           ) }}
@@ -33,7 +33,7 @@
 
       {%- if legal_basis -%}
           <h2 class="u-fs-m u-mb-xs" data-qa="legal-response">{{ _("Your response is legally required") }}</h2>
-          <p class="u-fs-r u-mb-m" data-qa="legal-basis">{{ legal_basis }}</p>
+          <p class="u-mb-m" data-qa="legal-basis">{{ legal_basis }}</p>
       {%- endif -%}
 
       {% block start_survey %}
