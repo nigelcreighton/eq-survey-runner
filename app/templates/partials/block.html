@@ -17,7 +17,7 @@
 
   {% for question in block['questions'] %}
     {% if not question.skipped %}
-      {% include theme('partials/question.html') %}
+      {% include 'partials/question.html' %}
     {% endif %}
   {% endfor %}
 </div>

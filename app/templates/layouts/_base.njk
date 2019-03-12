@@ -8,8 +8,11 @@
 } %}
 
 {% set _page = {
-  "title": survey_title,
+  "title": page_title + " " + survey_title if page_title else survey_title,
   "assetsURL": "http://localhost:3030",
+  "header": {
+      "title": survey_title
+  },
   "footer": {
     "assetsURL": "http://localhost:3030",
     "cols": [
