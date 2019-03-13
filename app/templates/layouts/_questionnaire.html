@@ -1,45 +1,54 @@
-{% extends theme('layouts/_twocol.html') %}
+{% extends 'layouts/_base.njk' %}
 {% import 'macros/helpers.html' as helpers %}
-
-{% block page_title %}{{page_title}}{% endblock %}
-
-{% block subheader %}
-    {{super()}}
-{% endblock subheader %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% set block = content.block %}
 {% set form = content.form %}
 
-{% block sidebar %}
-  {% if navigation %}
-    {% include theme('partials/section-navigation.html') %}
-  {% endif %}
-{% endblock %}
-
-{% block main %}
+{% block content %}
+    {% do page.footer | setAttributes({
+        "cols": [],
+        "rows": [
+            {
+                "itemsList": [
+                    {
+                        "text": 'Contact us',
+                        "url": '/contact-us'
+                    },
+                    {
+                        "text": 'Cookies and privacy',
+                        "url": '/cookies-privacy'
+                    }
+                ]
+            }
+        ]
+    }) %}
+    {% if previous_location %}
+        <div class="u-mb-s">
+            <a class="u-mb-s"
+            {{ helpers.track('click', 'Navigation', 'Previous link click', position )}}
+            href="{{previous_location}}" id="{{position}}-previous">{{ _("Previous") }}</a>
+        </div>
+    {% endif %}
 
     {% block form_errors %}{% endblock %}
 
-      {% block form_content %}
+    {% block form_content %}
         <div class="group" id="{{current_location.group_id}}">
             {% include 'partials/block.html' %}
         </div>
-      {% endblock form_content %}
+    {% endblock %}
 
-      {% block submit_button %}
-      <button class="btn u-mb-s" data-qa="btn-submit" type="submit" name="action[save_continue]">{% block submit_button_text %}{{ _("Save and continue") }}{% endblock submit_button_text %}</button>
-      {% endblock %}
-
-{% endblock main %}
-{% block footer %}
-<div class="pre-footer">
-  <div class="container">
-    <div class="grid">
-      <div class="grid__col col-7@m">
-        {% include theme('partials/feedback/expandable_inline.html') %}
-      </div>
-    </div>
-  </div>
-</div>
-{% include theme('partials/footer-transactional.html') %}
+    {% block submit_button %}
+        {{
+            onsButton({
+                "text": continue_button_text | default(_("Save and continue")),
+                "name": "action[save_continue]",
+                "classes": "u-mt-m",
+                "attributes": {
+                    "data-qa": "btn-submit"
+                }
+            })
+        }}
+    {% endblock %}
 {% endblock %}
