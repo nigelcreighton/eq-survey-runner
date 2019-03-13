@@ -578,3 +578,21 @@ def setAttributes(dictionary, attributes):
     for key in attributes:
         dictionary[key] = attributes[key]
     return dictionary
+
+@blueprint.app_template_filter()
+def question_as_legend(question):
+    answers = question['answers']
+    more_than_one_question = len(answers) > 1
+
+    if more_than_one_question:
+        return True
+    elif not more_than_one_question:
+        answer = answers[0]
+        if answer['type'] == 'Date' or not answer['label'].strip():
+            return True
+
+    return False
+
+@blueprint.app_context_processor
+def question_as_legend_processor():
+    return dict(question_as_legend=question_as_legend)
