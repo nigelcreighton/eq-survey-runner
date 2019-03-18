@@ -26,7 +26,7 @@
   }) %}
 
   {% if previous_location %}
-    <a class="u-mb-s" {{ helpers.track('click', 'Navigation', 'Previous link click', position )}} href="{{previous_location}}" id="{{position}}-previous">{{ _("Previous") }}</a>
+    <a class="u-mb-s" {{ helpers.track('click', 'Navigation', 'Previous link click', position )}} href="{{ previous_location }}" id="{{ position }}-previous">{{ _("Previous") }}</a>
   {% endif %}
 
   {% block form_errors %}{% endblock %}

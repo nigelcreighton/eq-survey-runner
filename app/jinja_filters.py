@@ -584,11 +584,11 @@ def question_as_legend(question):
     answers = question['answers']
     more_than_one_question = len(answers) > 1
 
-    if more_than_one_question:
+    if more_than_one_question and question['type'] != 'DateRange' and not any("Duration" in answer["type"] for answer in answers):
         return True
     elif not more_than_one_question:
         answer = answers[0]
-        if answer['type'] == 'Date' or not answer['label'].strip():
+        if 'type' in answer and answer['type'] == 'Date' or 'label' in answer and not answer['label'].strip():
             return True
 
     return False
@@ -596,3 +596,53 @@ def question_as_legend(question):
 @blueprint.app_context_processor
 def question_as_legend_processor():
     return dict(question_as_legend=question_as_legend)
+
+class LabelConfig(object):
+    def __init__(self, _for, text, description = None):
+        self._for = _for
+        self.text = text
+        self.description = description
+
+class CheckboxConfig(object):
+    def __init__(self, option, index, form, answer):
+        self.id = option.id
+        self.name = option.name
+        self.value = option.data
+        self.checked = option.checked
+
+        label_description = None
+        answer_option = answer['options'][index]
+
+        if answer_option and 'description' in answer_option:
+            label_description = answer_option['description']
+
+        self.label = LabelConfig(option.id, option.label.text, label_description)
+
+
+        if option.detail_answer_id:
+            detail_answer = form['fields'][option.detail_answer_id]
+            self.other = OtherConfig(detail_answer)
+
+
+class OtherConfig(object):
+    def __init__(self, detail_answer):
+        print(detail_answer.id)
+        self.id = detail_answer.id
+        self.name = detail_answer.name
+        self.value = detail_answer.data
+        self.label = LabelConfig(detail_answer.id, detail_answer.label.text)
+
+
+@contextfunction
+@blueprint.app_template_filter()
+def map_checkbox_config(context, form, answer):
+    parent_context = context.parent
+    question = parent_context['question']
+    answers = question['answers']
+    options = form['fields'][answer['id']]
+
+    return [CheckboxConfig(option, i, form, answer) for i, option in enumerate(options)]
+
+@blueprint.app_context_processor
+def map_checkbox_config_processor():
+    return dict(map_checkbox_config=map_checkbox_config)
