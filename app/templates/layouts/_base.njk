@@ -194,7 +194,6 @@
 {% set page = page | setAttributes(_page) if page else _page %}
 {% set data = page %}
 
-{% block preHeader %}
-  <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
-  <button class="u-vh" tabindex="-1" type="submit" name="action[save_continue]">{{_("Save and continue")}}</button>
-{% endblock %}
+{% if not previous_location %}
+    {% set pageClasses = pageClasses + " u-mt-m" if pageClasses else "u-mt-m" %}
+{% endif %}

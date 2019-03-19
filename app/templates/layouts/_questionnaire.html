@@ -5,6 +5,11 @@
 {% set block = content.block %}
 {% set form = content.form %}
 
+{% block preHeader %}
+  <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
+  <button class="u-vh" tabindex="-1" type="submit" name="action[save_continue]">{{_("Save and continue")}}</button>
+{% endblock %}
+
 {% block content %}
   {# Override footer to make it transactional #}
   {% do page.footer | setAttributes({
@@ -26,7 +31,9 @@
   }) %}
 
   {% if previous_location %}
-    <a class="u-mb-s" {{ helpers.track('click', 'Navigation', 'Previous link click', position )}} href="{{ previous_location }}" id="{{ position }}-previous">{{ _("Previous") }}</a>
+    <div class="u-mb-s">
+      <a {{ helpers.track('click', 'Navigation', 'Previous link click', position )}} href="{{ previous_location }}" id="{{ position }}-previous">{{ _("Previous") }}</a>
+    </div>
   {% endif %}
 
   {% block form_errors %}{% endblock %}
