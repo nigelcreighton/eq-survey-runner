@@ -623,6 +623,20 @@ class CheckboxConfig(object):
             detail_answer = form['fields'][option.detail_answer_id]
             self.other = OtherConfig(detail_answer)
 
+class RadioConfig(object):
+    def __init__(self, option, index, answer):
+        self.id = option.id
+        self.name = option.name
+        self.value = option.data
+        self.checked = option.checked
+
+        label_description = None
+        answer_option = answer['options'][index]
+
+        if answer_option and 'description' in answer_option:
+            label_description = answer_option['description']
+
+        self.label = LabelConfig(option.id, option.label.text, label_description)
 
 class OtherConfig(object):
     def __init__(self, detail_answer):
@@ -646,6 +660,20 @@ def map_checkbox_config(context, form, answer):
 @blueprint.app_context_processor
 def map_checkbox_config_processor():
     return dict(map_checkbox_config=map_checkbox_config)
+
+@contextfunction
+@blueprint.app_template_filter()
+def map_radio_config(context, form, answer):
+    parent_context = context.parent
+    question = parent_context['question']
+    answers = question['answers']
+    options = form['fields'][answer['id']]
+
+    return [RadioConfig(option, i, answer) for i, option in enumerate(options)]
+
+@blueprint.app_context_processor
+def map_radio_config_processor():
+    return dict(map_radio_config=map_radio_config)
 
 class SelectOptionConfig(object):
     def __init__(self, option, select):
