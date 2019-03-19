@@ -1,17 +1,36 @@
-<fieldset class="fieldgroup fieldgroup--inline">
+{% from "components/field/_macro.njk" import onsField %}
+{% from "components/input/_macro.njk" import onsInput %}
 
-  <legend id="duration-label" class="fieldgroup__title u-fs-r--b">{{answer.label}}</legend>
+{% call onsField({
+  "legend": answer.label
+}) %}
+  <div class="field__group">
+  {% if form.fields[answer.id].years %}
+    {% set input = form.fields[answer.id].years %}
+    <div class="field__item">
+      {{ onsInput({
+        "id": input.id,
+        "classes": "input--w-2",
+        "suffix": {
+          "title": _(input.label.text),
+          "text": format_unit_input_label('duration-year', unit_length='long') | capitalize
+        }
+      }) }}
+    </div>
+  {% endif %}
 
-  <div class="fieldgroup__fields">
-    {% if form.fields[answer.id].years %}
-      {% set input = form.fields[answer.id].years %}
-      {% set unit = 'duration-year' %}
-      {% include 'partials/answers/duration_unit.html' %}
-    {% endif %}
-    {% if form.fields[answer.id].months %}
-      {% set input = form.fields[answer.id].months %}
-      {% set unit = 'duration-month' %}
-      {% include 'partials/answers/duration_unit.html' %}
-    {% endif %}
+  {% if form.fields[answer.id].months %}
+    {% set input = form.fields[answer.id].months %}
+    <div class="field__item">
+      {{ onsInput({
+        "id": input.id,
+        "classes": "input--w-2",
+        "suffix": {
+          "title": _(input.label.text),
+          "text": format_unit_input_label('duration-month', unit_length='long') | capitalize
+        }
+      }) }}
+    </div>
+  {% endif %}
   </div>
-</fieldset>
+{% endcall %}
