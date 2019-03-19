@@ -5,6 +5,8 @@
 {{ onsInput({
   "id": answer.id,
   "type": "number",
+  "name": answer.id,
+  "value": input._value(),
   "label": {
     "text": answer.label,
     "description": answer.description
@@ -12,5 +14,8 @@
   "prefix": {
     "title": answer.currency,
     "text": get_currency_symbol(answer.currency)
+  },
+  "attributes": {
+    "data-qa": "input-text"
   }
 }) }}
