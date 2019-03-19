@@ -584,7 +584,7 @@ def question_as_legend(question):
     answers = question['answers']
     more_than_one_question = len(answers) > 1
 
-    if more_than_one_question and question['type'] != 'DateRange' and not any("Duration" in answer["type"] for answer in answers):
+    if more_than_one_question and question['type'] != 'DateRange' and not any('Duration' in answer['type'] for answer in answers):
         return True
     elif not more_than_one_question:
         answer = answers[0]
@@ -646,3 +646,19 @@ def map_checkbox_config(context, form, answer):
 @blueprint.app_context_processor
 def map_checkbox_config_processor():
     return dict(map_checkbox_config=map_checkbox_config)
+
+class SelectOptionConfig(object):
+    def __init__(self, option, select):
+        self.text = option[1]
+        self.value = option[0]
+        self.selected = select.data == self.value
+        self.disabled = self.value == '' and select.flags.required
+
+@contextfunction
+@blueprint.app_template_filter()
+def map_select_config(context, select):
+    return [SelectOptionConfig(tuple[1], select) for tuple in enumerate(select.choices)]
+
+@blueprint.app_context_processor
+def map_select_config_processor():
+    return dict(map_select_config=map_select_config)
