@@ -22,6 +22,7 @@
     {%- for block in group.blocks -%}
       {%- set summary %}
         {{ onsSummary({
+          "classes": "summary--no-bottom-border",
           "questions": map_summary_item_config(group, content.summary.summary_type, content.summary.answers_are_editable, _("No answer provided"), _("Change"), _("Change your answer for:"), content.summary.calculated_question)
         }) }}
       {%- endset -%}
@@ -33,7 +34,7 @@
 {%- endfor -%}
 
 {{ onsAccordion({
-  "id": "accordion",
+  "id": "summary-accordion",
   "allButton": {
       "open": _('Show all'),
       "close": _('Hide all'),
