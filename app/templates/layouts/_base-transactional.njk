@@ -1,0 +1,23 @@
+{% extends 'layouts/_base.njk' %}
+
+{% block content %}
+    {% do page.footer | setAttributes({
+        "cols": [],
+        "rows": [
+            {
+                "itemsList": [
+                    {
+                        "text": 'Contact us',
+                        "url": '/contact-us'
+                    },
+                    {
+                        "text": 'Cookies and privacy',
+                        "url": '/cookies-privacy'
+                    }
+                ]
+            }
+        ]
+    }) %}
+    {% block inner_content %}
+    {% endblock %}
+{% endblock %}

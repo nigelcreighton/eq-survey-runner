@@ -1,4 +1,4 @@
-{% extends 'layouts/_base.njk' %}
+{% extends 'layouts/_base-transactional.njk' %}
 {% import 'macros/helpers.html' as helpers %}
 {% from "components/button/_macro.njk" import onsButton %}
 
@@ -10,25 +10,8 @@
   <button class="u-vh" tabindex="-1" type="submit" name="action[save_continue]">{{_("Save and continue")}}</button>
 {% endblock %}
 
-{% block content %}
-  {# Override footer to make it transactional #}
-  {% do page.footer | setAttributes({
-      "cols": [],
-      "rows": [
-          {
-              "itemsList": [
-                  {
-                      "text": 'Contact us',
-                      "url": '/contact-us'
-                  },
-                  {
-                      "text": 'Cookies and privacy',
-                      "url": '/cookies-privacy'
-                  }
-              ]
-          }
-      ]
-  }) %}
+{% block inner_content %}
+
 
   {% if previous_location %}
     <div class="u-mb-s">

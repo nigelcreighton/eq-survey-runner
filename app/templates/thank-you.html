@@ -1,9 +1,9 @@
-{% extends 'layouts/_base.njk' %}
+{% extends 'layouts/_base-transactional.njk' %}
 {% from "components/panel/_macro.njk" import onsPanel %}
 
 {% set page_title = _("We\'ve received your answers") %}
 
-{% block content %}
+{% block inner_content %}
   <h1 class="u-fs-l" data-qa="submission-successful-title">{{ _("Submission successful") }}</h1>
 
   {% call onsPanel({
@@ -51,7 +51,3 @@
   <p class="u-mb-s">{{ _("For more information on how we use this data") }}.<br><a href="https://www.ons.gov.uk/surveys">https://www.ons.gov.uk/surveys</a></p>
 
 {% endblock %}
-
-{# {% block footer %}
-{% include theme('partials/footer-transactional.html') %}
-{% endblock %} #}
