@@ -11,6 +11,8 @@
       {{ onsInput({
         "id": input.id,
         "classes": "input--w-2",
+        "name": input.name,
+        "value": input.data if input.data is not none else '',
         "suffix": {
           "title": _(input.label.text),
           "text": format_unit_input_label('duration-year', unit_length='long') | capitalize
@@ -25,6 +27,8 @@
       {{ onsInput({
         "id": input.id,
         "classes": "input--w-2",
+        "name": input.name,
+        "value": input.data if input.data is not none else '',
         "suffix": {
           "title": _(input.label.text),
           "text": format_unit_input_label('duration-month', unit_length='long') | capitalize

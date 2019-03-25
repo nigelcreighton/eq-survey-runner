@@ -99,6 +99,7 @@ def format_duration(value):
     return ' '.join(parts)
 
 
+
 def as_london_tz(value):
     return value.replace(tzinfo=tz.gettz('UTC')).astimezone(tz.gettz('Europe/London'))
 
@@ -106,12 +107,13 @@ def as_london_tz(value):
 @evalcontextfilter
 @blueprint.app_template_filter()
 def format_multilined_string(context, value):
+    return mark_safe(context, get_format_multilined_string(value))
+
+def get_format_multilined_string(value):
     escaped_value = escape(value)
     new_line_regex = r'(?:\r\n|\r|\n)+'
     value_with_line_break_tag = re.sub(new_line_regex, '<br>', escaped_value)
-    result = '{}'.format(value_with_line_break_tag)
-    return mark_safe(context, result)
-
+    return'{}'.format(value_with_line_break_tag)
 
 @evalcontextfunction
 @blueprint.app_template_filter()
@@ -124,6 +126,9 @@ def get_current_date(context):
 @evalcontextfilter
 @blueprint.app_template_filter()
 def format_date(context, value):
+    return mark_safe(context, get_format_date(value))
+
+def get_format_date(value):
     """Format a datetime string.
 
     :param (jinja2.nodes.EvalContext) context: Evaluation context.
@@ -143,8 +148,7 @@ def format_date(context, value):
     result = "<span class='date'>{date}</span>".format(
         date=flask_babel.format_date(date_to_format, format=date_format))
 
-    return mark_safe(context, result)
-
+    return result
 
 @evalcontextfilter
 @blueprint.app_template_filter()
@@ -237,14 +241,15 @@ def calculate_years_difference(from_str, to_str):
 
 @evalcontextfunction
 def format_date_range(context, start_date, end_date=None):
-    if end_date:
-        result = flask_babel.gettext('%(from_date)s to %(to_date)s',
-                                     from_date=format_date(context, start_date),
-                                     to_date=format_date(context, end_date))
-    else:
-        result = format_date(context, start_date)
+    return mark_safe(context, get_format_date_range(start_date, end_date))
 
-    return mark_safe(context, result)
+def get_format_date_range(start_date, end_date=None):
+    if end_date:
+        return flask_babel.gettext('%(from_date)s to %(to_date)s',
+                                     from_date=get_format_date(start_date),
+                                     to_date=get_format_date(end_date))
+    else:
+        return get_format_date(start_date)
 
 
 @evalcontextfunction
@@ -640,7 +645,6 @@ class RadioConfig(object):
 
 class OtherConfig(object):
     def __init__(self, detail_answer):
-        print(detail_answer.id)
         self.id = detail_answer.id
         self.name = detail_answer.name
         self.value = detail_answer.data
@@ -690,3 +694,111 @@ def map_select_config(context, select):
 @blueprint.app_context_processor
 def map_select_config_processor():
     return dict(map_select_config=map_select_config)
+
+
+def format_checkbox_answer_with_detail_answer(answer):
+    html = answer['label']
+
+    if answer['detail_answer_value']:
+        html = html + '<ul><li>' + answer['detail_answer_value'] + '</li></ul>'
+
+    return html
+
+def format_checkbox_answer(answer):
+    if len(answer['value']) > 1:
+        html = '<ul>'
+
+        for value in answer['value']:
+            html = html + '<li>' + format_checkbox_answer_with_detail_answer(value) + '</li>'
+
+        html = html + '</ul>'
+
+        return html
+    else:
+        return format_checkbox_answer_with_detail_answer(answer['value'][0])
+
+class SummaryAction(object):
+    def __init__(self, block, question, answer, answer_title, edit_link_text, edit_link_aria_label):
+        self.text = edit_link_text
+        self.ariaLabel = edit_link_aria_label + ' ' + answer_title
+        self.url = block['link'] + '#' + answer['id']
+
+
+class SummaryAnswer(object):
+    def __init__(self, block, question, answer, multiple_answers, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label):
+        if multiple_answers:
+            self.title = answer['label']
+        else:
+            self.title = question['title']
+
+        value = answer['value']
+
+        if 'type' in answer:
+            answer_type = answer['type']
+        else:
+            answer_type = 'calculated'
+
+        if value is None or value == '':
+            self.answer = no_answer_provided
+        elif answer_type == 'checkbox':
+            self.answer = format_checkbox_answer(answer)
+        elif answer_type == 'currency':
+            self.answer = get_formatted_currency(value, answer['currency'])
+        elif answer_type == 'date' or answer_type == 'monthyeardate' or answer_type == 'yeardate':
+            if question['type'] == 'DateRange':
+                self.answer = get_format_date_range(value['from'], value['to'])
+            else:
+                self.answer = get_format_date(value)
+        elif answer_type == 'duration':
+            self.answer = format_duration(value)
+        elif answer_type == 'number':
+            self.answer = format_number(value)
+        elif answer_type == 'percentage':
+            self.answer = format_percentage(value)
+        elif answer_type == 'radio':
+            self.answer = value['label']
+
+            detail_answer_value = value['detail_answer_value']
+            if detail_answer_value:
+                self.answer = self.answer + '<ul><li>' + detail_answer_value + '</li></ul>'
+        elif answer_type == 'textarea':
+            self.answer = get_format_multilined_string(value)
+        elif answer_type == 'unit':
+            self.answer = format_unit(answer['unit'], value, answer['unit_length'])
+        else:
+            self.answer = value
+
+
+        if answers_are_editable:
+            self.action = SummaryAction(block, question, answer, self.title, edit_link_text, edit_link_aria_label)
+
+
+class SummaryQuestion(object):
+    def __init__(self, block, question, summary_type, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label):
+        self.title = question['title']
+        self.answers = []
+
+        multiple_answers = len(question['answers']) > 1
+
+        if summary_type == 'CalculatedSummary':
+             self.total = True
+
+        for answer in question['answers']:
+            self.answers.append(SummaryAnswer(block, question, answer, multiple_answers, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label))
+
+
+@contextfunction
+@blueprint.app_template_filter()
+def map_summary_item_config(context, group, summary_type, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label, calculated_question):
+    questions = []
+
+    for block in group['blocks']:
+        for question in block['questions']:
+            questions.append(SummaryQuestion(block, question, None, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label))
+    if summary_type == 'CalculatedSummary':
+        questions.append(SummaryQuestion(block, calculated_question, summary_type, False, None, None, None))
+    return questions
+
+@blueprint.app_context_processor
+def map_summary_item_config_processor():
+    return dict(map_summary_item_config=map_summary_item_config)
