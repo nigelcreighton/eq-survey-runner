@@ -126,7 +126,13 @@ def get_current_date(context):
 @evalcontextfilter
 @blueprint.app_template_filter()
 def format_date(context, value):
-    return mark_safe(context, get_format_date(value))
+    date_formatted = get_format_date(value)
+    if not isinstance(value, str):
+        return date_formatted
+    if date_formatted:
+        return mark_safe(context, date_formatted)
+    else:
+        return date_formatted
 
 def get_format_date(value):
     """Format a datetime string.
