@@ -28,10 +28,42 @@
   {% endif %}
 {% endset %}
 
+{%- set mutually_exclusive_quesstion = question.type == 'MutuallyExclusive' -%}
+
 {% set question_answers %}
-  {%- for answer in question.answers -%}
+  {% if mutually_exclusive_quesstion %}
+    {%- set answer = question.answers[0] -%}
+    {%- set mutuallyExclusiveAnswer = question.answers[1] -%}
+    {%- set mutuallyExlusiveOptions = mutuallyExclusiveAnswer.options[0] -%}
+
+    {%- set deselectionMessage = _("Selecting this will clear your answer") -%}
+    {%- set deselectGroupAdjective = _("cleared") -%}
+
+    {%- if answer.type == 'checkbox' -%}
+      {%- set deselectionMessage = _("Selecting this will deselect any selected options") -%}
+      {%- set deselectGroupAdjective = _("deselected") -%}
+    {%- endif -%}
+
+    {%- set mutuallyExclusive = {
+      "or": _("Or"),
+      "checkbox": {
+        "id": mutuallyExclusiveAnswer.id,
+        "label": {
+          "text": mutuallyExlusiveOptions.label
+        },
+        "value": mutuallyExlusiveOptions.value,
+        "name": mutuallyExclusiveAnswer.id
+      },
+      "deselectionMessage": deselectionMessage,
+      "deselectGroupAdjective": deselectGroupAdjective,
+      "deselectCheckboxAdjective": _("deselected"),
+    } %}
     {% include 'partials/answer.html' %}
-  {%- endfor -%}
+  {%- else -%}
+    {%- for answer in question.answers -%}
+      {% include 'partials/answer.html' %}
+    {%- endfor -%}
+  {%- endif -%}
 {% endset %}
 
 {% set question_markup %}
@@ -50,17 +82,18 @@
     "id": question.id,
     "legend": question_title,
     "description": question.description,
-    "questionMode": true
+    "questionMode": true,
+    "classes": "field--exclusive" if mutually_exclusive_quesstion else ""
   }) %}
     {{ question_markup }}
   {% endcall %}
 {% else %}
-  <div class="question" id="{{question.id}}">
+  <div class="question" id="{{ question.id }}">
       {% if question_title %}
         <h1 class="question__title u-fs-l" data-qa="question-title">{{ question_title }}</h1>
       {% endif %}
       {%- if question.description -%}
-        <div class="question__description" id="description-{{question.id}}">{{ question.description }}</div>
+        <div class="question__description" id="description-{{ question.id }}">{{ question.description }}</div>
       {% endif %}
       {{ question_markup }}
   </div>

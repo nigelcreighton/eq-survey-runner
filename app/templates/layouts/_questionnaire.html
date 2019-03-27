@@ -11,8 +11,6 @@
 {% endblock %}
 
 {% block inner_content %}
-
-
   {% if previous_location %}
     <div class="u-mb-s">
       <a {{ helpers.track('click', 'Navigation', 'Previous link click', position )}} href="{{ previous_location }}" id="{{ position }}-previous">{{ _("Previous") }}</a>
@@ -23,7 +21,7 @@
 
   {% block form_content %}
       <div class="group" id="{{current_location.group_id}}">
-          {% include 'partials/block.html' %}
+        {% include 'partials/block.html' %}
       </div>
   {% endblock %}
 

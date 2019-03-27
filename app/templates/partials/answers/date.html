@@ -1,24 +1,28 @@
-{% from "components/date-input/_macro.njk" import onsDateInput %}
+{%- from "components/date-input/_macro.njk" import onsDateInput -%}
 
-{% set day_field = form.fields[answer['id']]['day'] %}
-{% set month_field = form.fields[answer['id']]['month'] %}
-{% set year_field = form.fields[answer['id']]['year'] %}
+{%- set day_field = form.fields[answer['id']]['day'] -%}
+{%- set month_field = form.fields[answer['id']]['month'] -%}
+{%- set year_field = form.fields[answer['id']]['year'] -%}
 
-{% set config = {
+{%- set config = {
   "id": answer['id'],
-  "classes": "u-mt-s",
   "description": answer.description,
   "attributes": {
     "data-qa": "widget-date"
-  }
-} %}
+  },
+  "mutuallyExclusive": mutuallyExclusive
+} -%}
 
-{% if not wrap_question_in_fieldset %}
-  {% set config = config | setAttribute("legend", answer.label) %}
-{% endif %}
+{%- if wrap_question_in_fieldset -%}
+  {%- if answer.label -%}
+    <p class="u-fs-r--b u-mb-xs">{{ answer.label }}</p>
+  {%- endif -%}
+{%- else -%}
+  {%- set config = config | setAttribute("legend", answer.label) -%}
+{%- endif -%}
 
-{% if day_field %}
-  {% set config = config | setAttributes({
+{%- if day_field -%}
+  {%- set config = config | setAttributes({
     "day": {
       "label": {
         "text": _("Day"),
@@ -29,11 +33,11 @@
       "name": day_field.name,
       "value": day_field._value()
     }
-  }) %}
-{% endif %}
+  }) -%}
+{%- endif -%}
 
-{% if month_field %}
-  {% set config = config | setAttributes({
+{%- if month_field -%}
+  {%- set config = config | setAttributes({
     "month": {
       "label": {
         "text": _("Month"),
@@ -44,11 +48,11 @@
       "name": month_field.name,
       "value": month_field._value()
     }
-  }) %}
-{% endif %}
+  }) -%}
+{%- endif -%}
 
-{% if year_field %}
-  {% set config = config | setAttributes({
+{%- if year_field -%}
+  {%- set config = config | setAttributes({
     "year": {
       "label": {
         "text": _("Year"),
@@ -59,7 +63,7 @@
       "name": year_field.name,
       "value": year_field._value()
     }
-  }) %}
-{% endif %}
+  }) -%}
+{%- endif -%}
 
 {{ onsDateInput(config) }}

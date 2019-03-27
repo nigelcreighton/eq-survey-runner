@@ -586,14 +586,19 @@ def setAttributes(dictionary, attributes):
 
 @blueprint.app_template_filter()
 def question_as_legend(question):
+    question_type = question['type']
+
+    if question_type != 'DateRange' or question_type == 'MutuallyExclusive':
+        return True
+
     answers = question['answers']
     more_than_one_question = len(answers) > 1
 
-    if more_than_one_question and question['type'] != 'DateRange' and not any('Duration' in answer['type'] for answer in answers):
+    if more_than_one_question:
         return True
-    elif not more_than_one_question:
+    else:
         answer = answers[0]
-        if 'type' in answer and answer['type'] == 'Date' or 'label' in answer and not answer['label'].strip():
+        if 'type' in answer and any(answer['type'] in answer_type for answer_type in ['Checkbox', 'Radio', 'Date', 'Duration']):
             return True
 
     return False

@@ -88,7 +88,7 @@
           {% block subheader_container %}
             <div class="container u-cf">
               {% block subheader %}
-                {% with position = 'top' %}{% include 'partials/previous-link.html' %}{% endwith %}
+                {# {% with position = 'top' %}{% include 'partials/previous-link.html' %}{% endwith %} #}
                 {% if navigation %}
                 <div class="page__menubtn{{ ' u-mb-s' if previous_location }}">
                   <button class="btn btn--menu js-menu-btn" data-close-label="{{_('Hide sections')}}" type="button" id="menu-btn" aria-expanded="false" aria-controls="section-nav" aria-label="Toggle section menu" aria-haspopup="true">{{_('View sections')}}</button>
@@ -99,7 +99,7 @@
           {% endblock subheader_container %}
           <div class="page__container container{{ ' u-mt-s' if not previous_location }}">
             {% block content %}
-            {% with position = 'bottom' %}{% include 'partials/previous-link.html' %}{% endwith %}
+            {# {% with position = 'bottom' %}{% include 'partials/previous-link.html' %}{% endwith %} #}
             {% endblock %}
           </div>
         </form>
