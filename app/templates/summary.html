@@ -46,11 +46,13 @@
     {% endcall %}
   {% endif %}
 
-  {% if content.summary.summary_type == 'AnswerSummary' %}
-    {% include 'partials/summary/answer-summary.html' %}
-  {% else %}
-    {% include 'partials/summary/summary.html' %}
-  {% endif %}
+  <div class="u-mb-m">
+    {% if content.summary.summary_type == 'AnswerSummary' %}
+      {% include 'partials/summary/answer-summary.html' %}
+    {% else %}
+      {% include 'partials/summary/summary.html' %}
+    {% endif %}
+  </div>
 
   {% if content.summary.is_view_submission_response_enabled %}
     <div class="u-mt-m u-mb-s u-mb-m@s" data-qa="view-submission-text">
