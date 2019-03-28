@@ -1,9 +1,8 @@
 {% from "components/field/_macro.njk" import onsField %}
 
 {% set form = content.form %}
-{% set invalid = form.question_errors[question.id] | length > 0 if form else False %}
 
-{% set question_title = get_question_title(question.id) %}
+{% set question_title = question.title %}
 {% set question_guidance = "" %}
 {% set question_definition = "" %}
 {% set wrap_question_in_fieldset = question_as_legend(question) %}

@@ -473,22 +473,7 @@ def language_urls(languages, current_language):
 
 @contextfunction
 @blueprint.app_template_filter()
-def get_question_title(context, question_id):
-    """Return the value that should be used as the title to a question
-    May be from question.title or question_titles in the context"""
-    context = context.parent
-    question = context['question']
-
-    if question_id == question['id']:
-        if question.get('title') is not None:
-            return question['title']
-        question_title = context['content']['question_titles']
-        return question_title[question_id]
-
-
-@contextfunction
-@blueprint.app_template_filter()
-def get_answer_label(context, answer_id, question_id):
+def get_answer_label(context, answer_id):
     """Return the value that should be used as the answer label tries
     answer.label first then resorts to question title"""
     parent_context = context.parent
@@ -499,12 +484,7 @@ def get_answer_label(context, answer_id, question_id):
         if answer_id == answer['id']:
             if answer.get('label') is not None:
                 return answer['label']
-            return get_question_title(context, question_id)
-
-@blueprint.app_context_processor
-def get_question_title_processor():
-    return dict(get_question_title=get_question_title)
-
+            return question['title']
 
 @blueprint.app_context_processor
 def get_answer_label_processor():
@@ -804,8 +784,7 @@ def map_summary_item_config(context, group, summary_type, answers_are_editable, 
     questions = []
 
     for block in group['blocks']:
-        for question in block['questions']:
-            questions.append(SummaryQuestion(block, question, None, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label))
+        questions.append(SummaryQuestion(block, block['question'], None, answers_are_editable, no_answer_provided, edit_link_text, edit_link_aria_label))
     if summary_type == 'CalculatedSummary':
         questions.append(SummaryQuestion(block, calculated_question, summary_type, False, None, None, None))
     return questions
