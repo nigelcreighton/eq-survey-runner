@@ -109,6 +109,8 @@ def get_date_form(answer_store, metadata, answer=None, error_messages=None):
         min_max_validation = validate_min_max_date(answer, answer_store, metadata, 'yyyy-mm-dd')
         validate_with.append(min_max_validation)
 
+    DateForm.month = StringField(validators=validate_with)
+
     return DateForm
 
 
@@ -147,6 +149,8 @@ def get_month_year_form(answer, answer_store, metadata, error_messages):
     if 'minimum' in answer or 'maximum' in answer:
         min_max_validation = validate_min_max_date(answer, answer_store, metadata, 'yyyy-mm')
         validate_with.append(min_max_validation)
+
+    MonthYearDateForm.month = StringField(validators=validate_with)
 
     return MonthYearDateForm
 
