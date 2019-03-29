@@ -27,6 +27,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
                                 'blocks': [
                                     {
                                         'id': 'about you',
+                                        'type': 'Question',
                                         'question':
                                             {
                                                 'id': 'crisps-question',
@@ -45,6 +46,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
                                 'blocks': [
                                     {
                                         'id': 'where you live',
+                                        'type': 'Question',
                                         'question':
                                             {
                                                 'id': 'crisps-question',

@@ -26,7 +26,7 @@ def get_form_for_location(schema, block_json, location, answer_store, metadata, 
     mapped_answers = get_mapped_answers(
         schema,
         answer_store,
-        block_id=location.block_id,
+        location=location,
     )
 
     return generate_form(schema, block_json.get('question'), answer_store, metadata, data=mapped_answers)
@@ -88,19 +88,21 @@ def clear_detail_answer_field(data, question):
     return form_data
 
 
-def get_mapped_answers(schema, answer_store, block_id):
+def get_mapped_answers(schema, answer_store, location):
     """
     Maps the answers in an answer store to a dictionary of key, value answers.
-
-    :param schema:
-    :param answer_store:
-    :param block_id:
-    :return:
     """
+    if location.sub_block:
+        parent_block = schema.get_block(location.block_id)
+        child_block = parent_block[location.sub_block + '_block']
+        block_id = child_block['id']
+    else:
+        block_id = location.block_id
+
     answer_ids = schema.get_answer_ids_for_block(block_id)
 
     result = {}
-    for answer in answer_store.filter(answer_ids=answer_ids):
+    for answer in answer_store.filter(answer_ids=answer_ids, list_item_id=location.list_item_id):
         answer_id = answer['answer_id']
         result[answer_id] = answer['value']
 

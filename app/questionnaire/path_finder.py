@@ -228,6 +228,9 @@ class PathFinder:
         if first_block_for_group == current_location.block_id:
             return None
 
+        if current_location.sub_block:
+            return Location(block_id=current_location.block_id)
+
         routing_path = self.get_full_routing_path()
         current_location_index = PathFinder._get_current_location_index(routing_path, current_location)
 

@@ -66,6 +66,7 @@ class TestDumpAnswers(IntegrationTestCase):
                 {
                     'value': 'Toast',
                     'answer_id': 'radio-mandatory-answer',
+                    'list_item_id': None,
                 }
             ]
         }
@@ -184,6 +185,7 @@ class TestDumpSubmission(IntegrationTestCase):
                     {
                         'answer_id': 'radio-mandatory-answer',
                         'value': 'Coffee',
+                        'list_item_id': None
                     },
                 ],
                 'metadata': {

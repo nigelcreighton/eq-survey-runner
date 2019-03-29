@@ -17,6 +17,7 @@ def get_basic_input():
             'answer_id': 'test',
             'value': 'test',
         }],
+        'LISTS': [],
         'COMPLETED_BLOCKS': [
             {
                 'block_id': 'a-test-block',

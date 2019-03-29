@@ -3,8 +3,15 @@ from flask import url_for
 
 class Location:
 
-    def __init__(self, block_id):
+    def __init__(self, block_id, list_item_id=None, sub_block=None):
+        """
+        :param block_id: The id of the current block. This should always match the url
+        :param list_item_id: The list_item_id if this location is associated with a list
+        :param sub_block: The sub block, either edit, add or remove
+        """
         self.block_id = block_id
+        self.list_item_id = list_item_id
+        self.sub_block = sub_block
 
     def __eq__(self, other):
         """
@@ -38,10 +45,13 @@ class Location:
     @classmethod
     def from_dict(cls, location_dict):
         block_id = location_dict['block_id']
-        return cls(block_id)
+        list_item_id = location_dict.get('list_item_id')
+        sub_block = location_dict.get('sub_block')
+        return cls(block_id, list_item_id, sub_block)
 
     def to_dict(self):
-        return vars(self)
+        attributes = vars(self)
+        return {k: v for k, v in attributes.items() if v is not None}
 
     def url(self):
         """

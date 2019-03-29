@@ -155,10 +155,25 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
     def _parse_schema(self):
         self._sections_by_id = self._get_sections_by_id()
         self._groups_by_id = get_nested_schema_objects(self._sections_by_id, 'groups')
-        self._blocks_by_id = get_nested_schema_objects(self._groups_by_id, 'blocks')
+        self._blocks_by_id = self._get_blocks_by_id()
         self._questions_by_id = self._get_questions_by_id()
         self._answers_by_id = self._get_answers_by_id()
         self.error_messages = self._get_error_messages()
+
+    def _get_blocks_by_id(self):
+        blocks = defaultdict(list)
+
+        for group in self._groups_by_id.values():
+            for block in group['blocks']:
+                block['parent_id'] = group['id']
+                blocks[block['id']] = block
+
+                if block['type'] == 'ListCollector':
+                    for nested_block in ['add_block', 'edit_block', 'remove_block']:
+                        block[nested_block]['parent_id'] = block['id']
+                        blocks[block[nested_block]['id']] = block['add_block']
+
+        return blocks
 
     def _get_questions_by_id(self):
         questions_by_id = defaultdict(list)

@@ -10,17 +10,18 @@ from flask_themes2 import render_theme_template
 from jwcrypto.common import base64url_decode
 from sdc.crypto.encrypter import encrypt
 from structlog import get_logger
+from werkzeug.exceptions import NotFound
 
 from app.authentication.no_token_exception import NoTokenException
 from app.data_model.answer_store import AnswerStore
 from app.data_model.app_models import SubmittedResponse
-from app.globals import (get_answer_store, get_completed_blocks, get_metadata, get_questionnaire_store,
+from app.globals import (get_answer_store, get_list_store, get_completed_blocks, get_metadata, get_questionnaire_store,
                          get_collection_metadata)
 from app.globals import get_session_store
 from app.helpers.form_helper import post_form_for_block
 from app.helpers.path_finder_helper import path_finder, full_routing_path_required
 from app.helpers.schema_helpers import with_schema
-from app.helpers.session_helpers import with_answer_store, with_metadata, with_collection_metadata
+from app.helpers.session_helpers import with_answer_store, with_metadata, with_collection_metadata, with_list_store
 from app.helpers.template_helper import (with_session_timeout, with_analytics,
                                          with_legal_basis, render_template, safe_content)
 from app.keys import KEY_PURPOSE_SUBMISSION
@@ -118,11 +119,13 @@ def get_block(routing_path, schema, metadata, answer_store, block_id):
 @questionnaire_blueprint.route('<block_id>', methods=['POST'])
 @login_required
 @with_answer_store
+@with_list_store
 @with_collection_metadata
 @with_metadata
 @with_schema
 @full_routing_path_required
-def post_block(routing_path, schema, metadata, collection_metadata, answer_store, block_id):  # pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, too-many-return-statements
+def post_block(routing_path, schema, metadata, collection_metadata, list_store, answer_store, block_id):
     current_location = Location(block_id)
     completed_locations = get_completed_blocks(current_user)
     router = Router(schema, routing_path, current_location, completed_locations)
@@ -149,8 +152,14 @@ def post_block(routing_path, schema, metadata, collection_metadata, answer_store
     if form.validate():
         _set_started_at_metadata_if_required(form, collection_metadata)
         questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
-        answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store, rendered_block.get('question'))
+        answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store,
+                                                  rendered_block.get('question'))
         answer_store_updater.save_answers(form)
+
+        if block['type'] == 'ListCollector':
+            if list(form.data.values())[0] == block['add_answer_value']:
+                add_url = url_for('questionnaire.get_add_list_item', block_id=block_id)
+                return redirect(add_url)
 
         next_location = path_finder.get_next_location(current_location=current_location)
 
@@ -159,7 +168,8 @@ def post_block(routing_path, schema, metadata, collection_metadata, answer_store
 
         return redirect(next_location.url())
 
-    context = build_view_context(block['type'], metadata, schema, answer_store, rendered_block, current_location, form)
+    context = build_view_context(block['type'], metadata, schema, list_store, answer_store, rendered_block,
+                                 current_location, form)
 
     return _render_page(block['type'], context, current_location, schema)
 
@@ -177,7 +187,8 @@ def get_thank_you(schema):
         view_submission_duration = 0
         if _is_submission_viewable(schema.json, session_data.submitted_time):
             view_submission_url = url_for('.get_view_submission')
-            view_submission_duration = humanize.naturaldelta(timedelta(seconds=schema.json['view_submitted_response']['duration']))
+            view_submission_duration = humanize.naturaldelta(
+                timedelta(seconds=schema.json['view_submitted_response']['duration']))
 
         return render_theme_template(schema.json['theme'],
                                      template_name='thank-you.html',
@@ -324,7 +335,8 @@ def submit_answers(routing_path, schema):
     ))
 
     encrypted_message = encrypt(message, current_app.eq['key_store'], KEY_PURPOSE_SUBMISSION)
-    sent = current_app.eq['submitter'].send_message(encrypted_message, case_id=metadata.get('case_id'), tx_id=metadata.get('tx_id'))
+    sent = current_app.eq['submitter'].send_message(encrypted_message, case_id=metadata.get('case_id'),
+                                                    tx_id=metadata.get('tx_id'))
 
     if not sent:
         raise SubmissionFailedException()
@@ -415,18 +427,23 @@ def _get_context(block, current_location, schema, form=None):
 
     answer_store = get_answer_store(current_user)
 
-    return build_view_context(block['type'], metadata, schema, answer_store, block, current_location, form=form)
+    list_store = get_list_store(current_user)
+
+    return build_view_context(block['type'], metadata, schema, list_store, answer_store, block, current_location,
+                              form=form)
 
 
 def get_page_title_for_location(schema, current_location, context):
     block = schema.get_block(current_location.block_id)
     if block['type'] == 'Interstitial':
         group = schema.get_group(schema.get_group_by_block_id(block['id'])['id'])
-        page_title = '{group_title} - {survey_title}'.format(group_title=group['title'], survey_title=schema.json['title'])
+        page_title = '{group_title} - {survey_title}'.format(group_title=group['title'],
+                                                             survey_title=schema.json['title'])
     elif block['type'] == 'Question':
         question_title = context['block']['question'].get('title')
 
-        page_title = '{question_title} - {survey_title}'.format(question_title=question_title, survey_title=schema.json['title'])
+        page_title = '{question_title} - {survey_title}'.format(question_title=question_title,
+                                                                survey_title=schema.json['title'])
     else:
         page_title = schema.json['title']
 
@@ -464,6 +481,170 @@ def _render_template(context, current_location, template, previous_url, schema,
 def request_wants_json():
     best = request.accept_mimetypes \
         .best_match(['application/json', 'text/html'])
-    return best == 'application/json' and \
-        request.accept_mimetypes[best] > \
-        request.accept_mimetypes['text/html']
+    return best == 'application/json' and request.accept_mimetypes[best] > request.accept_mimetypes['text/html']
+
+
+class InvalidListItemId(Exception):
+    pass
+
+
+@with_list_store
+def validate_list_collector_route(list_store, schema, block_id, list_item_id=None):
+    block = schema.get_block(block_id)
+
+    if not block:
+        raise NotFound()
+
+    if block['type'] != 'ListCollector':
+        raise NotFound()
+
+    if list_item_id and list_item_id not in list_store[block['populates_list']]:
+        raise InvalidListItemId(f'List item id: {list_item_id} not found for block {block_id}')
+
+
+@questionnaire_blueprint.route('<block_id>/add', methods=['POST'])
+@login_required
+@with_answer_store
+@with_list_store
+@with_collection_metadata
+@with_metadata
+@with_schema
+def post_add_list_item(schema, metadata, collection_metadata, list_store, answer_store, block_id):
+
+    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id,
+                                       None, 'add')
+
+
+@questionnaire_blueprint.route('<block_id>/<list_item_id>/remove', methods=['POST'])
+@login_required
+@with_answer_store
+@with_list_store
+@with_collection_metadata
+@with_metadata
+@with_schema
+def post_remove_list_item(schema, metadata, collection_metadata, list_store, answer_store, block_id,
+                          list_item_id):
+
+    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id,
+                                       list_item_id, 'remove')
+
+
+@questionnaire_blueprint.route('<block_id>/<list_item_id>/edit', methods=['POST'])
+@login_required
+@with_answer_store
+@with_list_store
+@with_collection_metadata
+@with_metadata
+@with_schema
+def post_edit_list_item(schema, metadata, collection_metadata, list_store, answer_store, block_id,
+                        list_item_id):
+
+    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id,
+                                       list_item_id, 'edit')
+
+
+@questionnaire_blueprint.route('<block_id>/<list_item_id>/remove', methods=['GET'])
+@login_required
+@with_answer_store
+@with_metadata
+@with_schema
+def get_remove_list_item(schema, metadata, answer_store, block_id, list_item_id):
+    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'remove', list_item_id)
+
+
+@questionnaire_blueprint.route('<block_id>/<list_item_id>/edit', methods=['GET'])
+@login_required
+@with_answer_store
+@with_metadata
+@with_schema
+def get_edit_list_item(schema, metadata, answer_store, block_id, list_item_id):
+    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'edit', list_item_id)
+
+
+@questionnaire_blueprint.route('<block_id>/add', methods=['GET'])
+@login_required
+@with_answer_store
+@with_metadata
+@with_schema
+def get_add_list_item(schema, metadata, answer_store, block_id):
+    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'add')
+
+
+def list_collector_get_handler(schema, metadata, answer_store, block_id, list_operation, list_item_id=None):
+    try:
+        validate_list_collector_route(schema, block_id, list_item_id)
+    except InvalidListItemId:
+        return redirect(url_for('questionnaire.get_block', block_id=block_id))
+
+    parent_block = schema.get_block(block_id)
+    sub_block = parent_block[f'{list_operation}_block']
+
+    current_location = Location(block_id, list_item_id, sub_block=list_operation)
+
+    transformed_block = transform_variants(sub_block, schema, metadata, answer_store)
+
+    placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
+    rendered_block = placeholder_renderer.render(transformed_block)
+
+    context = _get_context(rendered_block, current_location, schema)
+
+    return _render_page(rendered_block['type'], context, current_location, schema)
+
+
+# pylint: disable=too-many-locals
+def list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id, list_item_id, list_operation):
+    try:
+        validate_list_collector_route(schema, block_id, list_item_id)
+    except InvalidListItemId:
+        return redirect(url_for('questionnaire.get_block', block_id=block_id))
+
+    parent_block = schema.get_block(block_id)
+    block = parent_block[f'{list_operation}_block']
+
+    current_location = Location(parent_block['id'], list_item_id, sub_block=list_operation)
+
+    transformed_block = transform_variants(block, schema, metadata, answer_store)
+
+    placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
+    rendered_block = placeholder_renderer.render(transformed_block)
+
+    form = _generate_wtf_form(request.form, rendered_block, schema)
+
+    if 'action[save_sign_out]' in request.form:
+        return _save_sign_out(current_location, rendered_block.get('question'), form, schema)
+
+    if 'action[sign_out]' in request.form:
+        return redirect(url_for('session.get_sign_out'))
+
+    if form.validate():
+        _set_started_at_metadata_if_required(form, collection_metadata)
+        questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
+        answer_store_updater = AnswerStoreUpdater(current_location, schema,
+                                                  questionnaire_store, rendered_block.get('question'))
+
+        if list_operation == 'remove':
+            if list(form.data.values())[0] == parent_block['remove_answer_value']:
+                list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
+                answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
+            else:
+                redirect(
+                    url_for('questionnaire.get_edit_list_item',
+                            block_id=parent_block['id'], list_item_id=list_item_id))
+        elif list_operation == 'add':
+            new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
+            current_location = Location(current_location.block_id, new_list_item_id, sub_block='add')
+            answer_store_updater = AnswerStoreUpdater(current_location, schema,
+                                                      questionnaire_store, rendered_block.get('question'))
+
+            answer_store_updater.save_answers(form)
+        else:
+            answer_store_updater.save_answers(form)
+
+        list_collector_url = url_for('questionnaire.get_block', block_id=parent_block['id'])
+
+        return redirect(list_collector_url)
+
+    context = build_view_context(block['type'], metadata, schema, list_store, answer_store, rendered_block,
+                                 current_location, form)
+
+    return _render_page(block['type'], context, current_location, schema)

@@ -15,6 +15,48 @@ class TestAnswer(unittest.TestCase):
     def test_matches_answer(self):
         answer_1 = Answer(
             answer_id='4',
+            list_item_id='dj892j',
+            value=25,
+        )
+        answer_2 = Answer(
+            answer_id='4',
+            list_item_id='dj892j',
+            value=25,
+        )
+
+        self.assertEqual(answer_1.matches(answer_2), True)
+
+    def test_matches_answer_dict(self):
+        answer_1 = Answer(
+            answer_id='4',
+            list_item_id='dj892j',
+            value=25,
+        )
+        answer_2 = {
+            'answer_id': '4',
+            'list_item_id': 'dj892j',
+            'value': 25,
+        }
+
+        self.assertEqual(answer_1.matches_dict(answer_2), True)
+
+    def test_non_matching_answer(self):
+        answer_1 = Answer(
+            answer_id='4',
+            list_item_id='iw892j',
+            value=25,
+        )
+        answer_2 = Answer(
+            answer_id='4',
+            list_item_id='dj892j',
+            value=65,
+        )
+
+        self.assertEqual(answer_1.matches(answer_2), False)
+
+    def test_matches_answer_simple(self):
+        answer_1 = Answer(
+            answer_id='4',
             value=25,
         )
         answer_2 = Answer(
@@ -24,7 +66,7 @@ class TestAnswer(unittest.TestCase):
 
         self.assertEqual(answer_1.matches(answer_2), True)
 
-    def test_matches_answer_dict(self):
+    def test_matches_answer_simple_dict(self):
         answer_1 = Answer(
             answer_id='4',
             value=25,
@@ -216,3 +258,101 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
 
         self.store.remove_answer(vars(answer_1))
         self.assertEqual(len(self.store), 1)
+
+    def test_filter_list_item_id(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+
+        filtered = self.store.filter(list_item_id='xyz987')
+
+        self.assertEqual(len(filtered), 1)
+
+    def test_filter_list_item_id_and_answer_id(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+        answer_3 = Answer(
+            answer_id='answer3',
+            value=30,
+            list_item_id='xyz987'
+        )
+
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+        self.store.add_or_update(answer_3)
+
+        filtered = self.store.filter(list_item_id='xyz987')
+
+        self.assertEqual(len(filtered), 2)
+
+        filtered = self.store.filter(answer_ids=['answer2'], list_item_id='xyz987')
+
+        self.assertEqual(len(filtered), 1)
+
+    def test_adding_list_item_ids_to_answer_store(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+
+        self.store = AnswerStore()
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+
+        assert answer_2.matches_dict(self.store.answer_map['answer2'][0])
+
+    def test_map_values_by_list_item_id(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+        answer_3 = Answer(
+            answer_id='answer3',
+            value=20,
+            list_item_id='xyz987'
+        )
+
+        self.store = AnswerStore()
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+        self.store.add_or_update(answer_3)
+
+        assert self.store.map_values_by_list_item_id() == {
+            'xyz987': [
+                {'answer_id': 'answer2', 'list_item_id': 'xyz987', 'value': 20},
+                {'answer_id': 'answer3', 'list_item_id': 'xyz987', 'value': 20}
+            ],
+            'abc123': [
+                {'answer_id': 'answer1', 'list_item_id': 'abc123', 'value': 10}
+            ]
+        }

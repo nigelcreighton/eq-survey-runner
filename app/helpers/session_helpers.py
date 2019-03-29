@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask_login import current_user
 
-from app.globals import get_answer_store, get_metadata, get_collection_metadata
+from app.globals import get_answer_store, get_metadata, get_collection_metadata, get_list_store
 
 
 def with_answer_store(function):
@@ -13,6 +13,18 @@ def with_answer_store(function):
     @wraps(function)
     def wrapped_function(*args, **kwargs):
         answer_store = get_answer_store(current_user)
+        return function(answer_store, *args, **kwargs)
+    return wrapped_function
+
+
+def with_list_store(function):
+    """Adds the `list_store` as an argument, where the `current_user` is defined.
+    Use on flask request handlers or methods called by flask request handlers.
+
+    May error unless there is a `current_user`."""
+    @wraps(function)
+    def wrapped_function(*args, **kwargs):
+        answer_store = get_list_store(current_user)
         return function(answer_store, *args, **kwargs)
     return wrapped_function
 

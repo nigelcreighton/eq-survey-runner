@@ -11,6 +11,7 @@ def make_schema(data_version, section, group, block, question):
                         'blocks': [
                             {
                                 'id': block,
+                                'type': 'Question',
                                 'question': question
                             }
                         ]

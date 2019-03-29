@@ -35,8 +35,13 @@ class AnswerStoreUpdater:
             if answer_id in answer_ids_for_question:
                 if answer_value not in self.EMPTY_ANSWER_VALUES:
                     answer = Answer(answer_id=answer_id,
+                                    list_item_id=self._current_location.list_item_id,
                                     value=answer_value)
 
                     self._answer_store.add_or_update(answer)
                 else:
                     self._answer_store.remove(answer_ids=[answer_id])
+
+    def remove_all_answers_with_list_item_id(self, list_item_id):
+        self._answer_store.remove(list_item_id=list_item_id)
+        self._questionnaire_store.add_or_update()

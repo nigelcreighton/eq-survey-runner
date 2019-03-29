@@ -1,10 +1,12 @@
+from flask import url_for
+from app.questionnaire.placeholder_transforms import PlaceholderTransforms
 from app.helpers.form_helper import get_form_for_location
 from app.jinja_filters import get_formatted_currency, format_number, format_unit, format_percentage
 from app.templating.summary_context import build_summary_rendering_context
 from app.questionnaire.schema_utils import choose_question_to_display, get_answer_ids_in_block
 
 
-def build_view_context(block_type, metadata, schema, answer_store, rendered_block, current_location, form):
+def build_view_context(block_type, metadata, schema, list_store, answer_store, rendered_block, current_location, form):
     if block_type == 'Summary':
         return build_view_context_for_final_summary(metadata, schema, answer_store, block_type,
                                                     rendered_block)
@@ -19,8 +21,53 @@ def build_view_context(block_type, metadata, schema, answer_store, rendered_bloc
         form = form or get_form_for_location(schema, rendered_block, current_location, answer_store, metadata)
         return build_view_context_for_question(rendered_block, form)
 
+    if block_type == 'ListCollector':
+        form = form or get_form_for_location(schema, rendered_block, current_location, answer_store, metadata)
+        return build_view_context_for_list_collector(rendered_block, list_store, answer_store, form)
+
     if block_type in ('Introduction', 'Interstitial', 'Confirmation'):
         return build_view_context_for_non_question(rendered_block, metadata)
+
+
+def generate_list_item_title(answers, block_schema):
+    """
+    Generate a list item title from the answers within a block. Concatenates stripped answers with a space.
+    Assumes that the block has already had variants transformed
+    """
+    output = []
+    for block_answer in block_schema['question']['answers']:
+        output.append(next((answer['value'] for answer in answers if answer['answer_id'] == block_answer['id']), '').strip())
+
+    output = ' '.join(PlaceholderTransforms.remove_empty_from_list(output))
+
+    return output
+
+
+def build_view_context_for_list_collector(rendered_block, list_store, answer_store, form):
+    question_context = build_view_context_for_question(rendered_block, form)
+
+    list_name = rendered_block['populates_list']
+    list_item_ids = list_store[list_name]
+
+    list_title_answer_ids = [answer['id'] for answer in rendered_block['add_block']['question']['answers']]
+    title_answer_map = answer_store.filter(list_title_answer_ids).map_values_by_list_item_id()
+
+    list_items = [
+        {
+            'answers': title_answer_map[list_item_id],
+            'item_title': generate_list_item_title(title_answer_map[list_item_id], rendered_block['add_block']),
+            'edit_link': url_for('questionnaire.get_edit_list_item', block_id=rendered_block['id'], list_item_id=list_item_id),
+            'remove_link': url_for('questionnaire.get_remove_list_item', block_id=rendered_block['id'], list_item_id=list_item_id),
+        }
+        for list_item_id in list_item_ids if title_answer_map[list_item_id]
+    ]
+
+    list_collector_context = {
+        'list_items': list_items,
+        'add_link': url_for('questionnaire.get_add_list_item', block_id=rendered_block['id']),
+    }
+
+    return {**question_context, **list_collector_context}
 
 
 def build_view_context_for_final_summary(metadata, schema, answer_store, block_type, rendered_block):
