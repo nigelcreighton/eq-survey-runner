@@ -54,12 +54,18 @@
             {% endif %}
 
             {%- if legal_basis -%}
-                <h2 class="u-fs-m u-mb-xs" data-qa="legal-response">{{ _("Your response is legally required") }}</h2>
+                <h3 class="u-fs-m" data-qa="legal-response">{{ _("Your response is legally required") }}</h3>
                 <p class="u-fs-r u-mb-m" data-qa="legal-basis">{{ legal_basis }}</p>
             {%- endif -%}
 
+            {% if survey_guide %}
+                <h3 class="u-fs-m" data-qa="survey-guide">{{ _("Guidance") }}</h3>
+                <p><a rel='noopener noreferrer' target='_blank' href={{ survey_guide }}>Guidance to help complete this survey</a></p>
+            {% endif %}
+
             {% block start_survey %}
                 {% include 'partials/introduction/start-survey.html' %}
+                <p></p>
             {% endblock start_survey %}
 
             {% if content.block.preview_content %}
