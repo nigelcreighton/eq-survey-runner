@@ -60,12 +60,11 @@
 
             {% if survey_guide %}
                 <h3 class="u-fs-m" data-qa="survey-guide">{{ _("Guidance") }}</h3>
-                <p><a rel='noopener noreferrer' target='_blank' href={{ survey_guide }}>Guidance to help complete this survey</a></p>
+                <p class="u-mb-m"><a rel='noopener noreferrer' target='_blank' href={{ survey_guide }}>Guidance to help complete this survey</a></p>
             {% endif %}
 
             {% block start_survey %}
                 {% include 'partials/introduction/start-survey.html' %}
-                <p></p>
             {% endblock start_survey %}
 
             {% if content.block.preview_content %}
