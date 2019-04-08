@@ -566,7 +566,7 @@ def get_edit_list_item(schema, metadata, answer_store, block_id, list_item_id):
 @with_metadata
 @with_schema
 def get_add_list_item(schema, metadata, answer_store, block_id):
-    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'add')
+    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'add', '')
 
 
 def list_collector_get_handler(schema, metadata, answer_store, block_id, list_operation, list_item_id=None):
