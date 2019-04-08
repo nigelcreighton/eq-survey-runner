@@ -16,6 +16,11 @@ class AnswerStore:
     """
 
     def __init__(self, existing_answers=None):
+        """ Instantiate an answer_store.
+        Args:
+            existing_answers: If a list of answer dictionaries is provided, this will be used to initialise the store.
+
+        """
         if isinstance(existing_answers, list):
             self.answer_map = self._build_map(existing_answers or [])
         else:
