@@ -429,8 +429,7 @@ def _get_context(block, current_location, schema, form=None):
 
     list_store = get_list_store(current_user)
 
-    return build_view_context(block['type'], metadata, schema, list_store, answer_store, block, current_location,
-                              form=form)
+    return build_view_context(block['type'], metadata, schema, list_store, answer_store, block, current_location, form=form)
 
 
 def get_page_title_for_location(schema, current_location, context):
@@ -577,14 +576,16 @@ def list_collector_get_handler(schema, metadata, answer_store, block_id, list_op
         return redirect(url_for('questionnaire.get_block', block_id=block_id))
 
     parent_block = schema.get_block(block_id)
-    sub_block = parent_block[f'{list_operation}_block']
+    list_operation_block = parent_block[f'{list_operation}_block']
 
-    current_location = Location(block_id, list_item_id, sub_block=list_operation)
+    current_location = Location(block_id, list_item_id, list_operation=list_operation)
 
-    transformed_block = transform_variants(sub_block, schema, metadata, answer_store)
+    transformed_block = transform_variants(list_operation_block, schema, metadata, answer_store)
 
     placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
     rendered_block = placeholder_renderer.render(transformed_block)
+
+    print('list_operation: {}'.format(current_location.list_operation))
 
     context = _get_context(rendered_block, current_location, schema)
 
@@ -601,7 +602,7 @@ def list_collector_post_handler(schema, metadata, collection_metadata, list_stor
     parent_block = schema.get_block(block_id)
     block = parent_block[f'{list_operation}_block']
 
-    current_location = Location(parent_block['id'], list_item_id, sub_block=list_operation)
+    current_location = Location(parent_block['id'], list_item_id, list_operation=list_operation)
 
     transformed_block = transform_variants(block, schema, metadata, answer_store)
 
@@ -632,7 +633,7 @@ def list_collector_post_handler(schema, metadata, collection_metadata, list_stor
                             block_id=parent_block['id'], list_item_id=list_item_id))
         elif list_operation == 'add':
             new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
-            current_location = Location(current_location.block_id, new_list_item_id, sub_block='add')
+            current_location = Location(current_location.block_id, new_list_item_id, list_operation='add')
             answer_store_updater = AnswerStoreUpdater(current_location, schema,
                                                       questionnaire_store, rendered_block.get('question'))
 

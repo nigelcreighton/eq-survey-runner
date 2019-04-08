@@ -92,9 +92,9 @@ def get_mapped_answers(schema, answer_store, location):
     """
     Maps the answers in an answer store to a dictionary of key, value answers.
     """
-    if location.sub_block:
+    if location.list_operation:
         parent_block = schema.get_block(location.block_id)
-        child_block = parent_block[location.sub_block + '_block']
+        child_block = parent_block[location.list_operation + '_block']
         block_id = child_block['id']
     else:
         block_id = location.block_id

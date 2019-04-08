@@ -37,13 +37,13 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
         path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])
         self.assertEqual(path_finder.get_previous_location(current_location=current_location), previous_location)
 
-    def test_previous_block_on_list_collector_sub_block(self):
+    def test_previous_block_on_list_collector_list_operation(self):
         """ Ensure we always return to the list collector when the previous link is used on a sub block
         """
         schema = load_schema_from_params('test', 'list_collector')
 
-        for sub_block in ['add', 'edit', 'remove']:
-            current_location = Location(block_id='list-collector', sub_block=sub_block)
+        for list_operation in ['add', 'edit', 'remove']:
+            current_location = Location(block_id='list-collector', list_operation=list_operation)
             previous_location = Location(block_id='list-collector')
 
             path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])

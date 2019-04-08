@@ -228,7 +228,7 @@ class PathFinder:
         if first_block_for_group == current_location.block_id:
             return None
 
-        if current_location.sub_block:
+        if current_location.list_operation:
             return Location(block_id=current_location.block_id)
 
         routing_path = self.get_full_routing_path()

@@ -147,7 +147,7 @@ class TestFormHelper(AppContextTestCase):
 
     def test_get_mapped_answers(self):
         schema = load_schema_from_params('test', 'list_collector')
-        location = Location(block_id='list-collector', sub_block='add')
+        location = Location(block_id='list-collector', list_operation='add')
         answer_store = AnswerStore([
             {
                 'answer_id': 'first-name',
