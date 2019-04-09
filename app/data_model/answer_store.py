@@ -40,37 +40,56 @@ class AnswerUnion:
         if self._answer:
             return 1
         else:
-            return len(self._answers)
+            return len(self._answers or ())
+
+    def __eq__(self, other):
+        if self._answer:
+            return self._answer == other._answer
+        else:
+            return self._answers == other._answers
+
 
     def add_answer(self, answer: dict):
-        if answer['list_item_id']:
+        if answer.get('list_item_id'):
             if not self._answers:
                 self._answers = {}
             self._answers[answer['list_item_id']] = answer
         else:
             self._answer = answer
 
-    def get_answer(self, list_item_id: str=None):
+    def get_answer(self, list_item_id: str=None) -> dict:
         """
         Returns an answer.
         If no list_item_id is provided then this is assumed to be a non-repeating answer
         """
-        if list_item_id:
+        if list_item_id and self._answers:
             return self._answers.get(list_item_id)
-        else:
+        elif self._answer:
             return self._answer
+        else:
+            return None
 
     def get_all_answers(self) -> List[dict]:
         if self._answer:
             return [self._answer]
+        elif self._answers:
+            return self._answers.values()
         else:
-            return self._answers
+            return []
 
-    def get_values(self):
+    def get_values(self) -> List[str]:
         if self._answer:
-            return self._answer['value'],
+            return [self._answer['value']]
+        elif self._answers:
+            return [answer['value'] for answer in self._answers.values()]
         else:
-            return (answer['value'] for answer in self._answers.values())
+            return []
+
+    def remove(self, answer: dict):
+        if self._answer:
+            self._answer = None
+        else:
+            del self._answers[answer['list_item_id']]
 
 class AnswerStoreMap(defaultdict):
     def __iter__(self):
@@ -94,7 +113,7 @@ class AnswerStore:
             self.answer_map = existing_answers or AnswerStoreMap(AnswerUnion)
 
     def __iter__(self):
-        return iter(self.answer_map.values())
+        return iter(self.answer_map)
 
     def __len__(self):
         return sum(len(answer_union) for answer_union in self.answer_map.values())
@@ -175,7 +194,7 @@ class AnswerStore:
 
         :return: Return a list of answer values
         """
-        return list(itertools.chain.from_iterable(answer_union.get_values() for answer_union in self))
+        return [answer['value'] for answer in self]
 
     def map_values_by_list_item_id(self):
         """
@@ -183,10 +202,9 @@ class AnswerStore:
         """
         output = defaultdict(list)
 
-        for answer_union in self:
-            for answer in answer_union:
-                if answer['list_item_id']:
-                    output[answer['list_item_id']].append(answer)
+        for answer in self:
+            if answer['list_item_id']:
+                output[answer['list_item_id']].append(answer)
 
         return output
 
@@ -211,17 +229,27 @@ class AnswerStore:
         """
         Find all answers in the answer store for a given set of filter parameter matches.
         If no filter parameters are passed it returns a copy of the instance.
-        :param answer_ids: The answer ids to filter results by
-        :param list_item_id: A list_item_id to filter results by.
-        :return: Return a new AnswerStore object with filtered answers for chaining
+
+        For the arguments:
+            - None values result in no filtering on that parameter.
+            - Falsey values != None, e.g. [] will run filtering, and will result in an empty answer_store
+
+        Args:
+            answer_ids: The answer ids to filter results by.
+            list_item_id: A list_item_id to filter results by.
+        Returns:
+            A new AnswerStore object with filtered answers for chaining
         """
 
-        if answer_ids:
-            answers = itertools.chain(self.answer_map[answer_id] for answer_id in answer_ids)
+        if answer_ids is None:
+            answers = [answer_union for answer_union in self.answer_map.values()]
         else:
-            answers = itertools.chain(answer_union for answer_union in self.answer_map.values())
+            answers = [self.answer_map[answer_id] for answer_id in answer_ids]
 
-        matches = [answer_union.get_answer(list_item_id) for answer_union in answers if answer_union.get_answer(list_item_id)]
+        if list_item_id is None:
+            matches = list(itertools.chain.from_iterable(answer_union.get_all_answers() for answer_union in answers))
+        else:
+            matches = [answer_union.get_answer(list_item_id) for answer_union in answers if answer_union.get_answer(list_item_id)]
 
         return self.__class__(existing_answers=matches)
 
@@ -256,4 +284,4 @@ class AnswerStore:
 
         :return: Return a unique hash value
         """
-        return hash(json.dumps(self.answer_map, sort_keys=True))
+        return hash(json.dumps(list(self), sort_keys=True))

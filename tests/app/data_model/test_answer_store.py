@@ -1,7 +1,20 @@
 # pylint: disable=no-self-use
 import unittest
+import json
+
+import pytest
 
 from app.data_model.answer_store import Answer, AnswerStore
+
+@pytest.fixture()
+def basic_answer_store():
+    answer_store = AnswerStore()
+
+    answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
+    answer_store.add_or_update(Answer(answer_id='answer2', value=20, list_item_id='xyz987'))
+    answer_store.add_or_update(Answer(answer_id='answer3', value=30))
+
+    return answer_store
 
 
 class TestAnswer(unittest.TestCase):
@@ -274,9 +287,12 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
         self.store.add_or_update(answer_1)
         self.store.add_or_update(answer_2)
 
+        self.assertEqual(len(self.store.filter()), 2)
+
         filtered = self.store.filter(list_item_id='xyz987')
 
         self.assertEqual(len(filtered), 1)
+
 
     def test_filter_list_item_id_and_answer_id(self):
         answer_1 = Answer(
@@ -356,3 +372,67 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
                 {'answer_id': 'answer1', 'list_item_id': 'abc123', 'value': 10}
             ]
         }
+
+    def test_list_serialisation(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+        answer_3 = Answer(
+            answer_id='answer3',
+            value=30,
+        )
+
+        self.store = AnswerStore()
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+        self.store.add_or_update(answer_3)
+
+        serialised_store = list(self.store)
+
+        assert serialised_store == [
+            {'answer_id': 'answer1', 'value': 10, 'list_item_id': 'abc123'},
+            {'answer_id': 'answer2', 'value': 20, 'list_item_id': 'xyz987'},
+            {'answer_id': 'answer3', 'value': 30, 'list_item_id': None}
+        ]
+
+
+    def test_json_serialisation(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+        answer_3 = Answer(
+            answer_id='answer3',
+            value=30,
+        )
+
+        self.store = AnswerStore()
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+        self.store.add_or_update(answer_3)
+
+        json_serialised = json.dumps(list(self.store))
+
+        assert json_serialised
+
+def test_hash(basic_answer_store):
+    hash = basic_answer_store.get_hash()
+    assert hash
+
+def test_empty_filter(basic_answer_store):
+    """Filtering answer ids against an empty list should return no answers"""
+    filtered = basic_answer_store.filter(answer_ids=[])
+    assert len(filtered) == 0

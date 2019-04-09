@@ -198,4 +198,4 @@ class TestDumpSubmission(IntegrationTestCase):
         }
         # Enable full dictionary diffs on test failure
         self.maxDiff = None
-        self.assertDictEqual(actual, expected)
+        assert actual == expected
