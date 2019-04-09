@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import List
 import itertools
 from collections import defaultdict
 from jinja2 import escape
@@ -8,6 +10,71 @@ from app.data_model.answer import Answer
 
 logger = get_logger()
 
+class AnswerUnion:
+    """ Representation of answers relating to a single answer_id.
+    Either:
+        - Represents a single answer
+        - Represents multiple answers with the same answer id
+
+    Multiple answers are stored as a map keyed on the list_item_id
+
+    Assumes that an answer id will never have a list_item_id if it is not in a repeat
+    i.e. You should never add a single answer, and then another answer with a list_item_id
+    Assumes list_item_ids are unique per answer_id
+
+    """
+
+    def __init__(self):
+        self._answers = None
+        self._answer = None
+
+    def __iter__(self):
+        if self._answers:
+            return iter(self._answers.values())
+        elif self._answer:
+            return iter((self._answer,))
+        else:
+            raise StopIteration
+
+    def __len__(self):
+        if self._answer:
+            return 1
+        else:
+            return len(self._answers)
+
+    def add_answer(self, answer: dict):
+        if answer['list_item_id']:
+            if not self._answers:
+                self._answers = {}
+            self._answers[answer['list_item_id']] = answer
+        else:
+            self._answer = answer
+
+    def get_answer(self, list_item_id: str=None):
+        """
+        Returns an answer.
+        If no list_item_id is provided then this is assumed to be a non-repeating answer
+        """
+        if list_item_id:
+            return self._answers.get(list_item_id)
+        else:
+            return self._answer
+
+    def get_all_answers(self) -> List[dict]:
+        if self._answer:
+            return [self._answer]
+        else:
+            return self._answers
+
+    def get_values(self):
+        if self._answer:
+            return self._answer['value'],
+        else:
+            return (answer['value'] for answer in self._answers.values())
+
+class AnswerStoreMap(defaultdict):
+    def __iter__(self):
+        return itertools.chain.from_iterable(union.get_all_answers() for union in self.values())
 
 class AnswerStore:
     """
@@ -24,13 +91,13 @@ class AnswerStore:
         if isinstance(existing_answers, list):
             self.answer_map = self._build_map(existing_answers or [])
         else:
-            self.answer_map = existing_answers or defaultdict(list)
+            self.answer_map = existing_answers or AnswerStoreMap(AnswerUnion)
 
     def __iter__(self):
-        return iter((answer for answers in self.answer_map.values() for answer in answers))
+        return iter(self.answer_map.values())
 
     def __len__(self):
-        return sum(len(answers) for answers in self.answer_map.values())
+        return sum(len(answer_union) for answer_union in self.answer_map.values())
 
     def __eq__(self, other):
         return self.answer_map == other.answer_map
@@ -40,10 +107,11 @@ class AnswerStore:
 
     @staticmethod
     def _build_map(answers):
-        answer_map = defaultdict(list)
+        """ Build the answer_store's internal representation of a set of answers"""
+        answer_map = AnswerStoreMap(AnswerUnion)
 
         for answer in answers:
-            answer_map[answer['answer_id']].append(answer)
+            answer_map[answer['answer_id']].add_answer(answer)
 
         return answer_map
 
@@ -52,25 +120,28 @@ class AnswerStore:
         if not isinstance(answer, Answer):
             raise TypeError('Method only supports Answer argument type')
 
-    def copy(self):
+    def copy(self) -> AnswerStore:
         """
         Create a new instance of answer_store with the same values.
         """
         return self.__class__(self.answer_map.copy())
 
-    def add_or_update(self, answer):
+    def add_or_update(self, answer: Answer):
         """
         Add a new answer into the answer store, or update if it exists.
-        :param answer: An answer object.
         """
         self._validate(answer)
-        position = self.find(answer)
 
-        if position is None:
-            answer_to_add = vars(answer).copy()
-            self.answer_map[answer_to_add['answer_id']].append(answer_to_add)
-        else:
-            self.answer_map[answer.answer_id][position]['value'] = answer.value
+        answer_to_add = vars(answer).copy()
+        self.answer_map[answer.answer_id].add_answer(answer_to_add)
+
+    def get_answer(self, answer_id: str, list_item_id: str=None):
+        """ Find an answer in the store if it exists
+        """
+        answer_union = self.answer_map[answer_id]
+        answer = answer_union.get_answer(list_item_id=list_item_id)
+
+        return answer
 
     def find(self, answer):
         """
@@ -80,8 +151,8 @@ class AnswerStore:
         """
         self._validate(answer)
 
-        if answer.answer_id in self.answer_map:
-            for index, existing in enumerate(self.answer_map[answer.answer_id]):
+        if answer['answer_id'] in self.answer_map:
+            for index, existing in enumerate(self.answer_map[answer['answer_id']]):
                 if answer.matches_dict(existing):
                     return index
 
@@ -104,7 +175,7 @@ class AnswerStore:
 
         :return: Return a list of answer values
         """
-        return [answer['value'] for answer in self]
+        return list(itertools.chain.from_iterable(answer_union.get_values() for answer_union in self))
 
     def map_values_by_list_item_id(self):
         """
@@ -112,9 +183,10 @@ class AnswerStore:
         """
         output = defaultdict(list)
 
-        for answer in self:
-            if answer['list_item_id']:
-                output[answer['list_item_id']].append(answer)
+        for answer_union in self:
+            for answer in answer_union:
+                if answer['list_item_id']:
+                    output[answer['list_item_id']].append(answer)
 
         return output
 
@@ -125,14 +197,17 @@ class AnswerStore:
         :return: Return a new AnswerStore object with escaped answers for chaining
         """
         escaped = []
-        for answer in self:
-            answer = answer.copy()
-            if isinstance(answer['value'], str):
-                answer['value'] = escape(answer['value'])
-            escaped.append(answer)
+        for answer_union in self.answer_map.values():
+            print(answer_union)
+            for answer in answer_union:
+                print(answer)
+                answer = answer.copy()
+                if isinstance(answer['value'], str):
+                    answer['value'] = escape(answer['value'])
+                escaped.append(answer)
         return self.__class__(existing_answers=escaped)
 
-    def filter(self, answer_ids=None, list_item_id=None):
+    def filter(self, answer_ids: List[str]=None, list_item_id: str=None):
         """
         Find all answers in the answer store for a given set of filter parameter matches.
         If no filter parameters are passed it returns a copy of the instance.
@@ -140,28 +215,15 @@ class AnswerStore:
         :param list_item_id: A list_item_id to filter results by.
         :return: Return a new AnswerStore object with filtered answers for chaining
         """
-        filtered = []
-
-        filter_vars = {
-            'answer_id': answer_ids,
-            'list_item_id': list_item_id,
-        }
 
         if answer_ids:
-            answers = itertools.chain.from_iterable(self.answer_map.get(answer_id, []) for answer_id in answer_ids)
+            answers = itertools.chain(self.answer_map[answer_id] for answer_id in answer_ids)
         else:
-            answers = self
+            answers = itertools.chain(answer_union for answer_union in self.answer_map.values())
 
-        for answer in answers:
-            matches = all(
-                answer[key] in value if isinstance(value, (list, set)) else answer[key] == value
-                for key, value in filter_vars.items()
-                if value is not None
-            )
-            if matches:
-                filtered.append(answer)
+        matches = [answer_union.get_answer(list_item_id) for answer_union in answers if answer_union.get_answer(list_item_id)]
 
-        return self.__class__(existing_answers=filtered)
+        return self.__class__(existing_answers=matches)
 
     def clear(self):
         """

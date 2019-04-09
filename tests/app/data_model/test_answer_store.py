@@ -160,12 +160,12 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
         escaped = self.store.escaped()
 
         self.assertEqual(len(escaped), 2)
-        self.assertEqual(escaped.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(escaped.filter(answer_ids=['2']).values()[0], '&#39;Twenty Five&#39;')
+        self.assertEqual(escaped.get_answer(answer_id='1')['value'], 25)
+        self.assertEqual(escaped.get_answer(answer_id='2')['value'], '&#39;Twenty Five&#39;')
 
         # answers in the store have not been escaped
-        self.assertEqual(self.store.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(self.store.filter(answer_ids=['2']).values()[0], "'Twenty Five'")
+        self.assertEqual(self.store.get_answer(answer_id='1')['value'], 25)
+        self.assertEqual(self.store.get_answer(answer_id='2')['value'], "'Twenty Five'")
 
     def test_filter_answers_does_not_escapes_values(self):
 
@@ -182,8 +182,8 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
         filtered = self.store.filter(['1', '2'])
 
         self.assertEqual(len(filtered), 2)
-        self.assertEqual(filtered.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(filtered.filter(answer_ids=['2']).values()[0], "'Twenty Five'")
+        self.assertEqual(filtered.get_answer('1')['value'], 25)
+        self.assertEqual(filtered.get_answer('2')['value'], "'Twenty Five'")
 
     def test_filter_chaining_escaped(self):
 
@@ -203,8 +203,8 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
         self.assertEqual(escaped.values()[0], '&#39;Twenty Five&#39;')
 
         # answers in the store have not been escaped
-        self.assertEqual(self.store.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(self.store.filter(answer_ids=['2']).values()[0], "'Twenty Five'")
+        self.assertEqual(self.store.get_answer('1')['value'], 25)
+        self.assertEqual(self.store.get_answer('2')['value'], "'Twenty Five'")
 
         values = self.store.filter(answer_ids=['2']).escaped().values()
 
@@ -323,7 +323,7 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
         self.store.add_or_update(answer_1)
         self.store.add_or_update(answer_2)
 
-        assert answer_2.matches_dict(self.store.answer_map['answer2'][0])
+        assert answer_2.matches_dict(self.store.get_answer(answer_id='answer2', list_item_id='xyz987'))
 
     def test_map_values_by_list_item_id(self):
         answer_1 = Answer(

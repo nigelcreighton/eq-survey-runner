@@ -12,6 +12,17 @@ class Answer:
         self.value = value
         self.list_item_id = list_item_id
 
+    def copy(self):
+        return Answer(self.answer_id, self.value, self.list_item_id)
+
+    @staticmethod
+    def from_dict(input: dict):
+        return Answer(
+            input.get('answer_id'),
+            input.get('value'),
+            input.get('list_item_id'),
+        )
+
     def matches(self, answer):
         """
         Check to see if two answers match.
@@ -29,8 +40,4 @@ class Answer:
         :return: True if both answers match, otherwise False.
         """
 
-        return self.matches(Answer(
-            answer_dict.get('answer_id'),
-            answer_dict.get('value'),
-            answer_dict.get('list_item_id'),
-        ))
+        return self.matches(Answer.from_dict(answer_dict))
