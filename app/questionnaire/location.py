@@ -1,19 +1,22 @@
+from __future__ import annotations
+
 from flask import url_for
 
 
 class Location:
 
-    def __init__(self, block_id, list_item_id=None, list_operation=None):
+    def __init__(self, block_id: str, list_name: str=None, list_item_id: str=None):
         """
-        :param block_id: The id of the current block. This should always match the url
-        :param list_item_id: The list_item_id if this location is associated with a list
-        :param list_operation: The sub block, either edit, add or remove
+        Args:
+            block_id: The id of the current block. This could be a block inside a list collector
+            list_item_id: The list_item_id if this location is associated with a list
+            list_name: The list name
         """
         self.block_id = block_id
+        self.list_name = list_name
         self.list_item_id = list_item_id
-        self.list_operation = list_operation
 
-    def __eq__(self, other):
+    def __eq__(self, other: Location):
         """
         Check to see if two locations are equal.
         Two answers are considered to be equal if their dictionary representations equal one another.
@@ -43,19 +46,21 @@ class Location:
         return str(self)
 
     @classmethod
-    def from_dict(cls, location_dict):
+    def from_dict(cls, location_dict: dict):
         block_id = location_dict['block_id']
         list_item_id = location_dict.get('list_item_id')
-        list_operation = location_dict.get('list_operation')
-        return cls(block_id, list_item_id, list_operation)
+        list_name = location_dict.get('list_name')
+        return cls(block_id, list_item_id, list_name)
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         attributes = vars(self)
         return {k: v for k, v in attributes.items() if v is not None}
 
-    def url(self):
+    def url(self) -> str:
         """
         Return the survey runner url that this location represents
+
+        The structure
 
         :return:
         """

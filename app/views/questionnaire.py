@@ -104,16 +104,7 @@ def get_block(routing_path, schema, metadata, answer_store, block_id):
         next_location = router.get_next_location()
         return _redirect_to_location(next_location)
 
-    block = schema.get_block(current_location.block_id)
-
-    transformed_block = transform_variants(block, schema, metadata, answer_store)
-
-    placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
-    rendered_block = placeholder_renderer.render(transformed_block)
-
-    context = _get_context(rendered_block, current_location, schema)
-
-    return _render_page(block['type'], context, current_location, schema)
+    return _render_block(schema, metadata, answer_store, block_id, current_location)
 
 
 @questionnaire_blueprint.route('<block_id>', methods=['POST'])
@@ -158,7 +149,7 @@ def post_block(routing_path, schema, metadata, collection_metadata, list_store, 
 
         if block['type'] == 'ListCollector':
             if list(form.data.values())[0] == block['add_answer_value']:
-                add_url = url_for('questionnaire.get_add_list_item', block_id=block_id)
+                add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
                 return redirect(add_url)
 
         next_location = path_finder.get_next_location(current_location=current_location)
@@ -488,121 +479,103 @@ class InvalidListItemId(Exception):
 
 
 @with_list_store
-def validate_list_collector_route(list_store, schema, block_id, list_item_id=None):
+def validate_list_collector_route(list_store, schema, block_id, list_name=None, list_item_id=None):
+    current_block = schema.get_block(block_id)
+
+    list_collector_block = schema.get_list_collector_for_block_id(block_id)
+
+    if not list_collector_block:
+        print(block_id)
+        raise NotFound(f'List collector populating {list_name} not found')
+
+    if not current_block:
+        raise NotFound(f'Block id: {block_id} not found')
+
+    if list_item_id and list_item_id not in list_store[list_name]:
+        raise InvalidListItemId(f'List item id: {list_item_id} not found for list {list_name}')
+
+
+def _render_block(schema, metadata, answer_store, block_id, current_location):
     block = schema.get_block(block_id)
-
-    if not block:
-        raise NotFound()
-
-    if block['type'] != 'ListCollector':
-        raise NotFound()
-
-    if list_item_id and list_item_id not in list_store[block['populates_list']]:
-        raise InvalidListItemId(f'List item id: {list_item_id} not found for block {block_id}')
-
-
-@questionnaire_blueprint.route('<block_id>/add', methods=['POST'])
-@login_required
-@with_answer_store
-@with_list_store
-@with_collection_metadata
-@with_metadata
-@with_schema
-def post_add_list_item(schema, metadata, collection_metadata, list_store, answer_store, block_id):
-
-    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id,
-                                       None, 'add')
-
-
-@questionnaire_blueprint.route('<block_id>/<list_item_id>/remove', methods=['POST'])
-@login_required
-@with_answer_store
-@with_list_store
-@with_collection_metadata
-@with_metadata
-@with_schema
-def post_remove_list_item(schema, metadata, collection_metadata, list_store, answer_store, block_id,
-                          list_item_id):
-
-    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id,
-                                       list_item_id, 'remove')
-
-
-@questionnaire_blueprint.route('<block_id>/<list_item_id>/edit', methods=['POST'])
-@login_required
-@with_answer_store
-@with_list_store
-@with_collection_metadata
-@with_metadata
-@with_schema
-def post_edit_list_item(schema, metadata, collection_metadata, list_store, answer_store, block_id,
-                        list_item_id):
-
-    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id,
-                                       list_item_id, 'edit')
-
-
-@questionnaire_blueprint.route('<block_id>/<list_item_id>/remove', methods=['GET'])
-@login_required
-@with_answer_store
-@with_metadata
-@with_schema
-def get_remove_list_item(schema, metadata, answer_store, block_id, list_item_id):
-    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'remove', list_item_id)
-
-
-@questionnaire_blueprint.route('<block_id>/<list_item_id>/edit', methods=['GET'])
-@login_required
-@with_answer_store
-@with_metadata
-@with_schema
-def get_edit_list_item(schema, metadata, answer_store, block_id, list_item_id):
-    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'edit', list_item_id)
-
-
-@questionnaire_blueprint.route('<block_id>/add', methods=['GET'])
-@login_required
-@with_answer_store
-@with_metadata
-@with_schema
-def get_add_list_item(schema, metadata, answer_store, block_id):
-    return list_collector_get_handler(schema, metadata, answer_store, block_id, 'add', '')
-
-
-def list_collector_get_handler(schema, metadata, answer_store, block_id, list_operation, list_item_id=None):
-    try:
-        validate_list_collector_route(schema, block_id, list_item_id)
-    except InvalidListItemId:
-        return redirect(url_for('questionnaire.get_block', block_id=block_id))
-
-    parent_block = schema.get_block(block_id)
-    list_operation_block = parent_block[f'{list_operation}_block']
-
-    current_location = Location(block_id, list_item_id, list_operation=list_operation)
-
-    transformed_block = transform_variants(list_operation_block, schema, metadata, answer_store)
+    transformed_block = transform_variants(block, schema, metadata, answer_store)
 
     placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
     rendered_block = placeholder_renderer.render(transformed_block)
-
-    print('list_operation: {}'.format(current_location.list_operation))
 
     context = _get_context(rendered_block, current_location, schema)
 
     return _render_page(rendered_block['type'], context, current_location, schema)
 
 
-# pylint: disable=too-many-locals
-def list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id, list_item_id, list_operation):
+def validate_list_block(schema, block_id, list_name, list_item_id=None):
+    parent_block = schema.get_list_collector_for_block_id(block_id)
+
     try:
-        validate_list_collector_route(schema, block_id, list_item_id)
+        validate_list_collector_route(schema, block_id, list_name, list_item_id)
     except InvalidListItemId:
-        return redirect(url_for('questionnaire.get_block', block_id=block_id))
+        return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
 
-    parent_block = schema.get_block(block_id)
-    block = parent_block[f'{list_operation}_block']
 
-    current_location = Location(parent_block['id'], list_item_id, list_operation=list_operation)
+@questionnaire_blueprint.route('<list_name>/<add_block_id>', methods=['GET'])
+@login_required
+@with_answer_store
+@with_metadata
+@with_schema
+def get_add_list_item(schema, metadata, answer_store, list_name, add_block_id):
+    to_redirect = validate_list_block(schema, add_block_id, list_name)
+    if to_redirect:
+        return to_redirect
+
+    current_location = Location(add_block_id, list_name)
+
+    return _render_block(schema, metadata, answer_store, add_block_id, current_location)
+
+
+@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['GET'])
+@login_required
+@with_answer_store
+@with_metadata
+@with_schema
+def get_list_item_block_id(schema, metadata, answer_store, list_name, list_item_id, block_id):
+    to_redirect = validate_list_block(schema, block_id, list_name, list_item_id)
+    if to_redirect:
+        return to_redirect
+
+    current_location = Location(block_id, list_name, list_item_id)
+
+    return _render_block(schema, metadata, answer_store, block_id, current_location)
+
+@questionnaire_blueprint.route('<list_name>/<block_id>', methods=['POST'])
+@login_required
+@with_answer_store
+@with_list_store
+@with_collection_metadata
+@with_metadata
+@with_schema
+def post_add_list_item(schema, metadata, collection_metadata, list_store, answer_store, list_name, block_id):
+    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id, list_name, None)
+
+@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['POST'])
+@login_required
+@with_answer_store
+@with_list_store
+@with_collection_metadata
+@with_metadata
+@with_schema
+def post_list_item_block(schema, metadata, collection_metadata, list_store, answer_store, list_name, list_item_id, block_id):
+    return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id, list_name, list_item_id)
+
+
+# pylint: disable=too-many-locals
+def list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id, list_name, list_item_id):
+    to_redirect = validate_list_block(schema, block_id, list_name, list_item_id)
+    if to_redirect:
+        return to_redirect
+
+    parent_block = schema.get_list_collector_for_block_id(block_id)
+    block = schema.get_block(block_id)
+
+    current_location = Location(block_id, list_name, list_item_id)
 
     transformed_block = transform_variants(block, schema, metadata, answer_store)
 
@@ -623,23 +596,30 @@ def list_collector_post_handler(schema, metadata, collection_metadata, list_stor
         answer_store_updater = AnswerStoreUpdater(current_location, schema,
                                                   questionnaire_store, rendered_block.get('question'))
 
-        if list_operation == 'remove':
+        list_operation = block['list_operation']
+
+        if list_operation == 'remove_block':
             if list(form.data.values())[0] == parent_block['remove_answer_value']:
                 list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
                 answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
             else:
-                redirect(
+                return redirect(
                     url_for('questionnaire.get_edit_list_item',
                             block_id=parent_block['id'], list_item_id=list_item_id))
-        elif list_operation == 'add':
+        elif list_operation == 'add_block':
             new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
-            current_location = Location(current_location.block_id, new_list_item_id, list_operation='add')
+            current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
             answer_store_updater = AnswerStoreUpdater(current_location, schema,
                                                       questionnaire_store, rendered_block.get('question'))
 
             answer_store_updater.save_answers(form)
         else:
             answer_store_updater.save_answers(form)
+
+        # Clear the answer from the confirmation question on the list collector question
+        transformed_parent = transform_variants(parent_block, schema, metadata, answer_store)
+        answer_ids_to_remove = [answer['id'] for answer in transformed_parent['question']['answers']]
+        answer_store_updater.remove_answer_ids(answer_ids_to_remove)
 
         list_collector_url = url_for('questionnaire.get_block', block_id=parent_block['id'])
 

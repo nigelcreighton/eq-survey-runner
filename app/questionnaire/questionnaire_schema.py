@@ -152,7 +152,15 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
 
         return False
 
+    def get_list_collectors(self, list_name):
+        return self._list_collectors.get(list_name)
+
+    def get_list_collector_for_block_id(self, block_id):
+        block = self.get_block(block_id)
+        return self.get_block(block['list_collector'])
+
     def _parse_schema(self):
+        self._list_collectors = defaultdict(list)
         self._sections_by_id = self._get_sections_by_id()
         self._groups_by_id = get_nested_schema_objects(self._sections_by_id, 'groups')
         self._blocks_by_id = self._get_blocks_by_id()
@@ -169,9 +177,13 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
                 blocks[block['id']] = block
 
                 if block['type'] == 'ListCollector':
-                    for nested_block in ['add_block', 'edit_block', 'remove_block']:
-                        block[nested_block]['parent_id'] = block['id']
-                        blocks[block[nested_block]['id']] = block['add_block']
+                    self._list_collectors[block['populates_list']].append(block)
+                    for nested_block_name in ['add_block', 'edit_block', 'remove_block']:
+                        nested_block = block[nested_block_name]
+                        nested_block['parent_id'] = group['id']
+                        nested_block['list_collector'] = block['id']
+                        nested_block['list_operation'] = nested_block_name
+                        blocks[nested_block['id']] = nested_block
 
         return blocks
 

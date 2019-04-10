@@ -16,9 +16,6 @@ class ListStore:
     """
 
     def __init__(self, existing_items=None):
-        """
-        TODO (rich): What format should the existing items be in.
-        """
         if not existing_items:
             existing_items = []
 

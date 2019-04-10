@@ -228,8 +228,9 @@ class PathFinder:
         if first_block_for_group == current_location.block_id:
             return None
 
-        if current_location.list_operation:
-            return Location(block_id=current_location.block_id)
+        # TODO: Add something to replace this further up, with knowledge of schema.
+        # if current_location.list_operation:
+        #     return Location(block_id=current_location.block_id)
 
         routing_path = self.get_full_routing_path()
         current_location_index = PathFinder._get_current_location_index(routing_path, current_location)

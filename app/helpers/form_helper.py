@@ -92,16 +92,13 @@ def get_mapped_answers(schema, answer_store, location):
     """
     Maps the answers in an answer store to a dictionary of key, value answers.
     """
-    if location.list_operation:
-        parent_block = schema.get_block(location.block_id)
-        child_block = parent_block[location.list_operation + '_block']
-        block_id = child_block['id']
-    else:
-        block_id = location.block_id
+
+    block_id = location.block_id
 
     answer_ids = schema.get_answer_ids_for_block(block_id)
 
     result = {}
+    # TODO: For the edit block, list_item_id will be none, but filter will assume that means ANY rather than None.
     for answer in answer_store.filter(answer_ids=answer_ids, list_item_id=location.list_item_id):
         answer_id = answer['answer_id']
         result[answer_id] = answer['value']
