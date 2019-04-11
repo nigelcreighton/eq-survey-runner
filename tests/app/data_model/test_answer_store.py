@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 import json
 
 import pytest
@@ -159,5 +160,3 @@ def test_hash(basic_answer_store):
     assert basic_answer_store.get_hash() != first_hash
     basic_answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
     assert basic_answer_store.get_hash() == first_hash
-
-

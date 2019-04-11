@@ -5,7 +5,7 @@ from flask import url_for
 
 class Location:
 
-    def __init__(self, block_id: str, list_name: str=None, list_item_id: str=None):
+    def __init__(self, block_id: str, list_name: str = None, list_item_id: str = None):
         """
         Args:
             block_id: The id of the current block. This could be a block inside a list collector

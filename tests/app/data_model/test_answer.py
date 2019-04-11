@@ -1,5 +1,5 @@
 import unittest
-from app.data_model.answer_store import Answer, AnswerStore
+from app.data_model.answer_store import Answer
 
 class TestAnswer(unittest.TestCase):
     def test_raises_error_on_invalid(self):
@@ -74,4 +74,3 @@ class TestAnswer(unittest.TestCase):
         }
 
         self.assertEqual(answer_1.matches_dict(answer_2), True)
-

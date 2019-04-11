@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import List
 
 from jinja2 import escape
 from structlog import get_logger
@@ -76,7 +77,7 @@ class AnswerStore:
 
         self.answer_map[(answer.answer_id, answer.list_item_id)] = vars(answer).copy()
 
-    def values(self) -> list[str]:
+    def values(self) -> List[str]:
         """
         Return a flat list of all answer values in the answer store.
         """
@@ -97,7 +98,7 @@ class AnswerStore:
             escaped.append(answer)
         return self.__class__(existing_answers=escaped)
 
-    def get_answer(self, answer_id: str, list_item_id: str=None) -> Answer:
+    def get_answer(self, answer_id: str, list_item_id: str = None) -> Answer:
         """ Get a single answer from the store
 
         Args:
@@ -109,7 +110,7 @@ class AnswerStore:
         """
         return self.answer_map.get((answer_id, list_item_id))
 
-    def get_answers_by_answer_id(self, answer_ids: list[str], list_item_id: str=None) -> list[Answer]:
+    def get_answers_by_answer_id(self, answer_ids: List[str], list_item_id: str = None) -> List[Answer]:
         """ Get multiple answers from the store using the answer_id
 
         Args:
@@ -134,7 +135,7 @@ class AnswerStore:
         """
         self.answer_map.clear()
 
-    def remove_answer(self, answer_id: str, list_item_id: str=None):
+    def remove_answer(self, answer_id: str, list_item_id: str = None):
         """
         Removes answer *in place* from the answer store.
         """

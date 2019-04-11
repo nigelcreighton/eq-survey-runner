@@ -15,7 +15,8 @@ class Question:
         self.number = question_schema.get('number', None)
         self.answers = self._build_answers(answer_store, question_schema)
 
-    def _get_answer(self, answer_store, answer_id):
+    @staticmethod
+    def _get_answer(answer_store, answer_id):
         answer = answer_store.get_answer(answer_id)
         if answer:
             return answer['value']

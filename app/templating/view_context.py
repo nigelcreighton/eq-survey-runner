@@ -23,7 +23,7 @@ def build_view_context(block_type, metadata, schema, list_store, answer_store, r
 
     if block_type == 'ListCollector':
         form = form or get_form_for_location(schema, rendered_block, current_location, answer_store, metadata)
-        return build_view_context_for_list_collector(rendered_block, schema, list_store, answer_store, form)
+        return build_view_context_for_list_collector(rendered_block, list_store, answer_store, form)
 
     if block_type in ('Introduction', 'Interstitial', 'Confirmation'):
         return build_view_context_for_non_question(rendered_block, metadata)
@@ -43,7 +43,7 @@ def generate_list_item_title(answers, block_schema):
     return output
 
 
-def build_view_context_for_list_collector(rendered_block, schema, list_store, answer_store, form):
+def build_view_context_for_list_collector(rendered_block, list_store, answer_store, form):
     question_context = build_view_context_for_question(rendered_block, form)
 
     list_name = rendered_block['populates_list']
@@ -58,8 +58,14 @@ def build_view_context_for_list_collector(rendered_block, schema, list_store, an
             list_items.append({
                 'answers': title_answers,
                 'item_title': generate_list_item_title(title_answers, rendered_block['add_block']),
-                'edit_link': url_for('questionnaire.get_list_item_block_id', list_name=list_name, block_id=rendered_block['edit_block']['id'], list_item_id=list_item_id),
-                'remove_link': url_for('questionnaire.get_list_item_block_id', list_name=list_name, block_id=rendered_block['remove_block']['id'], list_item_id=list_item_id),
+                'edit_link': url_for('questionnaire.get_list_item_block_id',
+                                     list_name=list_name,
+                                     block_id=rendered_block['edit_block']['id'],
+                                     list_item_id=list_item_id),
+                'remove_link': url_for('questionnaire.get_list_item_block_id',
+                                       list_name=list_name,
+                                       block_id=rendered_block['remove_block']['id'],
+                                       list_item_id=list_item_id),
             })
 
     list_collector_context = {

@@ -4,7 +4,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from app.questionnaire.location import Location
-from app.data_model.answer_store import AnswerStore
 
 MAX_REPEATS = 25
 
@@ -231,6 +230,7 @@ def get_answer_store_value(answer_id, answer_store, schema, routing_path=None):
             return answer['value']
     else:
         return answer['value']
+
 
 def get_metadata_value(metadata, key):
     return metadata.get(key)

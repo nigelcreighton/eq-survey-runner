@@ -485,7 +485,6 @@ def validate_list_collector_route(list_store, schema, block_id, list_name=None, 
     list_collector_block = schema.get_list_collector_for_block_id(block_id)
 
     if not list_collector_block:
-        print(block_id)
         raise NotFound(f'List collector populating {list_name} not found')
 
     if not current_block:
@@ -545,6 +544,7 @@ def get_list_item_block_id(schema, metadata, answer_store, list_name, list_item_
 
     return _render_block(schema, metadata, answer_store, block_id, current_location)
 
+
 @questionnaire_blueprint.route('<list_name>/<block_id>', methods=['POST'])
 @login_required
 @with_answer_store
@@ -554,6 +554,7 @@ def get_list_item_block_id(schema, metadata, answer_store, list_name, list_item_
 @with_schema
 def post_add_list_item(schema, metadata, collection_metadata, list_store, answer_store, list_name, block_id):
     return list_collector_post_handler(schema, metadata, collection_metadata, list_store, answer_store, block_id, list_name, None)
+
 
 @questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['POST'])
 @login_required
