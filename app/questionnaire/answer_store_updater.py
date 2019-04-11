@@ -40,12 +40,13 @@ class AnswerStoreUpdater:
 
                     self._answer_store.add_or_update(answer)
                 else:
-                    self._answer_store.remove(answer_ids=[answer_id])
+                    self._answer_store.remove_answer(answer_id)
 
     def remove_all_answers_with_list_item_id(self, list_item_id):
-        self._answer_store.remove(list_item_id=list_item_id)
+        self._answer_store.remove_all_answers_for_list_item_id(list_item_id=list_item_id)
         self._questionnaire_store.add_or_update()
 
     def remove_answer_ids(self, answer_ids: list):
-        self._answer_store.remove(answer_ids=answer_ids)
+        for answer_id in answer_ids:
+            self._answer_store.remove_answer(answer_id)
         self._questionnaire_store.add_or_update()

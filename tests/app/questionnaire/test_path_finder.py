@@ -42,8 +42,8 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
         """
         schema = load_schema_from_params('test', 'list_collector')
 
-        for list_operation in ['add', 'edit', 'remove']:
-            current_location = Location(block_id='list-collector', list_operation=list_operation)
+        for list_block, list_id in [('add_block', None), ('edit_block', 'abc123'), ('remove_block', 'abc123')]:
+            current_location = Location(block_id=list_block, list_name='people', list_item_id=list_id)
             previous_location = Location(block_id='list-collector')
 
             path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])

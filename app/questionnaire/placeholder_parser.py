@@ -13,7 +13,7 @@ class PlaceholderParser:
         self._transformer = PlaceholderTransforms()
 
     def _lookup_answer(self, answer_id):
-        found_answers = self._answer_store.filter(answer_ids=[answer_id])
+        found_answers = self._answer_store.get_answer(answer_id)
 
         if found_answers.count() > 0:
             return found_answers.values()[0]

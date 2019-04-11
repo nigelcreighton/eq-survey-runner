@@ -176,7 +176,7 @@ class TestQuestionnaireStore(TestCase):
         # Then
         self.assertEqual(store.completed_blocks, [])
         self.assertEqual(store.metadata.copy(), {})
-        self.assertEqual(store.answer_store.count(), 0)
+        self.assertEqual(len(store.answer_store), 0)
         self.assertEqual(store.collection_metadata, {})
 
     def test_questionnaire_store_removes_completed_location(self):

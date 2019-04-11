@@ -137,7 +137,7 @@ class PathFinder:
         if 'when' in goto_rule.keys():
             for condition in goto_rule['when']:
                 if 'meta' not in condition.keys():
-                    self.answer_store.remove(answer_ids=[condition['id']])
+                    self.answer_store.remove_answer(condition['id'])
 
         if this_location in self.completed_blocks:
             self.completed_blocks.remove(this_location)

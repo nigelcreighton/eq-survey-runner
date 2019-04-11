@@ -283,8 +283,8 @@ def get_schema_defined_limit(answer_id, definition, answer_store):
             value = definition['value']
         else:
             source_answer_id = definition.get('answer_id')
-            answer_list = answer_store.filter(answer_ids=[source_answer_id])
-            value = next(iter(answer_list)).get('value')
+            answer = answer_store.get_answer(source_answer_id)
+            value = answer.get('value')
             if not isinstance(value, int) and not isinstance(value, Decimal):
                 raise Exception('answer: {} value: {} for answer id: {} is not a valid number'
                                 .format(source_answer_id, value, answer_id))

@@ -50,14 +50,14 @@ def build_view_context_for_list_collector(rendered_block, schema, list_store, an
     list_item_ids = list_store[list_name]
 
     list_title_answer_ids = [answer['id'] for answer in rendered_block['add_block']['question']['answers']]
-    title_answer_map = answer_store.filter(list_title_answer_ids).map_values_by_list_item_id()
 
     list_items = []
     for list_item_id in list_item_ids:
-        if title_answer_map[list_item_id]:
+        title_answers = answer_store.get_answers_by_answer_id(answer_ids=list_title_answer_ids, list_item_id=list_item_id)
+        if title_answers:
             list_items.append({
-                'answers': title_answer_map[list_item_id],
-                'item_title': generate_list_item_title(title_answer_map[list_item_id], rendered_block['add_block']),
+                'answers': title_answers,
+                'item_title': generate_list_item_title(title_answers, rendered_block['add_block']),
                 'edit_link': url_for('questionnaire.get_list_item_block_id', list_name=list_name, block_id=rendered_block['edit_block']['id'], list_item_id=list_item_id),
                 'remove_link': url_for('questionnaire.get_list_item_block_id', list_name=list_name, block_id=rendered_block['remove_block']['id'], list_item_id=list_item_id),
             })

@@ -20,7 +20,7 @@ def convert_answers_to_payload_0_0_1(metadata, answer_store, schema, routing_pat
     data = OrderedDict()
     for location in routing_path:
         answer_ids = schema.get_answer_ids_for_block(location.block_id)
-        answers_in_block = answer_store.filter(answer_ids)
+        answers_in_block = answer_store.get_answers_by_answer_id(answer_ids, location.list_item_id)
 
         for answer_in_block in answers_in_block:
             answer_schema = None
@@ -62,11 +62,11 @@ def _get_checkbox_answer_data(answer_store, answer_schema, value):
 
         if option:
             if 'detail_answer' in option:
-                filtered = answer_store.filter(answer_ids=[option['detail_answer']['id']])
+                detail_answer = answer_store.get_answer(option['detail_answer']['id'])
 
                 # if the user has selected an option with a detail answer we need to find the detail answer value it refers to.
                 # the detail answer value can be empty, in this case we just use the main value (e.g. other)
-                user_answer = filtered.values()[0] or user_answer
+                user_answer = detail_answer or user_answer
 
             qcodes_and_values.append((option.get('q_code'), user_answer))
 

@@ -1,8 +1,20 @@
 # pylint: disable=no-self-use
+import json
 import unittest
+
+import pytest
 
 from app.data_model.answer_store import Answer, AnswerStore
 
+@pytest.fixture()
+def basic_answer_store():
+    answer_store = AnswerStore()
+
+    answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
+    answer_store.add_or_update(Answer(answer_id='answer2', value=20, list_item_id='xyz987'))
+    answer_store.add_or_update(Answer(answer_id='answer3', value=30))
+
+    return answer_store
 
 class TestAnswer(unittest.TestCase):
     def test_raises_error_on_invalid(self):
@@ -356,3 +368,64 @@ class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-met
                 {'answer_id': 'answer1', 'list_item_id': 'abc123', 'value': 10}
             ]
         }
+
+    def test_list_serialisation(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+        answer_3 = Answer(
+            answer_id='answer3',
+            value=30,
+        )
+
+        self.store = AnswerStore()
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+        self.store.add_or_update(answer_3)
+
+        serialised_store = list(self.store)
+
+        assert serialised_store == [
+            {'answer_id': 'answer1', 'value': 10, 'list_item_id': 'abc123'},
+            {'answer_id': 'answer2', 'value': 20, 'list_item_id': 'xyz987'},
+            {'answer_id': 'answer3', 'value': 30, 'list_item_id': None}
+        ]
+
+    def test_json_serialisation(self):
+        answer_1 = Answer(
+            answer_id='answer1',
+            value=10,
+            list_item_id='abc123'
+        )
+        answer_2 = Answer(
+            answer_id='answer2',
+            value=20,
+            list_item_id='xyz987'
+        )
+        answer_3 = Answer(
+            answer_id='answer3',
+            value=30,
+        )
+
+        self.store = AnswerStore()
+        self.store.add_or_update(answer_1)
+        self.store.add_or_update(answer_2)
+        self.store.add_or_update(answer_3)
+
+        json_serialised = json.dumps(list(self.store))
+
+        assert json_serialised
+
+def test_serialise_and_deserialise(basic_answer_store):
+    json_serialised = json.dumps(list(basic_answer_store))
+    deserialised = AnswerStore(json.loads(json_serialised))
+
+    assert deserialised == basic_answer_store
+

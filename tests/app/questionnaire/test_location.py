@@ -19,15 +19,15 @@ class TestLocation(AppContextTestCase):
     def test_load_location_from_dict(self):
         location_dict = {
             'block_id': 'some-block',
+            'list_name': 'people',
             'list_item_id': 'adhjiiw',
-            'list_operation': 'remove'
         }
 
         location = Location.from_dict(location_dict)
 
         self.assertEqual(location.block_id, 'some-block')
         self.assertEqual(location.list_item_id, 'adhjiiw')
-        self.assertEqual(location.list_operation, 'remove')
+        self.assertEqual(location.list_name, 'people')
 
     def test_load_location_from_dict_without_list_item_id(self):
         location_dict = {
@@ -38,4 +38,4 @@ class TestLocation(AppContextTestCase):
 
         self.assertEqual(location.block_id, 'some-block')
         self.assertEqual(location.list_item_id, None)
-        self.assertEqual(location.list_operation, None)
+        self.assertEqual(location.list_name, None)

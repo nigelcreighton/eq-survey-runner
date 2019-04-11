@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import itertools
 from collections import defaultdict
 from jinja2 import escape
@@ -13,6 +15,14 @@ class AnswerStore:
     """
     An object that stores and updates a collection of answers, ready for serialisation
     via the Questionnaire Store.
+
+    Internally stores answers in the form:
+
+    {
+        (<answer_id>, <list_item_id>): {
+            Answer
+        }
+    }
     """
 
     def __init__(self, existing_answers=None):
@@ -24,13 +34,13 @@ class AnswerStore:
         if isinstance(existing_answers, list):
             self.answer_map = self._build_map(existing_answers or [])
         else:
-            self.answer_map = existing_answers or defaultdict(list)
+            self.answer_map = existing_answers or {}
 
     def __iter__(self):
-        return iter((answer for answers in self.answer_map.values() for answer in answers))
+        return iter(self.answer_map.values())
 
     def __len__(self):
-        return sum(len(answers) for answers in self.answer_map.values())
+        return len(self.answer_map)
 
     def __eq__(self, other):
         return self.answer_map == other.answer_map
@@ -40,10 +50,12 @@ class AnswerStore:
 
     @staticmethod
     def _build_map(answers):
-        answer_map = defaultdict(list)
+        """ Builds the answer_store's data structure from a list of Answer dictionaries"""
+        answer_map = {}
 
         for answer in answers:
-            answer_map[answer['answer_id']].append(answer)
+            list_item_id = answer.get('list_item_id')
+            answer_map[answer['answer_id'], list_item_id] = answer
 
         return answer_map
 
@@ -52,64 +64,33 @@ class AnswerStore:
         if not isinstance(answer, Answer):
             raise TypeError('Method only supports Answer argument type')
 
-    def copy(self):
+    def copy(self) -> AnswerStore:
         """
         Create a new instance of answer_store with the same values.
         """
         return self.__class__(self.answer_map.copy())
 
-    def add_or_update(self, answer):
+    def add_or_update(self, answer: Answer):
         """
         Add a new answer into the answer store, or update if it exists.
-        :param answer: An answer object.
-        """
-        self._validate(answer)
-        position = self.find(answer)
-
-        if position is None:
-            answer_to_add = vars(answer).copy()
-            self.answer_map[answer_to_add['answer_id']].append(answer_to_add)
-        else:
-            self.answer_map[answer.answer_id][position]['value'] = answer.value
-
-    def find(self, answer):
-        """
-        Returns the position of an answer if it exists
-        :param answer: The answer to search for
-        :return: The position the answer exists at, None if it doesn't exist
         """
         self._validate(answer)
 
-        if answer.answer_id in self.answer_map:
-            for index, existing in enumerate(self.answer_map[answer.answer_id]):
-                if answer.matches_dict(existing):
-                    return index
+        self.answer_map[(answer.answer_id, answer.list_item_id)] = vars(answer).copy()
 
-        return None
-
-    def count(self):
+    def values(self) -> list[str]:
         """
-        Count of the number of answers in the answer store.
-        NB: can be combined with `filter` method to find count of an answer, e.g.:
-
-            `answer_store.filter(answer_id=example_id).count()`
-
-        :return: Number of answers in this store.
-        """
-        return len(self)
-
-    def values(self):
-        """
-        Return a flat list of all values in the answer store.
-
-        :return: Return a list of answer values
+        Return a flat list of all answer values in the answer store.
         """
         return [answer['value'] for answer in self]
 
-    def map_values_by_list_item_id(self):
+    def map_values_by_list_item_id(self) -> dict[str, dict]:
         """
-        Generate a map keyed on the list_item_id
+        Generate a map keyed on the list_item_id.
+
+        This method is not efficient.
         """
+        # TODO: This shouldn't be needed.
         output = defaultdict(list)
 
         for answer in self:
@@ -118,7 +99,7 @@ class AnswerStore:
 
         return output
 
-    def escaped(self):
+    def escaped(self) -> AnswerStore:
         """
         Escape all answer values and return a new AnswerStore instance.
 
@@ -132,36 +113,33 @@ class AnswerStore:
             escaped.append(answer)
         return self.__class__(existing_answers=escaped)
 
-    def filter(self, answer_ids=None, list_item_id=None):
+    def get_answer(self, answer_id: str, list_item_id: str=None) -> Answer:
+        """ Get a single answer from the store
+        Args:
+            answer_id: The answer id to find
+            list_item_id: If not provided (None), will only match an answer with no list_item_id
+
+        Returns:
+            A single Answer or None if it doesn't exist
         """
-        Find all answers in the answer store for a given set of filter parameter matches.
-        If no filter parameters are passed it returns a copy of the instance.
-        :param answer_ids: The answer ids to filter results by
-        :param list_item_id: A list_item_id to filter results by.
-        :return: Return a new AnswerStore object with filtered answers for chaining
+        return self.answer_map.get((answer_id, list_item_id))
+
+    def get_answers_by_answer_id(self, answer_ids: list[str], list_item_id: str=None) -> list[Answer]:
+        """ Get multiple answers from the store using the answer_id
+        Args:
+            answer_ids: list of answer ids to find
+            list_item_id: If not provided (None), will only match an answer with no list_item_id
+
+        Returns:
+            A list of Answer objects
         """
-        filtered = []
+        output = []
+        for answer_id in answer_ids:
+            answer = self.answer_map.get((answer_id, list_item_id))
+            if answer:
+                output.append(answer)
 
-        filter_vars = {
-            'answer_id': answer_ids,
-            'list_item_id': list_item_id,
-        }
-
-        if answer_ids:
-            answers = itertools.chain.from_iterable(self.answer_map.get(answer_id, []) for answer_id in answer_ids)
-        else:
-            answers = self
-
-        for answer in answers:
-            matches = all(
-                answer[key] in value if isinstance(value, (list, set)) else answer[key] == value
-                for key, value in filter_vars.items()
-                if value is not None
-            )
-            if matches:
-                filtered.append(answer)
-
-        return self.__class__(existing_answers=filtered)
+        return output
 
     def clear(self):
         """
@@ -169,29 +147,30 @@ class AnswerStore:
         """
         self.answer_map.clear()
 
-    def remove(self, answer_ids=None, list_item_id=None):
-        """
-        Removes answer(s) *in place* from the answer store.
-
-        :param answer_ids: The answer ids to remove
-        """
-        for answer in self.filter(answer_ids, list_item_id=list_item_id):
-            self.answer_map[answer['answer_id']].remove(answer)
-
-    def remove_answer(self, answer):
+    def remove_answer(self, answer_id: str, list_item_id: str=None):
         """
         Removes answer *in place* from the answer store.
-
-        :param answer: The answer to remove
         """
 
-        if answer['answer_id'] in self.answer_map:
-            del self.answer_map[answer['answer_id']]
+        if self.answer_map.get((answer_id, list_item_id)):
+            del self.answer_map[(answer_id, list_item_id)]
 
-    def get_hash(self):
+    def remove_all_answers_for_list_item_id(self, list_item_id: str):
+        """Remove all answers associated with a particular list_item_id
+        This method iterates through the entire list of answers. Not efficient.
+        """
+        trimmed_answers = self.answer_map.copy()
+
+        for answer in self:
+            if answer['list_item_id'] == list_item_id:
+                del trimmed_answers[(answer['answer_id'], answer['list_item_id'])]
+
+        self.answer_map = trimmed_answers
+
+    def get_hash(self) -> str:
         """
         Gets unique hash from answers contained within this AnswerStore
 
         :return: Return a unique hash value
         """
-        return hash(json.dumps(self.answer_map, sort_keys=True))
+        return hash(json.dumps(list(self), sort_keys=True))
