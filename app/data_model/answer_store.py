@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import itertools
-from collections import defaultdict
 from jinja2 import escape
 from structlog import get_logger
 import simplejson as json
@@ -84,26 +82,12 @@ class AnswerStore:
         """
         return [answer['value'] for answer in self]
 
-    def map_values_by_list_item_id(self) -> dict[str, dict]:
-        """
-        Generate a map keyed on the list_item_id.
-
-        This method is not efficient.
-        """
-        # TODO: This shouldn't be needed.
-        output = defaultdict(list)
-
-        for answer in self:
-            if answer['list_item_id']:
-                output[answer['list_item_id']].append(answer)
-
-        return output
-
     def escaped(self) -> AnswerStore:
         """
         Escape all answer values and return a new AnswerStore instance.
 
-        :return: Return a new AnswerStore object with escaped answers for chaining
+        Returns:
+            A new AnswerStore object with escaped answers for chaining
         """
         escaped = []
         for answer in self:
@@ -115,6 +99,7 @@ class AnswerStore:
 
     def get_answer(self, answer_id: str, list_item_id: str=None) -> Answer:
         """ Get a single answer from the store
+
         Args:
             answer_id: The answer id to find
             list_item_id: If not provided (None), will only match an answer with no list_item_id
@@ -126,9 +111,11 @@ class AnswerStore:
 
     def get_answers_by_answer_id(self, answer_ids: list[str], list_item_id: str=None) -> list[Answer]:
         """ Get multiple answers from the store using the answer_id
+
         Args:
             answer_ids: list of answer ids to find
-            list_item_id: If not provided (None), will only match an answer with no list_item_id
+            list_item_id: list item id to match
+                          If not provided (None), will only match an answer with no list_item_id
 
         Returns:
             A list of Answer objects
@@ -167,10 +154,11 @@ class AnswerStore:
 
         self.answer_map = trimmed_answers
 
-    def get_hash(self) -> str:
+    def get_hash(self):
         """
         Gets unique hash from answers contained within this AnswerStore
 
         :return: Return a unique hash value
         """
+        # TODO: How can order be preserved here without using json.dumps?
         return hash(json.dumps(list(self), sort_keys=True))

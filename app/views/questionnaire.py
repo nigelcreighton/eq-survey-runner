@@ -441,7 +441,7 @@ def get_page_title_for_location(schema, current_location, context):
 
 
 def _build_template(current_location, context, template, schema):
-    previous_location = path_finder.get_previous_location(current_location)
+    previous_location = path_finder.get_previous_location(current_location, schema)
     previous_url = previous_location.url() if previous_location is not None else None
 
     return _render_template(context, current_location, template, previous_url, schema)

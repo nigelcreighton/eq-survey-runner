@@ -145,4 +145,4 @@ class TestAnswerStoreUpdater(unittest.TestCase):
         self.answer_store_updater.remove_all_answers_with_list_item_id('abcdef')
 
         assert len(answer_store) == 1
-        assert answer_store['test3']
+        assert answer_store.get_answer('test3', 'uvwxyz')

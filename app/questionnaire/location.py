@@ -50,7 +50,7 @@ class Location:
         block_id = location_dict['block_id']
         list_item_id = location_dict.get('list_item_id')
         list_name = location_dict.get('list_name')
-        return cls(block_id, list_item_id, list_name)
+        return cls(block_id, list_name, list_item_id)
 
     def to_dict(self) -> dict:
         attributes = vars(self)

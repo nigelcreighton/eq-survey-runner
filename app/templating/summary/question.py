@@ -16,7 +16,11 @@ class Question:
         self.answers = self._build_answers(answer_store, question_schema)
 
     def _get_answer(self, answer_store, answer_id):
-        return answer_store.get_answer(answer_id)
+        answer = answer_store.get_answer(answer_id)
+        if answer:
+            return answer['value']
+
+        return None
 
     def _build_answers(self, answer_store, question_schema):
         summary_answers = []

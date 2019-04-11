@@ -26,7 +26,7 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
         previous_location = Location(block_id='name-block')
 
         path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])
-        self.assertEqual(path_finder.get_previous_location(current_location=current_location), previous_location)
+        self.assertEqual(path_finder.get_previous_location(current_location, schema), previous_location)
 
     def test_previous_block_on_list_collector(self):
         schema = load_schema_from_params('test', 'list_collector')
@@ -35,19 +35,19 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
         previous_location = Location(block_id='introduction')
 
         path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])
-        self.assertEqual(path_finder.get_previous_location(current_location=current_location), previous_location)
+        self.assertEqual(path_finder.get_previous_location(current_location, schema), previous_location)
 
     def test_previous_block_on_list_collector_list_operation(self):
         """ Ensure we always return to the list collector when the previous link is used on a sub block
         """
         schema = load_schema_from_params('test', 'list_collector')
 
-        for list_block, list_id in [('add_block', None), ('edit_block', 'abc123'), ('remove_block', 'abc123')]:
+        for list_block, list_id in [('add-person', None), ('edit-person', 'abc123'), ('remove-person', 'abc123')]:
             current_location = Location(block_id=list_block, list_name='people', list_item_id=list_id)
             previous_location = Location(block_id='list-collector')
 
             path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])
-            self.assertEqual(path_finder.get_previous_location(current_location=current_location), previous_location)
+            self.assertEqual(path_finder.get_previous_location(current_location, schema), previous_location)
 
     def test_introduction_in_path_when_in_schema(self):
         schema = load_schema_from_params('test', 'introduction')
@@ -155,7 +155,7 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
 
         first_location = Location('general-business-information-completed')
 
-        previous_location = path_finder.get_previous_location(current_location=first_location)
+        previous_location = path_finder.get_previous_location(first_location, schema)
 
         self.assertEqual('introduction', previous_location.block_id)
 
@@ -179,7 +179,7 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
         expected_previous_location = expected_path[0]
 
         path_finder = PathFinder(schema, answer_store=answers, metadata={}, completed_blocks=[])
-        actual_previous_block = path_finder.get_previous_location(current_location=current_location)
+        actual_previous_block = path_finder.get_previous_location(current_location, schema)
 
         self.assertEqual(actual_previous_block, expected_previous_location)
 
@@ -204,7 +204,7 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
 
         path_finder = PathFinder(schema, answer_store=answers, metadata={}, completed_blocks=[])
 
-        self.assertEqual(path_finder.get_previous_location(current_location=current_location),
+        self.assertEqual(path_finder.get_previous_location(current_location, schema),
                          expected_previous_location)
 
     def test_next_location_goto_summary(self):

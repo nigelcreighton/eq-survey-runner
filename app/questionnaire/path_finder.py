@@ -215,7 +215,7 @@ class PathFinder:
                 if location not in self.completed_blocks:
                     return None
 
-    def get_previous_location(self, current_location):
+    def get_previous_location(self, current_location, schema):
         """
         Returns the previous 'location' to visit given a set of user answers
         :param current_location:
@@ -228,9 +228,10 @@ class PathFinder:
         if first_block_for_group == current_location.block_id:
             return None
 
-        # TODO: Add something to replace this further up, with knowledge of schema.
-        # if current_location.list_operation:
-        #     return Location(block_id=current_location.block_id)
+        current_block = schema.get_block(current_location.block_id)
+        if 'list_operation' in current_block:
+            # If this is a list collector sub block, return the collector in the previous link
+            return Location(block_id=current_block['list_collector'])
 
         routing_path = self.get_full_routing_path()
         current_location_index = PathFinder._get_current_location_index(routing_path, current_location)

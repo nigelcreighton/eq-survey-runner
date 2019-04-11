@@ -1,10 +1,13 @@
-# pylint: disable=no-self-use
 import json
-import unittest
 
 import pytest
 
 from app.data_model.answer_store import Answer, AnswerStore
+
+@pytest.fixture()
+def empty_answer_store():
+    answer_store = AnswerStore()
+    return answer_store
 
 @pytest.fixture()
 def basic_answer_store():
@@ -12,420 +15,149 @@ def basic_answer_store():
 
     answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
     answer_store.add_or_update(Answer(answer_id='answer2', value=20, list_item_id='xyz987'))
+    answer_store.add_or_update(Answer(answer_id='another-answer2', value=25, list_item_id='xyz987'))
+
     answer_store.add_or_update(Answer(answer_id='answer3', value=30))
+    answer_store.add_or_update(Answer(answer_id='another-answer3', value=35))
+
+    answer_store.add_or_update(Answer(answer_id='to-escape', value="'Twenty Five'"))
 
     return answer_store
 
-class TestAnswer(unittest.TestCase):
-    def test_raises_error_on_invalid(self):
+@pytest.fixture()
+def store_to_serialise():
+    answer_store = AnswerStore()
 
-        with self.assertRaises(ValueError) as ite:
-            Answer(None, None)
+    answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
+    answer_store.add_or_update(Answer(answer_id='answer2', value=20, list_item_id='xyz987'))
+    answer_store.add_or_update(Answer(answer_id='answer3', value=30))
 
-        self.assertIn("Both 'answer_id' and 'value' must be set for Answer", str(ite.exception))
+    return answer_store
+def test_adding_new_answer(empty_answer_store):
+    answer = Answer(
+        answer_id='4',
+        value=25,
+    )
 
-    def test_matches_answer(self):
-        answer_1 = Answer(
-            answer_id='4',
-            list_item_id='dj892j',
-            value=25,
-        )
-        answer_2 = Answer(
-            answer_id='4',
-            list_item_id='dj892j',
-            value=25,
-        )
+    empty_answer_store.add_or_update(answer)
 
-        self.assertEqual(answer_1.matches(answer_2), True)
+    assert len(empty_answer_store) == 1
 
-    def test_matches_answer_dict(self):
-        answer_1 = Answer(
-            answer_id='4',
-            list_item_id='dj892j',
-            value=25,
-        )
-        answer_2 = {
-            'answer_id': '4',
-            'list_item_id': 'dj892j',
-            'value': 25,
-        }
+def test_raises_error_on_invalid_answer(empty_answer_store):
 
-        self.assertEqual(answer_1.matches_dict(answer_2), True)
-
-    def test_non_matching_answer(self):
-        answer_1 = Answer(
-            answer_id='4',
-            list_item_id='iw892j',
-            value=25,
-        )
-        answer_2 = Answer(
-            answer_id='4',
-            list_item_id='dj892j',
-            value=65,
-        )
-
-        self.assertEqual(answer_1.matches(answer_2), False)
-
-    def test_matches_answer_simple(self):
-        answer_1 = Answer(
-            answer_id='4',
-            value=25,
-        )
-        answer_2 = Answer(
-            answer_id='4',
-            value=65,
-        )
-
-        self.assertEqual(answer_1.matches(answer_2), True)
-
-    def test_matches_answer_simple_dict(self):
-        answer_1 = Answer(
-            answer_id='4',
-            value=25,
-        )
-        answer_2 = {
+    with pytest.raises(TypeError) as e:
+        empty_answer_store.add_or_update({
             'answer_id': '4',
             'value': 25,
-        }
+        })
 
-        self.assertEqual(answer_1.matches_dict(answer_2), True)
+    assert 'Method only supports Answer argument type' in str(e)
 
+def test_updates_answer_no_list_id(basic_answer_store):
 
-class TestAnswerStore(unittest.TestCase):  # pylint: disable=too-many-public-methods
-    def setUp(self):
-        self.store = AnswerStore()
+    store_length = len(basic_answer_store)
 
-    def tearDown(self):
-        self.store.clear()
+    duplicate_answer = Answer(
+        answer_id='answer3',
+        value=300
+    )
 
-    def test_adds_answer(self):
-        answer = Answer(
-            answer_id='4',
-            value=25,
-        )
+    basic_answer_store.add_or_update(duplicate_answer)
 
-        self.store.add_or_update(answer)
+    assert len(basic_answer_store) == store_length
 
-        self.assertEqual(len(self.store), 1)
+    assert basic_answer_store.get_answer('answer3')['value'] == 300
 
-    def test_raises_error_on_invalid(self):
+def test_updates_answer_with_list_id(basic_answer_store):
+    store_length = len(basic_answer_store)
 
-        with self.assertRaises(TypeError) as ite:
-            self.store.add_or_update({
-                'answer_id': '4',
-                'value': 25,
-            })
+    duplicate_answer = Answer(
+        answer_id='answer1',
+        list_item_id='abc123',
+        value=100
+    )
 
-        self.assertIn('Method only supports Answer argument type', str(ite.exception))
+    basic_answer_store.add_or_update(duplicate_answer)
 
-    def test_updates_answer(self):
-        answer_1 = Answer(
-            answer_id='4',
-            value=25,
-        )
-        answer_2 = Answer(
-            answer_id='4',
-            value=65,
-        )
+    assert len(basic_answer_store) == store_length
 
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
+    assert basic_answer_store.get_answer('answer1', list_item_id='abc123')['value'] == 100
 
-        self.assertEqual(len(self.store), 1)
+def test_get_answer_no_list(basic_answer_store):
+    assert basic_answer_store.get_answer('answer3') == {
+        'answer_id': 'answer3',
+        'list_item_id': None,
+        'value': 30
+    }
 
-        store_match = self.store.filter(
-            answer_ids=['4'],
-        )
+def test_get_answer_with_list(basic_answer_store):
+    assert basic_answer_store.get_answer('answer1', 'abc123') == {
+        'answer_id': 'answer1',
+        'list_item_id': 'abc123',
+        'value': 10
+    }
 
-        self.assertEqual(store_match, AnswerStore([answer_2.__dict__]))
 
-    def test_filters_answers(self):
+def test_escaped(basic_answer_store):
+    escaped = basic_answer_store.escaped()
 
-        answer_1 = Answer(
-            answer_id='2',
-            value=25,
-        )
-        answer_2 = Answer(
-            answer_id='5',
-            value=65,
-        )
+    assert len(basic_answer_store) == len(escaped)
+    assert escaped.get_answer('to-escape')['value'] == '&#39;Twenty Five&#39;'
+    assert escaped.get_answer('answer1', 'abc123')['value'] == 10
 
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
+    # answers in the store have not been escaped
+    assert basic_answer_store.get_answer('answer3')['value'] == 30
+    assert basic_answer_store.get_answer('to-escape')['value'] == "'Twenty Five'"
 
-        filtered = self.store.filter(answer_ids=['5'])
+def test_get_answer_does_not_escape_values(basic_answer_store):
+    normal_answer = basic_answer_store.get_answer('answer3')
+    answer_needs_escaping = basic_answer_store.get_answer('to-escape')
 
-        self.assertEqual(len(filtered), 1)
+    assert normal_answer['value'] == 30
+    assert answer_needs_escaping['value'] == "'Twenty Five'"
 
-    def test_escaped(self):
+def test_get_answers_with_list_item_id(basic_answer_store):
+    ids_to_get = ['answer2', 'another-answer2']
+    answers = basic_answer_store.get_answers_by_answer_id(ids_to_get, 'xyz987')
 
-        self.store.add_or_update(Answer(
-            answer_id='1',
-            value=25,
-        ))
+    assert len(answers) == len(ids_to_get)
 
-        self.store.add_or_update(Answer(
-            answer_id='2',
-            value="'Twenty Five'",
-        ))
+def test_get_answers_no_list(basic_answer_store):
+    ids_to_get = ['answer3', 'another-answer3']
+    answers = basic_answer_store.get_answers_by_answer_id(ids_to_get)
 
-        escaped = self.store.escaped()
+    assert len(answers) == len(ids_to_get)
 
-        self.assertEqual(len(escaped), 2)
-        self.assertEqual(escaped.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(escaped.filter(answer_ids=['2']).values()[0], '&#39;Twenty Five&#39;')
+def test_remove_all_answers(basic_answer_store):
+    assert basic_answer_store
+    basic_answer_store.clear()
+    assert not basic_answer_store
 
-        # answers in the store have not been escaped
-        self.assertEqual(self.store.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(self.store.filter(answer_ids=['2']).values()[0], "'Twenty Five'")
+def test_remove_answer(basic_answer_store):
+    len_before_remove = len(basic_answer_store)
+    basic_answer_store.remove_answer('answer1', 'abc123')
+    assert len(basic_answer_store) == len_before_remove - 1
 
-    def test_filter_answers_does_not_escapes_values(self):
+def test_list_serialisation(store_to_serialise):
+    serialised_store = list(store_to_serialise)
 
-        self.store.add_or_update(Answer(
-            answer_id='1',
-            value=25,
-        ))
-
-        self.store.add_or_update(Answer(
-            answer_id='2',
-            value="'Twenty Five'",
-        ))
-
-        filtered = self.store.filter(['1', '2'])
-
-        self.assertEqual(len(filtered), 2)
-        self.assertEqual(filtered.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(filtered.filter(answer_ids=['2']).values()[0], "'Twenty Five'")
-
-    def test_filter_chaining_escaped(self):
-
-        self.store.add_or_update(Answer(
-            answer_id='1',
-            value=25,
-        ))
-
-        self.store.add_or_update(Answer(
-            answer_id='2',
-            value="'Twenty Five'",
-        ))
-
-        escaped = self.store.filter(answer_ids=['2']).escaped()
-
-        self.assertEqual(len(escaped), 1)
-        self.assertEqual(escaped.values()[0], '&#39;Twenty Five&#39;')
-
-        # answers in the store have not been escaped
-        self.assertEqual(self.store.filter(answer_ids=['1']).values()[0], 25)
-        self.assertEqual(self.store.filter(answer_ids=['2']).values()[0], "'Twenty Five'")
-
-        values = self.store.filter(answer_ids=['2']).escaped().values()
-
-        self.assertEqual(len(values), 1)
-        self.assertEqual(values[0], '&#39;Twenty Five&#39;')
-
-    def test_filter_chaining_count(self):
-
-        self.store.add_or_update(Answer(
-            answer_id='1',
-            value=25,
-        ))
-
-        self.store.add_or_update(Answer(
-            answer_id='2',
-            value="'Twenty Five'",
-        ))
-
-        self.assertEqual(self.store.count(), 2)
-        self.assertEqual(self.store.filter(answer_ids=['2']).count(), 1)
-        self.assertEqual(self.store.filter(answer_ids=['1', '2']).count(), 2)
-
-    def test_remove_all_answers(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-        )
-
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-
-        self.store.clear()
-        self.assertEqual(len(self.store), 0)
-
-    def test_remove_answer(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-        )
-
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-
-        self.store.remove_answer(vars(answer_1))
-        self.assertEqual(len(self.store), 1)
-
-    def test_filter_list_item_id(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-            list_item_id='abc123'
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-            list_item_id='xyz987'
-        )
-
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-
-        filtered = self.store.filter(list_item_id='xyz987')
-
-        self.assertEqual(len(filtered), 1)
-
-    def test_filter_list_item_id_and_answer_id(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-            list_item_id='abc123'
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-            list_item_id='xyz987'
-        )
-        answer_3 = Answer(
-            answer_id='answer3',
-            value=30,
-            list_item_id='xyz987'
-        )
-
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-        self.store.add_or_update(answer_3)
-
-        filtered = self.store.filter(list_item_id='xyz987')
-
-        self.assertEqual(len(filtered), 2)
-
-        filtered = self.store.filter(answer_ids=['answer2'], list_item_id='xyz987')
-
-        self.assertEqual(len(filtered), 1)
-
-    def test_adding_list_item_ids_to_answer_store(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-            list_item_id='abc123'
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-            list_item_id='xyz987'
-        )
-
-        self.store = AnswerStore()
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-
-        assert answer_2.matches_dict(self.store.answer_map['answer2'][0])
-
-    def test_map_values_by_list_item_id(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-            list_item_id='abc123'
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-            list_item_id='xyz987'
-        )
-        answer_3 = Answer(
-            answer_id='answer3',
-            value=20,
-            list_item_id='xyz987'
-        )
-
-        self.store = AnswerStore()
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-        self.store.add_or_update(answer_3)
-
-        assert self.store.map_values_by_list_item_id() == {
-            'xyz987': [
-                {'answer_id': 'answer2', 'list_item_id': 'xyz987', 'value': 20},
-                {'answer_id': 'answer3', 'list_item_id': 'xyz987', 'value': 20}
-            ],
-            'abc123': [
-                {'answer_id': 'answer1', 'list_item_id': 'abc123', 'value': 10}
-            ]
-        }
-
-    def test_list_serialisation(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-            list_item_id='abc123'
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-            list_item_id='xyz987'
-        )
-        answer_3 = Answer(
-            answer_id='answer3',
-            value=30,
-        )
-
-        self.store = AnswerStore()
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-        self.store.add_or_update(answer_3)
-
-        serialised_store = list(self.store)
-
-        assert serialised_store == [
-            {'answer_id': 'answer1', 'value': 10, 'list_item_id': 'abc123'},
-            {'answer_id': 'answer2', 'value': 20, 'list_item_id': 'xyz987'},
-            {'answer_id': 'answer3', 'value': 30, 'list_item_id': None}
-        ]
-
-    def test_json_serialisation(self):
-        answer_1 = Answer(
-            answer_id='answer1',
-            value=10,
-            list_item_id='abc123'
-        )
-        answer_2 = Answer(
-            answer_id='answer2',
-            value=20,
-            list_item_id='xyz987'
-        )
-        answer_3 = Answer(
-            answer_id='answer3',
-            value=30,
-        )
-
-        self.store = AnswerStore()
-        self.store.add_or_update(answer_1)
-        self.store.add_or_update(answer_2)
-        self.store.add_or_update(answer_3)
-
-        json_serialised = json.dumps(list(self.store))
-
-        assert json_serialised
+    assert serialised_store == [
+        {'answer_id': 'answer1', 'value': 10, 'list_item_id': 'abc123'},
+        {'answer_id': 'answer2', 'value': 20, 'list_item_id': 'xyz987'},
+        {'answer_id': 'answer3', 'value': 30, 'list_item_id': None}
+    ]
 
 def test_serialise_and_deserialise(basic_answer_store):
     json_serialised = json.dumps(list(basic_answer_store))
     deserialised = AnswerStore(json.loads(json_serialised))
 
     assert deserialised == basic_answer_store
+
+def test_hash(basic_answer_store):
+    first_hash = basic_answer_store.get_hash()
+    basic_answer_store.remove_answer('answer1', 'abc123')
+    assert basic_answer_store.get_hash() != first_hash
+    basic_answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
+    assert basic_answer_store.get_hash() == first_hash
+
 

@@ -223,14 +223,14 @@ def get_answer_store_value(answer_id, answer_store, schema, routing_path=None):
     """
 
     answer = answer_store.get_answer(answer_id)
+    if not answer:
+        return None
+
     if routing_path:
-        if _is_answer_on_path(schema, answer_id, routing_path):
+        if _is_answer_on_path(schema, answer, routing_path):
             return answer['value']
     else:
         return answer['value']
-
-    return None
-
 
 def get_metadata_value(metadata, key):
     return metadata.get(key)

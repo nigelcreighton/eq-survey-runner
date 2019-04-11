@@ -139,6 +139,6 @@ class TestDateRules(AppContextTestCase):
         }
 
         answer_store = AnswerStore({})
-        answer_store.add_or_update(Answer(answer_id='date_answer', value='2018-02-01'))
+        answer_store.add_or_update(Answer(answer_id='date-answer', value='2018-02-01'))
 
         self.assertFalse(evaluate_goto(goto_rule, get_schema_mock(), {}, answer_store, 0))

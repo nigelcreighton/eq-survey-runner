@@ -66,7 +66,7 @@ def _get_checkbox_answer_data(answer_store, answer_schema, value):
 
                 # if the user has selected an option with a detail answer we need to find the detail answer value it refers to.
                 # the detail answer value can be empty, in this case we just use the main value (e.g. other)
-                user_answer = detail_answer or user_answer
+                user_answer = detail_answer['value'] or user_answer
 
             qcodes_and_values.append((option.get('q_code'), user_answer))
 
