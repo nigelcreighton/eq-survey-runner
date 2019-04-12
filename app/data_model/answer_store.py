@@ -3,7 +3,6 @@ from typing import List
 
 from jinja2 import escape
 from structlog import get_logger
-import simplejson as json
 
 from app.data_model.answer import Answer
 
@@ -161,5 +160,5 @@ class AnswerStore:
 
         :return: Return a unique hash value
         """
-        # TODO: How can order be preserved here without using json.dumps?
-        return hash(json.dumps(list(self), sort_keys=True))
+
+        return hash(frozenset(self.answer_map))
