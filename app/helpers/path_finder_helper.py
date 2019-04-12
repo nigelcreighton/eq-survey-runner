@@ -1,5 +1,6 @@
 from functools import wraps
 
+from aws_xray_sdk.core import xray_recorder
 from flask import g
 from flask_login import current_user, login_required
 from werkzeug.local import LocalProxy
@@ -9,6 +10,7 @@ from app.questionnaire.path_finder import PathFinder
 
 
 @login_required
+@xray_recorder.capture('path_finder_helper.get_path_finder')
 def get_path_finder():
     finder = getattr(g, 'path_finder', None)
 

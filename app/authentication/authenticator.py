@@ -49,8 +49,12 @@ def _extend_session_expiry(session_store):
     """
     session_timeout = cookie_session.get('expires_in')
     if session_timeout:
-        session_store.expiration_time = datetime.now(tz=tzutc()) + timedelta(seconds=session_timeout)
-        session_store.save()
+        new_expiration_time = datetime.now(tz=tzutc()) + timedelta(seconds=session_timeout)
+
+        # Only update expiry time if its greater than 60s different to what is currently set
+        if (new_expiration_time - session_store.expiration_time).total_seconds() > 60:
+            session_store.expiration_time = new_expiration_time
+            session_store.save()
 
         logger.debug('session expiry extended')
 
@@ -69,6 +73,7 @@ def _is_session_valid(session_store):
     return True
 
 
+@xray_recorder.capture('authenitcator.load_user')
 def load_user():
     """
     Checks for the present of the JWT in the users sessions
@@ -96,6 +101,7 @@ def load_user():
     return None
 
 
+@xray_recorder.capture('authenitcator._create_session_data_from_metadata')
 def _create_session_data_from_metadata(metadata):
     """
     Creates a SessionData object from metadata
@@ -119,6 +125,7 @@ def _create_session_data_from_metadata(metadata):
     return session_data
 
 
+@xray_recorder.capture('authenitcator.store_session')
 def store_session(metadata):
     """
     Store new session and metadata
