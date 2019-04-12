@@ -3,9 +3,9 @@ from typing import List
 
 from jinja2 import escape
 from structlog import get_logger
+import simplejson as json
 
 from app.data_model.answer import Answer
-from app.libs.utils import make_hash
 
 logger = get_logger()
 
@@ -162,4 +162,4 @@ class AnswerStore:
         :return: Return a unique hash value
         """
 
-        return make_hash(self.answer_map)
+        return hash(json.dumps(list(self.answer_map.items())))
