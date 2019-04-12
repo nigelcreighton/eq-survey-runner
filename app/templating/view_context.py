@@ -17,7 +17,7 @@ def build_view_context(block_type, metadata, schema, list_store, answer_store, r
     if block_type == 'CalculatedSummary':
         return build_view_context_for_calculated_summary(metadata, schema, answer_store, block_type, current_location)
 
-    if block_type in ('Question', 'ConfirmationQuestion'):
+    if block_type in ('Question', 'ConfirmationQuestion', 'ListAddQuestion', 'ListEditQuestion', 'ListRemoveQuestion'):
         form = form or get_form_for_location(schema, rendered_block, current_location, answer_store, metadata)
         return build_view_context_for_question(rendered_block, form)
 

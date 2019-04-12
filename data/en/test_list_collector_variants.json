@@ -114,7 +114,7 @@
                     ],
                     "add_block": {
                         "id": "add-person",
-                        "type": "Question",
+                        "type": "ListAddQuestion",
                         "question_variants": [{
                                 "question": {
                                     "id": "add-question",
@@ -169,7 +169,7 @@
                     },
                     "edit_block": {
                         "id": "edit-person",
-                        "type": "Question",
+                        "type": "ListEditQuestion",
                         "question_variants": [{
                                 "question": {
                                     "id": "edit-question",
@@ -224,7 +224,7 @@
                     },
                     "remove_block": {
                         "id": "remove-person",
-                        "type": "Question",
+                        "type": "ListRemoveQuestion",
                         "question_variants": [{
                                 "question": {
                                     "id": "remove-question",

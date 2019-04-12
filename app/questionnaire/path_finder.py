@@ -228,10 +228,10 @@ class PathFinder:
         if first_block_for_group == current_location.block_id:
             return None
 
-        current_block = schema.get_block(current_location.block_id)
-        if 'list_operation' in current_block:
+        block = schema.get_block(current_location.block_id)
+        if schema.is_block_list_collector_child(current_location.block_id):
             # If this is a list collector sub block, return the collector in the previous link
-            return Location(block_id=current_block['list_collector'])
+            return Location(block_id=block['parent_id'])
 
         routing_path = self.get_full_routing_path()
         current_location_index = PathFinder._get_current_location_index(routing_path, current_location)

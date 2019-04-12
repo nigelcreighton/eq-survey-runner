@@ -597,9 +597,9 @@ def list_collector_post_handler(schema, metadata, collection_metadata, list_stor
         answer_store_updater = AnswerStoreUpdater(current_location, schema,
                                                   questionnaire_store, rendered_block.get('question'))
 
-        list_operation = block['list_operation']
+        block_type = block['type']
 
-        if list_operation == 'remove_block':
+        if block_type == 'ListRemoveQuestion':
             if list(form.data.values())[0] == parent_block['remove_answer_value']:
                 list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
                 answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
@@ -607,7 +607,7 @@ def list_collector_post_handler(schema, metadata, collection_metadata, list_stor
                 return redirect(
                     url_for('questionnaire.get_edit_list_item',
                             block_id=parent_block['id'], list_item_id=list_item_id))
-        elif list_operation == 'add_block':
+        elif block_type == 'ListAddQuestion':
             new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
             current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
             answer_store_updater = AnswerStoreUpdater(current_location, schema,

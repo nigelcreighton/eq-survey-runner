@@ -5,7 +5,7 @@ from flask_babel import force_locale
 from app.validation.error_messages import error_messages
 
 DEFAULT_LANGUAGE_CODE = 'en'
-
+LIST_COLLECTOR_CHILDREN = ['ListAddQuestion', 'ListEditQuestion', 'ListRemoveQuestion']
 
 class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
     def __init__(self, questionnaire_json, language_code=DEFAULT_LANGUAGE_CODE):
@@ -75,6 +75,9 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
 
     def get_group_by_block_id(self, block_id):
         block = self.get_block(block_id)
+        if block['type'] in LIST_COLLECTOR_CHILDREN:
+            parent = self.get_block(block['parent_id'])
+            return self.get_group(parent['parent_id'])
         return self.get_group(block['parent_id'])
 
     @classmethod
@@ -157,7 +160,13 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
 
     def get_list_collector_for_block_id(self, block_id):
         block = self.get_block(block_id)
-        return self.get_block(block['list_collector'])
+        return self.get_block(block['parent_id'])
+
+    def is_block_list_collector_child(self, block_id):
+        block = self.get_block(block_id)
+        parent = self.get_block(block['parent_id'])
+
+        return parent and parent['type'] == 'ListCollector'
 
     def _parse_schema(self):
         self._list_collectors = defaultdict(list)
@@ -180,9 +189,7 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
                     self._list_collectors[block['populates_list']].append(block)
                     for nested_block_name in ['add_block', 'edit_block', 'remove_block']:
                         nested_block = block[nested_block_name]
-                        nested_block['parent_id'] = group['id']
-                        nested_block['list_collector'] = block['id']
-                        nested_block['list_operation'] = nested_block_name
+                        nested_block['parent_id'] = block['id']
                         blocks[nested_block['id']] = nested_block
 
         return blocks

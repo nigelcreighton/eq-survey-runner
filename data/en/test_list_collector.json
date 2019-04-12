@@ -57,7 +57,7 @@
                         },
                         "add_block": {
                             "id": "add-person",
-                            "type": "Question",
+                            "type": "ListAddQuestion",
                             "question": {
                                 "id": "add-question",
                                 "type": "General",
@@ -79,7 +79,7 @@
                         },
                         "edit_block": {
                             "id": "edit-person",
-                            "type": "Question",
+                            "type": "ListEditQuestion",
                             "question": {
                                 "id": "edit-question",
                                 "type": "General",
@@ -101,7 +101,7 @@
                         },
                         "remove_block": {
                             "id": "remove-person",
-                            "type": "Question",
+                            "type": "ListRemoveQuestion",
                             "question": {
                                 "id": "remove-question",
                                 "type": "General",
@@ -163,7 +163,7 @@
                         },
                         "add_block": {
                             "id": "another-add-person",
-                            "type": "Question",
+                            "type": "ListAddQuestion",
                             "question": {
                                 "id": "another-add-question",
                                 "type": "General",
@@ -185,7 +185,7 @@
                         },
                         "edit_block": {
                             "id": "another-edit-person",
-                            "type": "Question",
+                            "type": "ListEditQuestion",
                             "question": {
                                 "id": "another-edit-question",
                                 "type": "General",
@@ -207,7 +207,7 @@
                         },
                         "remove_block": {
                             "id": "another-remove-person",
-                            "type": "Question",
+                            "type": "ListRemoveQuestion",
                             "question": {
                                 "id": "another-remove-question",
                                 "type": "General",
