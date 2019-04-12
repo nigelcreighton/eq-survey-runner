@@ -154,9 +154,3 @@ def test_serialise_and_deserialise(basic_answer_store):
 
     assert deserialised == basic_answer_store
 
-def test_hash(basic_answer_store):
-    first_hash = basic_answer_store.get_hash()
-    basic_answer_store.remove_answer('answer1', 'abc123')
-    assert basic_answer_store.get_hash() != first_hash
-    basic_answer_store.add_or_update(Answer(answer_id='answer1', value=10, list_item_id='abc123'))
-    assert basic_answer_store.get_hash() == first_hash

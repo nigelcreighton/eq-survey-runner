@@ -164,6 +164,9 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
 
     def is_block_list_collector_child(self, block_id):
         block = self.get_block(block_id)
+        if not block:
+            return False
+
         parent = self.get_block(block['parent_id'])
 
         return parent and parent['type'] == 'ListCollector'

@@ -35,6 +35,8 @@ class AnswerStore:
         else:
             self.answer_map = existing_answers or {}
 
+        self.dirty = False
+
     def __iter__(self):
         return iter(self.answer_map.values())
 
@@ -155,11 +157,3 @@ class AnswerStore:
 
         self.answer_map = trimmed_answers
 
-    def get_hash(self):
-        """
-        Gets unique hash from answers contained within this AnswerStore
-
-        :return: Return a unique hash value
-        """
-
-        return hash(json.dumps(list(self.answer_map.items())))

@@ -21,6 +21,7 @@ class AnswerStoreUpdater:
             self._questionnaire_store.completed_blocks.append(self._current_location)
 
         self._questionnaire_store.add_or_update()
+        self._answer_store.dirty = True
 
     def _update_questionnaire_store_with_form_data(self, form_data):
         answer_ids_for_question = self._schema.get_answer_ids_for_question(self._current_question)
@@ -45,8 +46,10 @@ class AnswerStoreUpdater:
     def remove_all_answers_with_list_item_id(self, list_item_id):
         self._answer_store.remove_all_answers_for_list_item_id(list_item_id=list_item_id)
         self._questionnaire_store.add_or_update()
+        self._answer_store.dirty = True
 
     def remove_answer_ids(self, answer_ids: list):
         for answer_id in answer_ids:
             self._answer_store.remove_answer(answer_id)
         self._questionnaire_store.add_or_update()
+        self._answer_store.dirty = True

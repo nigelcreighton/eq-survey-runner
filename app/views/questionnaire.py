@@ -197,6 +197,8 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
             answer_store_updater.save_answers(form)
         elif block_type == 'ListEditQuestion':
             answer_store_updater.save_answers(form)
+        else:
+            answer_store_updater.save_answers(form)
 
         if list_collector_child:
             # Clear the answer from the confirmation question on the list collector question

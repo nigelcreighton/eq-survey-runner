@@ -19,7 +19,6 @@ class PathFinder:
         self.metadata = metadata
         self.schema = schema
         self.completed_blocks = completed_blocks
-        self._answer_store_hash = self.answer_store.get_hash()
         self._full_routing_path = None
 
     @staticmethod
@@ -147,12 +146,10 @@ class PathFinder:
         Returns a list of the block ids visited based on answers provided
         :return: List of block location dicts
         """
-        latest_answer_store_hash = self.answer_store.get_hash()
         if self._full_routing_path and \
-                self._answer_store_hash == latest_answer_store_hash:
+                not self.answer_store.dirty:
             return self._full_routing_path
 
-        self._answer_store_hash = latest_answer_store_hash
         self._full_routing_path = self.build_path()
 
         return self._full_routing_path
