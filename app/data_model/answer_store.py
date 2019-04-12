@@ -3,7 +3,6 @@ from typing import List
 
 from jinja2 import escape
 from structlog import get_logger
-import simplejson as json
 
 from app.data_model.answer import Answer
 
@@ -156,4 +155,3 @@ class AnswerStore:
                 del trimmed_answers[(answer['answer_id'], answer['list_item_id'])]
 
         self.answer_map = trimmed_answers
-

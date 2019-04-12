@@ -7,6 +7,7 @@ from app.validation.error_messages import error_messages
 DEFAULT_LANGUAGE_CODE = 'en'
 LIST_COLLECTOR_CHILDREN = ['ListAddQuestion', 'ListEditQuestion', 'ListRemoveQuestion']
 
+
 class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
     def __init__(self, questionnaire_json, language_code=DEFAULT_LANGUAGE_CODE):
         self.json = questionnaire_json

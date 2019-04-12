@@ -133,7 +133,10 @@ def get_block_handler(routing_path, schema, metadata, answer_store, block_id, li
 
     return _render_block(schema, metadata, answer_store, block_id, current_location)
 
-def post_block_handler(routing_path, schema, metadata, collection_metadata, list_store, answer_store, block_id, list_name=None, list_item_id=None):
+
+# pylint: disable=too-complex, too-many-locals, too-many-return-statements, too-many-branches, too-many-statements
+def post_block_handler(routing_path, schema, metadata, collection_metadata, list_store,  # noqa: C901
+                       answer_store, block_id, list_name=None, list_item_id=None):
     current_location = Location(block_id, list_name, list_item_id)
 
     block = schema.get_block(current_location.block_id)
@@ -606,4 +609,3 @@ def validate_list_block(schema, block_id, list_name, list_item_id=None):
         validate_list_collector_route(schema, block_id, list_name, list_item_id)
     except InvalidListItemId:
         return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
-

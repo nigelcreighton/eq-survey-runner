@@ -1,5 +1,6 @@
 import uuid
 
+
 def convert_tx_id(tx_id):
     """
     Converts the guid tx_id to string of 16 characters with a dash between every 4 characters

@@ -153,4 +153,3 @@ def test_serialise_and_deserialise(basic_answer_store):
     deserialised = AnswerStore(json.loads(json_serialised))
 
     assert deserialised == basic_answer_store
-
