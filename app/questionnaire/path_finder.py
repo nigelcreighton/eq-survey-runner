@@ -1,4 +1,6 @@
 import copy
+
+from aws_xray_sdk.core import xray_recorder
 from structlog import get_logger
 
 from app.questionnaire.location import Location
@@ -26,6 +28,7 @@ class PathFinder:
     def _block_index_for_location(blocks, location):
         return next((index for (index, block) in enumerate(blocks) if block['id'] == location.block_id), None)
 
+    @xray_recorder.capture('PathFinder.build_path')
     def build_path(self):
         """
         Visits all the blocks from a location forwards and returns path

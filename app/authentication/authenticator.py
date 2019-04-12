@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
+from aws_xray_sdk.core import xray_recorder
 from blinker import ANY
 from dateutil.tz import tzutc
 from flask import session as cookie_session, current_app
@@ -148,6 +149,7 @@ def store_session(metadata):
     logger.info('user authenticated')
 
 
+@xray_recorder.capture('authenticator.decrypt_token')
 def decrypt_token(encrypted_token):
     if not encrypted_token:
         raise NoTokenException('Please provide a token')
