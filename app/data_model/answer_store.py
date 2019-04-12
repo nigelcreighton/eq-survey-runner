@@ -5,6 +5,7 @@ from jinja2 import escape
 from structlog import get_logger
 
 from app.data_model.answer import Answer
+from app.libs.utils import make_hash
 
 logger = get_logger()
 
@@ -161,4 +162,4 @@ class AnswerStore:
         :return: Return a unique hash value
         """
 
-        return hash(frozenset(self.answer_map))
+        return make_hash(self.answer_map)
