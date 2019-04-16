@@ -34,6 +34,7 @@ def store_to_serialise():
     answer_store.add_or_update(Answer(answer_id='answer3', value=30))
 
     return answer_store
+
 def test_adding_new_answer(empty_answer_store):
     answer = Answer(
         answer_id='4',
@@ -67,7 +68,7 @@ def test_updates_answer_no_list_id(basic_answer_store):
 
     assert len(basic_answer_store) == store_length
 
-    assert basic_answer_store.get_answer('answer3')['value'] == 300
+    assert basic_answer_store.get_answer('answer3').value == 300
 
 def test_updates_answer_with_list_id(basic_answer_store):
     store_length = len(basic_answer_store)
@@ -82,40 +83,39 @@ def test_updates_answer_with_list_id(basic_answer_store):
 
     assert len(basic_answer_store) == store_length
 
-    assert basic_answer_store.get_answer('answer1', list_item_id='abc123')['value'] == 100
+    assert basic_answer_store.get_answer('answer1', list_item_id='abc123').value == 100
 
 def test_get_answer_no_list(basic_answer_store):
-    assert basic_answer_store.get_answer('answer3') == {
+    assert basic_answer_store.get_answer('answer3') == Answer.from_dict({
         'answer_id': 'answer3',
         'list_item_id': None,
         'value': 30
-    }
+    })
 
 def test_get_answer_with_list(basic_answer_store):
-    assert basic_answer_store.get_answer('answer1', 'abc123') == {
+    assert basic_answer_store.get_answer('answer1', 'abc123') == Answer.from_dict({
         'answer_id': 'answer1',
         'list_item_id': 'abc123',
         'value': 10
-    }
-
+    })
 
 def test_escaped(basic_answer_store):
     escaped = basic_answer_store.escaped()
 
     assert len(basic_answer_store) == len(escaped)
-    assert escaped.get_answer('to-escape')['value'] == '&#39;Twenty Five&#39;'
-    assert escaped.get_answer('answer1', 'abc123')['value'] == 10
+    assert escaped.get_answer('to-escape').value == '&#39;Twenty Five&#39;'
+    assert escaped.get_answer('answer1', 'abc123').value == 10
 
     # answers in the store have not been escaped
-    assert basic_answer_store.get_answer('answer3')['value'] == 30
-    assert basic_answer_store.get_answer('to-escape')['value'] == "'Twenty Five'"
+    assert basic_answer_store.get_answer('answer3').value == 30
+    assert basic_answer_store.get_answer('to-escape').value == "'Twenty Five'"
 
 def test_get_answer_does_not_escape_values(basic_answer_store):
     normal_answer = basic_answer_store.get_answer('answer3')
     answer_needs_escaping = basic_answer_store.get_answer('to-escape')
 
-    assert normal_answer['value'] == 30
-    assert answer_needs_escaping['value'] == "'Twenty Five'"
+    assert normal_answer.value == 30
+    assert answer_needs_escaping.value == "'Twenty Five'"
 
 def test_get_answers_with_list_item_id(basic_answer_store):
     ids_to_get = ['answer2', 'another-answer2']
@@ -143,13 +143,13 @@ def test_list_serialisation(store_to_serialise):
     serialised_store = list(store_to_serialise)
 
     assert serialised_store == [
-        {'answer_id': 'answer1', 'value': 10, 'list_item_id': 'abc123'},
-        {'answer_id': 'answer2', 'value': 20, 'list_item_id': 'xyz987'},
-        {'answer_id': 'answer3', 'value': 30, 'list_item_id': None}
+        Answer.from_dict({'answer_id': 'answer1', 'value': 10, 'list_item_id': 'abc123'}),
+        Answer.from_dict({'answer_id': 'answer2', 'value': 20, 'list_item_id': 'xyz987'}),
+        Answer.from_dict({'answer_id': 'answer3', 'value': 30, 'list_item_id': None})
     ]
 
 def test_serialise_and_deserialise(basic_answer_store):
-    json_serialised = json.dumps(list(basic_answer_store))
+    json_serialised = json.dumps(basic_answer_store.serialise())
     deserialised = AnswerStore(json.loads(json_serialised))
 
     assert deserialised == basic_answer_store

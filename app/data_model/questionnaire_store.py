@@ -54,7 +54,7 @@ class QuestionnaireStore:
     def _serialise(self):
         data = {
             'METADATA': self._metadata,
-            'ANSWERS': list(self.answer_store),
+            'ANSWERS': self.answer_store.serialise(),
             'LISTS': self.list_store.serialise(),
             'COMPLETED_BLOCKS': self.completed_blocks,
             'COLLECTION_METADATA': self.collection_metadata,

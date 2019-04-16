@@ -19,7 +19,7 @@ class Question:
     def _get_answer(answer_store, answer_id):
         answer = answer_store.get_answer(answer_id)
         if answer:
-            return answer['value']
+            return answer.value
 
         return None
 

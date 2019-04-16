@@ -136,7 +136,7 @@ def evaluate_goto(goto_rule, schema, metadata, answer_store, routing_path=None):
 
 
 def _is_answer_on_path(schema, answer, routing_path):
-    block_schema = schema.get_block_for_answer_id(answer['answer_id'])
+    block_schema = schema.get_block_for_answer_id(answer.answer_id)
     location = Location(block_id=block_schema['id'])
     return location in routing_path
 
@@ -227,9 +227,9 @@ def get_answer_store_value(answer_id, answer_store, schema, routing_path=None):
 
     if routing_path:
         if _is_answer_on_path(schema, answer, routing_path):
-            return answer['value']
+            return answer.value
     else:
-        return answer['value']
+        return answer.value
 
 
 def get_metadata_value(metadata, key):

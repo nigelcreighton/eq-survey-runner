@@ -100,7 +100,7 @@ def get_mapped_answers(schema, answer_store, location):
     result = {}
     answers = answer_store.get_answers_by_answer_id(answer_ids=answer_ids, list_item_id=location.list_item_id)
     for answer in answers:
-        answer_id = answer['answer_id']
-        result[answer_id] = answer['value']
+        answer_id = answer.answer_id
+        result[answer_id] = answer.value
 
     return OrderedDict(sorted(result.items()))

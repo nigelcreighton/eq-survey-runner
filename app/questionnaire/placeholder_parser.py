@@ -16,7 +16,7 @@ class PlaceholderParser:
         answer = self._answer_store.get_answer(answer_id)
 
         if answer:
-            return answer['value']
+            return answer.value
 
     def parse(self, placeholder_list):
         placeholder_map = {}

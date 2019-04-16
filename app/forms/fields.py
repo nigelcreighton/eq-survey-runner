@@ -284,7 +284,7 @@ def get_schema_defined_limit(answer_id, definition, answer_store):
         else:
             source_answer_id = definition.get('answer_id')
             answer = answer_store.get_answer(source_answer_id)
-            value = answer.get('value')
+            value = answer.value
             if not isinstance(value, int) and not isinstance(value, Decimal):
                 raise Exception('answer: {} value: {} for answer id: {} is not a valid number'
                                 .format(source_answer_id, value, answer_id))

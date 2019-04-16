@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Optional, Dict
+from copy import copy
 
 from jinja2 import escape
 from structlog import get_logger
@@ -23,7 +24,7 @@ class AnswerStore:
     }
     """
 
-    def __init__(self, existing_answers=None):
+    def __init__(self, existing_answers: List[Dict]=None):
         """ Instantiate an answer_store.
         Args:
             existing_answers: If a list of answer dictionaries is provided, this will be used to initialise the store.
@@ -37,7 +38,7 @@ class AnswerStore:
         self.dirty = False
 
     def __iter__(self):
-        return iter(self.answer_map.values())
+        return iter(map(Answer.from_dict, self.answer_map.values()))
 
     def __len__(self):
         return len(self.answer_map)
@@ -49,7 +50,7 @@ class AnswerStore:
         return self.answer_map[key]
 
     @staticmethod
-    def _build_map(answers):
+    def _build_map(answers: List[Dict]):
         """ Builds the answer_store's data structure from a list of Answer dictionaries"""
         answer_map = {}
 
@@ -75,14 +76,20 @@ class AnswerStore:
         Add a new answer into the answer store, or update if it exists.
         """
         self._validate(answer)
+        store_key = (answer.answer_id, answer.list_item_id)
 
-        self.answer_map[(answer.answer_id, answer.list_item_id)] = vars(answer).copy()
+        existing_answer = self.answer_map.get(store_key)
+
+        if existing_answer != answer:
+            self.dirty = True
+
+        self.answer_map[store_key] = vars(answer).copy()
 
     def values(self) -> List[str]:
         """
         Return a flat list of all answer values in the answer store.
         """
-        return [answer['value'] for answer in self]
+        return [answer.value for answer in self]
 
     def escaped(self) -> AnswerStore:
         """
@@ -93,13 +100,13 @@ class AnswerStore:
         """
         escaped = []
         for answer in self:
-            answer = answer.copy()
-            if isinstance(answer['value'], str):
-                answer['value'] = escape(answer['value'])
-            escaped.append(answer)
+            answer = copy(answer)
+            if isinstance(answer.value, str):
+                answer.value = escape(answer.value)
+            escaped.append(answer.to_dict())
         return self.__class__(existing_answers=escaped)
 
-    def get_answer(self, answer_id: str, list_item_id: str = None) -> Answer:
+    def get_answer(self, answer_id: str, list_item_id: str = None) -> Optional[Answer]:
         """ Get a single answer from the store
 
         Args:
@@ -109,7 +116,10 @@ class AnswerStore:
         Returns:
             A single Answer or None if it doesn't exist
         """
-        return self.answer_map.get((answer_id, list_item_id))
+        answer = self.answer_map.get((answer_id, list_item_id))
+
+        if answer:
+            return Answer.from_dict(answer)
 
     def get_answers_by_answer_id(self, answer_ids: List[str], list_item_id: str = None) -> List[Answer]:
         """ Get multiple answers from the store using the answer_id
@@ -128,7 +138,7 @@ class AnswerStore:
             if answer:
                 output.append(answer)
 
-        return output
+        return AnswerStore(output)
 
     def clear(self):
         """
@@ -146,12 +156,17 @@ class AnswerStore:
 
     def remove_all_answers_for_list_item_id(self, list_item_id: str):
         """Remove all answers associated with a particular list_item_id
-        This method iterates through the entire list of answers. Not efficient.
+        This method iterates through the entire list of answers.
+
+        *Not efficient.*
         """
         trimmed_answers = self.answer_map.copy()
 
         for answer in self:
-            if answer['list_item_id'] == list_item_id:
-                del trimmed_answers[(answer['answer_id'], answer['list_item_id'])]
+            if answer.list_item_id == list_item_id:
+                del trimmed_answers[(answer.answer_id, answer.list_item_id)]
 
         self.answer_map = trimmed_answers
+
+    def serialise(self):
+        return list(self.answer_map.values())

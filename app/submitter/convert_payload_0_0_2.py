@@ -1,4 +1,4 @@
-
+from app.data_model.answer_store import AnswerStore
 def convert_answers_to_payload_0_0_2(answer_store, schema, routing_path):
     """
     Convert answers into the data format below
@@ -19,6 +19,6 @@ def convert_answers_to_payload_0_0_2(answer_store, schema, routing_path):
     data = []
     for location in routing_path:
         answer_ids = schema.get_answer_ids_for_block(location.block_id)
-        answers_in_block = answer_store.get_answers_by_answer_id(answer_ids, list_item_id=location.list_item_id)
+        answers_in_block = answer_store.get_answers_by_answer_id(answer_ids, list_item_id=location.list_item_id).serialise()
         data.extend(answers_in_block)
     return data

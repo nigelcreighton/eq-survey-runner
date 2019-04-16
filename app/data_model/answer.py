@@ -1,18 +1,28 @@
+from __future__ import annotations
+from dataclasses import dataclass, field, asdict
+from typing import Dict
+
 from structlog import get_logger
 
 logger = get_logger()
 
 
+@dataclass
 class Answer:
-    def __init__(self, answer_id, value, list_item_id=None):
-        if answer_id is None or value is None:
-            raise ValueError("Both 'answer_id' and 'value' must be set for Answer")
+    answer_id: str
+    value: str
+    list_item_id: str = field(default=None)
 
-        self.answer_id = answer_id
-        self.value = value
-        self.list_item_id = list_item_id
+    @classmethod
+    def from_dict(cls, answer_dict: Dict) -> Answer:
+        return cls(answer_id=answer_dict['answer_id'],
+               value=answer_dict['value'],
+               list_item_id=answer_dict.get('list_item_id'))
 
-    def matches(self, answer):
+    def to_dict(self) -> Dict:
+        return asdict(self)
+
+    def matches(self, answer: Answer):
         """
         Check to see if two answers match.
 

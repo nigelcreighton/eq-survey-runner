@@ -2,13 +2,6 @@ import unittest
 from app.data_model.answer_store import Answer
 
 class TestAnswer(unittest.TestCase):
-    def test_raises_error_on_invalid(self):
-
-        with self.assertRaises(ValueError) as ite:
-            Answer(None, None)
-
-        self.assertIn("Both 'answer_id' and 'value' must be set for Answer", str(ite.exception))
-
     def test_matches_answer(self):
         answer_1 = Answer(
             answer_id='4',

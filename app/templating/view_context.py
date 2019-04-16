@@ -36,7 +36,7 @@ def generate_list_item_title(answers, block_schema):
     """
     output = []
     for block_answer in block_schema['question']['answers']:
-        output.append(next((answer['value'] for answer in answers if answer['answer_id'] == block_answer['id']), '').strip())
+        output.append(next((answer.value for answer in answers if answer.answer_id == block_answer['id']), '').strip())
 
     output = ' '.join(PlaceholderTransforms.remove_empty_from_list(output))
 

@@ -124,14 +124,17 @@ class TestAnswerStoreUpdater(unittest.TestCase):
         answer_store = AnswerStore(existing_answers=[
             {
                 'answer_id': 'test1',
+                'value': 1,
                 'list_item_id': 'abcdef'
             },
             {
                 'answer_id': 'test2',
+                'value': 2,
                 'list_item_id': 'abcdef'
             },
             {
                 'answer_id': 'test3',
+                'value': 3,
                 'list_item_id': 'uvwxyz'
             }
         ])
