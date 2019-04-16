@@ -179,12 +179,10 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
             parent_block = schema.get_list_collector_for_block_id(block_id)
 
         if block_type == 'ListCollector':
+            answer_store_updater.save_answers(form)
             if list(form.data.values())[0] == block['add_answer_value']:
-                answer_store_updater.save_answers(form)
                 add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
                 return redirect(add_url)
-            else:
-                answer_store_updater.save_answers(form)
         elif block_type == 'ListRemoveQuestion':
             if list(form.data.values())[0] == parent_block['remove_answer_value']:
                 list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
