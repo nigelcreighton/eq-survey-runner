@@ -183,14 +183,15 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
                 answer_store_updater.save_answers(form)
                 add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
                 return redirect(add_url)
+            else:
+                answer_store_updater.save_answers(form)
         elif block_type == 'ListRemoveQuestion':
             if list(form.data.values())[0] == parent_block['remove_answer_value']:
                 list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
                 answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
             else:
                 return redirect(
-                    url_for('questionnaire.get_edit_list_item',
-                            block_id=parent_block['id'], list_item_id=list_item_id))
+                    url_for('questionnaire.get_block', block_id=parent_block['id']))
         elif block_type == 'ListAddQuestion':
             new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
             current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
