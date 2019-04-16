@@ -60,9 +60,6 @@ class Location:
         """
         Return the survey runner url that this location represents
 
-        The structure
-
         :return:
         """
-        return url_for('questionnaire.get_block',
-                       block_id=self.block_id)
+        return url_for('questionnaire.get_block', block_id=self.block_id)

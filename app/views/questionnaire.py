@@ -116,44 +116,39 @@ def get_list_item_block_id(schema, metadata, answer_store, list_name, list_item_
 def get_block(routing_path, schema, metadata, answer_store, block_id):
     return get_block_handler(routing_path, schema, metadata, answer_store, block_id)
 
-
-def get_block_handler(routing_path, schema, metadata, answer_store, block_id, list_name=None, list_item_id=None):
-    current_location = Location(block_id, list_name, list_item_id)
+def validate_location(schema, routing_path, current_location):
     completed_locations = get_completed_blocks(current_user)
     router = Router(schema, routing_path, current_location, completed_locations)
 
-    if schema.is_block_list_collector_child(block_id):
-        to_redirect = validate_list_block(schema, block_id, list_name, list_item_id)
+    if schema.is_block_list_collector_child(current_location.block_id):
+        to_redirect = validate_list_block(schema, current_location.block_id, current_location.list_name, current_location.list_item_id)
         if to_redirect:
             return to_redirect
     else:
         if not router.can_access_location():
             next_location = router.get_next_location()
             return _redirect_to_location(next_location)
+
+
+def get_block_handler(routing_path, schema, metadata, answer_store, block_id, list_name=None, list_item_id=None):
+    current_location = Location(block_id, list_name, list_item_id)
+
+    to_redirect = validate_location(schema, routing_path, current_location)
+    if to_redirect:
+        return to_redirect
 
     return _render_block(schema, metadata, answer_store, block_id, current_location)
 
 
-# pylint: disable=too-complex, too-many-locals, too-many-return-statements, too-many-branches, too-many-statements
 def post_block_handler(routing_path, schema, metadata, collection_metadata, list_store,  # noqa: C901
                        answer_store, block_id, list_name=None, list_item_id=None):
     current_location = Location(block_id, list_name, list_item_id)
 
-    block = schema.get_block(current_location.block_id)
+    to_redirect = validate_location(schema, routing_path, current_location)
+    if to_redirect:
+        return to_redirect
 
-    list_collector_child = schema.is_block_list_collector_child(block_id)
-
-    if list_collector_child:
-        to_redirect = validate_list_block(schema, block_id, list_name, list_item_id)
-        if to_redirect:
-            return to_redirect
-    else:
-        completed_locations = get_completed_blocks(current_user)
-        router = Router(schema, routing_path, current_location, completed_locations)
-
-        if not router.can_access_location():
-            next_location = router.get_next_location()
-            return _redirect_to_location(next_location)
+    block = schema.get_block(block_id)
 
     transformed_block = transform_variants(block, schema, metadata, answer_store)
 
@@ -173,44 +168,16 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
         questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
         answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store,
                                                   rendered_block.get('question'))
-        block_type = block['type']
 
-        if list_collector_child:
-            parent_block = schema.get_list_collector_for_block_id(block_id)
+        list_action_result = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, questionnaire_store, list_store, list_item_id)
+        if list_action_result:
+            return list_action_result
 
-        if block_type == 'ListCollector':
+        if block['type'] == 'ListCollector':
             answer_store_updater.save_answers(form)
             if list(form.data.values())[0] == block['add_answer_value']:
                 add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
                 return redirect(add_url)
-        elif block_type == 'ListRemoveQuestion':
-            if list(form.data.values())[0] == parent_block['remove_answer_value']:
-                list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
-                answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
-            else:
-                return redirect(
-                    url_for('questionnaire.get_block', block_id=parent_block['id']))
-        elif block_type == 'ListAddQuestion':
-            new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
-            current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
-            answer_store_updater = AnswerStoreUpdater(current_location, schema,
-                                                      questionnaire_store, rendered_block.get('question'))
-
-            answer_store_updater.save_answers(form)
-        elif block_type == 'ListEditQuestion':
-            answer_store_updater.save_answers(form)
-        else:
-            answer_store_updater.save_answers(form)
-
-        if list_collector_child:
-            # Clear the answer from the confirmation question on the list collector question
-            transformed_parent = transform_variants(parent_block, schema, metadata, answer_store)
-            answer_ids_to_remove = [answer['id'] for answer in transformed_parent['question']['answers']]
-            answer_store_updater.remove_answer_ids(answer_ids_to_remove)
-
-            list_collector_url = url_for('questionnaire.get_block', block_id=parent_block['id'])
-
-            return redirect(list_collector_url)
 
         next_location = path_finder.get_next_location(current_location=current_location)
 
@@ -223,6 +190,39 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
                                  current_location, form)
 
     return _render_page(block['type'], context, current_location, schema)
+
+
+def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, questionnaire_store, list_store, list_item_id):
+    list_collector_child = schema.is_block_list_collector_child(current_location.block_id)
+
+    block = schema.get_block(current_location.block_id)
+
+    parent_block = schema.get_list_collector_for_block_id(current_location.block_id)
+
+    if block['type'] == 'ListRemoveQuestion':
+        if list(form.data.values())[0] == parent_block['remove_answer_value']:
+            list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
+            answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
+        else:
+            return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
+    elif block['type'] == 'ListAddQuestion':
+        new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
+        current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
+        answer_store_updater = AnswerStoreUpdater(current_location, schema,
+                                                  questionnaire_store, rendered_block.get('question'))
+        answer_store_updater.save_answers(form)
+    else:
+        answer_store_updater.save_answers(form)
+
+    if list_collector_child:
+        # Clear the answer from the confirmation question on the list collector question
+        transformed_parent = transform_variants(parent_block, schema, metadata, answer_store)
+        answer_ids_to_remove = [answer['id'] for answer in transformed_parent['question']['answers']]
+        answer_store_updater.remove_answer_ids(answer_ids_to_remove)
+
+        list_collector_url = url_for('questionnaire.get_block', block_id=parent_block['id'])
+
+        return redirect(list_collector_url)
 
 
 @questionnaire_blueprint.route('<block_id>', methods=['POST'])
