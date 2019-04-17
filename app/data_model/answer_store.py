@@ -22,7 +22,7 @@ class AnswerStore:
     }
     """
 
-    def __init__(self, existing_answers: List[Answer]=None):
+    def __init__(self, existing_answers: List[Answer] = None):
         """ Instantiate an answer_store.
 
         Args:
@@ -48,7 +48,7 @@ class AnswerStore:
         return self.answer_map[key]
 
     @staticmethod
-    def _build_map(answers: List[Union[Answer,Dict]]):
+    def _build_map(answers: List[Union[Answer, Dict]]):
         """ Builds the answer_store's data structure from a list of Answer objects"""
         answer_map = {}
 

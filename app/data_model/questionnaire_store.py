@@ -76,4 +76,3 @@ class QuestionnaireStore:
         """Removes completed blocks from store
         """
         self.completed_blocks.remove(location)
-

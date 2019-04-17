@@ -1,4 +1,3 @@
-from app.data_model.answer_store import AnswerStore
 def convert_answers_to_payload_0_0_2(answer_store, schema, routing_path):
     """
     Convert answers into the data format below

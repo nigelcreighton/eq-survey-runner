@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from flask import url_for
 
+
 @dataclass
 class Location:
     """

@@ -117,6 +117,7 @@ def get_list_item_block_id(schema, metadata, answer_store, list_name, list_item_
 def get_block(routing_path, schema, metadata, answer_store, block_id):
     return get_block_handler(routing_path, schema, metadata, answer_store, block_id)
 
+
 def validate_location(schema, routing_path, current_location):
     completed_locations = get_completed_blocks(current_user)
     router = Router(schema, routing_path, current_location, completed_locations)
@@ -141,6 +142,8 @@ def get_block_handler(routing_path, schema, metadata, answer_store, block_id, li
     return _render_block(schema, metadata, answer_store, block_id, current_location)
 
 
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-return-statements
 def post_block_handler(routing_path, schema, metadata, collection_metadata, list_store,  # noqa: C901
                        answer_store, block_id, list_name=None, list_item_id=None):
     current_location = Location(block_id, list_name, list_item_id)
@@ -166,32 +169,30 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
     if 'action[sign_out]' in request.form:
         return redirect(url_for('session.get_sign_out'))
 
-    if form.validate():
-        _set_started_at_metadata_if_required(form, collection_metadata)
-        questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
-        answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store,
-                                                  rendered_block.get('question'))
+    if not form.validate():
+        context = build_view_context(block['type'], metadata, schema, list_store, answer_store, rendered_block,
+                                     current_location, form)
+        return _render_page(block['type'], context, current_location, schema)
 
-        list_collection_block = schema.is_block_list_collector_child(current_location.block_id) or block['type'] == 'ListCollector'
+    _set_started_at_metadata_if_required(form, collection_metadata)
+    questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
+    answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store,
+                                              rendered_block.get('question'))
 
-        if not list_collection_block:
-            answer_store_updater.save_answers(form)
-            next_location = path_finder.get_next_location(current_location=current_location)
+    list_collection_block = schema.is_block_list_collector_child(current_location.block_id) or block['type'] == 'ListCollector'
 
-            if _is_end_of_questionnaire(block, next_location):
-                return submit_answers(routing_path, schema)
+    if not list_collection_block:
+        answer_store_updater.save_answers(form)
+        next_location = path_finder.get_next_location(current_location=current_location)
 
-            return redirect(next_location.url())
-        else:
-            next_url = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id)
-            if next_url:
-                return redirect(next_url)
+        if _is_end_of_questionnaire(block, next_location):
+            return submit_answers(routing_path, schema)
 
-
-    context = build_view_context(block['type'], metadata, schema, list_store, answer_store, rendered_block,
-                                 current_location, form)
-
-    return _render_page(block['type'], context, current_location, schema)
+        return redirect(next_location.url())
+        
+    next_url = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id)
+    if next_url:
+        return redirect(next_url)
 
 
 def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id):
