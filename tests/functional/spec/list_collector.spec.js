@@ -11,14 +11,20 @@ const ListCollectorRemovePage = require('../generated_pages/list_collector/list-
 const NextInterstitialPage = require('../generated_pages/list_collector/next-interstitial.page.js');
 const SummaryPage = require('../generated_pages/list_collector/summary.page.js');
 
+function checkPeopleInList(peopleExpected) {
+  for (let i=1; i<=peopleExpected.length; i++) {
+    browser.getText(ListCollectorPage.listLabel(i)).should.eventually.include(peopleExpected[i-1])
+  }
+}
+
 describe('@watch List Collector', function() {
 
   describe('List Collector Without Variants', function() {
-    beforeEach('Load the survey', function() {
+    before('Load the survey', function() {
       return helpers.openQuestionnaire('test_list_collector.json');
     });
 
-    it('Given a normal journey through the list collector, the user is able to add / remove / edit members of the household', function() {
+    it('Given a normal journey through the list collector, the user is able to add members of the household', function() {
       return browser
         .click(IntroductionPage.getStarted())
         .click(ListCollectorPage.yes())
@@ -40,9 +46,29 @@ describe('@watch List Collector', function() {
         .click(ListCollectorPage.submit())
         .setValue(ListCollectorAddPage.firstName(), 'Suzy')
         .setValue(ListCollectorAddPage.lastName(), 'Clemens')
+        .click(ListCollectorAddPage.submit());
+    });
 
+    it('Shows all of the household members in the summary', function() {
+      const peopleExpected = ['Mark Twain', 'Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens']
+      checkPeopleInList(peopleExpected)
+    });
+
+    it('Allows me to remove a person from the summary', function() {
+      return browser
+        .click(ListCollectorPage.listRemoveLink(1))
+        .click(ListCollectorRemovePage.yes())
+        .click(ListCollectorRemovePage.submit())
+    })
+
+    it('Does not show Mark Twain anymore.', function() {
+      return browser
+        .getText(ListCollectorPage.listLabel()).should.not.include('Mark Twain')
+    })
+
+    it('Allows more people to be added', function() {
+      browser
         // Correct name spelling, ensure reflected in summary
-
         .click(ListCollectorAddPage.submit())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
