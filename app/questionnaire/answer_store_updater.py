@@ -14,14 +14,14 @@ class AnswerStoreUpdater:
         self._questionnaire_store = questionnaire_store
         self._answer_store = self._questionnaire_store.answer_store
 
-    def save_answers(self, form):
+    def save_answers(self, form, save_completed_blocks=True):
         self._update_questionnaire_store_with_form_data(form.data)
 
-        if self._current_location not in self._questionnaire_store.completed_blocks:
-            self._questionnaire_store.completed_blocks.append(self._current_location)
+        if save_completed_blocks:
+            if self._current_location not in self._questionnaire_store.completed_blocks:
+                self._questionnaire_store.completed_blocks.append(self._current_location)
 
         self._questionnaire_store.add_or_update()
-        self._answer_store.dirty = True
 
     def _update_questionnaire_store_with_form_data(self, form_data):
         answer_ids_for_question = self._schema.get_answer_ids_for_question(self._current_question)

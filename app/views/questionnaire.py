@@ -210,9 +210,9 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
         current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
         answer_store_updater = AnswerStoreUpdater(current_location, schema,
                                                   questionnaire_store, rendered_block.get('question'))
-        answer_store_updater.save_answers(form)
+        answer_store_updater.save_answers(form, False)
     else:
-        answer_store_updater.save_answers(form)
+        answer_store_updater.save_answers(form, False)
 
     if list_collector_child:
         # Clear the answer from the confirmation question on the list collector question
