@@ -418,7 +418,7 @@ def submit_answers(routing_path, schema):
         schema,
         answer_store,
         routing_path,
-    ))
+    ), for_json=True)
 
     encrypted_message = encrypt(message, current_app.eq['key_store'], KEY_PURPOSE_SUBMISSION)
     sent = current_app.eq['submitter'].send_message(encrypted_message, case_id=metadata.get('case_id'),

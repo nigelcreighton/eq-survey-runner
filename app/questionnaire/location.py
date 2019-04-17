@@ -52,7 +52,10 @@ class Location:
         list_name = location_dict.get('list_name')
         return cls(block_id, list_name, list_item_id)
 
-    def to_dict(self) -> dict:
+    def for_json(self) -> dict:
+        """
+        Used to serialise a location to json.
+        """
         attributes = vars(self)
         return {k: v for k, v in attributes.items() if v is not None}
 

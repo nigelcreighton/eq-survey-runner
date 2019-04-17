@@ -1,6 +1,8 @@
 from flask_login import current_user
 from flask_login import login_required
-from flask import Blueprint, jsonify
+from flask import Blueprint
+
+import simplejson as json
 
 
 from app.authentication.roles import role_required
@@ -19,7 +21,7 @@ dump_blueprint = Blueprint('dump', __name__)
 @role_required('dumper')
 def dump_answers():
     response = {'answers': get_answer_store(current_user).serialise() or []}
-    return jsonify(response), 200
+    return json.dumps(response, for_json=True), 200
 
 
 @dump_blueprint.route('/dump/submission', methods=['GET'])
@@ -34,4 +36,4 @@ def dump_submission():
     completed_blocks = get_completed_blocks(current_user)
     routing_path = PathFinder(schema, answer_store, metadata, completed_blocks).get_full_routing_path()
     response = {'submission': convert_answers(metadata, collection_metadata, schema, answer_store, routing_path)}
-    return jsonify(response), 200
+    return json.dumps(response, for_json=True), 200

@@ -241,7 +241,6 @@ def _get_number_field_validators(answer, error_messages, answer_store):
     if max_decimals > MAX_DECIMAL_PLACES:
         raise Exception('decimal_places: {} > system maximum: {} for answer id: {}'
                         .format(max_decimals, MAX_DECIMAL_PLACES, answer['id']))
-
     min_value, minimum_exclusive = get_schema_defined_limit(answer['id'], answer.get('min_value'), answer_store)
     if min_value is None:
         min_value = 0

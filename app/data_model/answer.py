@@ -19,6 +19,12 @@ class Answer:
                value=answer_dict['value'],
                list_item_id=answer_dict.get('list_item_id'))
 
+    def for_json(self) -> Dict:
+        output = self.to_dict()
+        if not self.list_item_id:
+            del output['list_item_id']
+        return output
+
     def to_dict(self) -> Dict:
         return asdict(self)
 

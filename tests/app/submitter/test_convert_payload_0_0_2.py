@@ -71,8 +71,8 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 2)
-            self.assertEqual(answer_object['data'][0]['value'], 'Joe Bloggs')
-            self.assertEqual(answer_object['data'][1]['value'], '62 Somewhere')
+            self.assertEqual(answer_object['data'][0].value, 'Joe Bloggs')
+            self.assertEqual(answer_object['data'][1].value, '62 Somewhere')
 
     def test_convert_payload_0_0_2_multiple_answers(self):
         with self._app.test_request_context():
@@ -112,7 +112,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], ['Ready salted', 'Sweet chilli'])
+            self.assertEqual(answer_object['data'][0].value, ['Ready salted', 'Sweet chilli'])
 
     def test_radio_answer(self):
         with self._app.test_request_context():
@@ -146,7 +146,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 'Coffee')
+            self.assertEqual(answer_object['data'][0].value, 'Coffee')
 
     def test_number_answer(self):
         with self._app.test_request_context():
@@ -170,7 +170,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 1.755)
+            self.assertEqual(answer_object['data'][0].value, 1.755)
 
     def test_percentage_answer(self):
         with self._app.test_request_context():
@@ -194,7 +194,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 99)
+            self.assertEqual(answer_object['data'][0].value, 99)
 
     def test_textarea_answer(self):
         with self._app.test_request_context():
@@ -218,7 +218,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 'This is an example text!')
+            self.assertEqual(answer_object['data'][0].value, 'This is an example text!')
 
     def test_currency_answer(self):
         with self._app.test_request_context():
@@ -242,7 +242,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 100)
+            self.assertEqual(answer_object['data'][0].value, 100)
 
     def test_dropdown_answer(self):
         with self._app.test_request_context():
@@ -280,7 +280,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 'Rugby is better!')
+            self.assertEqual(answer_object['data'][0].value, 'Rugby is better!')
 
     def test_date_answer(self):
         with self._app.test_request_context():
@@ -306,7 +306,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
             # Then
             self.assertEqual(len(answer_object['data']), 1)
 
-            self.assertEqual(answer_object['data'][0]['value'], '01-01-1990')
+            self.assertEqual(answer_object['data'][0].value, '01-01-1990')
 
     def test_month_year_date_answer(self):
         with self._app.test_request_context():
@@ -332,7 +332,7 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
             # Then
             self.assertEqual(len(answer_object['data']), 1)
 
-            self.assertEqual(answer_object['data'][0]['value'], '01-1990')
+            self.assertEqual(answer_object['data'][0].value, '01-1990')
 
     def test_unit_answer(self):
         with self._app.test_request_context():
@@ -356,4 +356,4 @@ class TestConvertPayload002(TestConverter):  # pylint: disable=too-many-public-m
 
             # Then
             self.assertEqual(len(answer_object['data']), 1)
-            self.assertEqual(answer_object['data'][0]['value'], 10)
+            self.assertEqual(answer_object['data'][0].value, 10)

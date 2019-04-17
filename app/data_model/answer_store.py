@@ -1,8 +1,6 @@
 from __future__ import annotations
-from typing import List, Optional, Dict
-from copy import copy
+from typing import List, Optional, Dict, Union
 
-from jinja2 import escape
 from structlog import get_logger
 
 from app.data_model.answer import Answer
@@ -24,11 +22,11 @@ class AnswerStore:
     }
     """
 
-    def __init__(self, existing_answers: List[Dict]=None):
+    def __init__(self, existing_answers: List[Answer]=None):
         """ Instantiate an answer_store.
-        Args:
-            existing_answers: If a list of answer dictionaries is provided, this will be used to initialise the store.
 
+        Args:
+            existing_answers: If a list of answer objects is provided, this will be used to initialise the store.
         """
         if isinstance(existing_answers, list):
             self.answer_map = self._build_map(existing_answers or [])
@@ -38,7 +36,7 @@ class AnswerStore:
         self.dirty = False
 
     def __iter__(self):
-        return iter(map(Answer.from_dict, self.answer_map.values()))
+        return iter(self.answer_map.values())
 
     def __len__(self):
         return len(self.answer_map)
@@ -50,13 +48,16 @@ class AnswerStore:
         return self.answer_map[key]
 
     @staticmethod
-    def _build_map(answers: List[Dict]):
-        """ Builds the answer_store's data structure from a list of Answer dictionaries"""
+    def _build_map(answers: List[Union[Answer,Dict]]):
+        """ Builds the answer_store's data structure from a list of Answer objects"""
         answer_map = {}
 
         for answer in answers:
-            list_item_id = answer.get('list_item_id')
-            answer_map[answer['answer_id'], list_item_id] = answer
+            if isinstance(answer, dict):
+                answer_map[answer['answer_id'], answer.get('list_item_id')] = Answer.from_dict(answer)
+            else:
+                list_item_id = answer.list_item_id
+                answer_map[answer.answer_id, list_item_id] = answer
 
         return answer_map
 
@@ -83,28 +84,13 @@ class AnswerStore:
         if existing_answer != answer:
             self.dirty = True
 
-        self.answer_map[store_key] = vars(answer).copy()
+        self.answer_map[store_key] = answer
 
     def values(self) -> List[str]:
         """
         Return a flat list of all answer values in the answer store.
         """
         return [answer.value for answer in self]
-
-    def escaped(self) -> AnswerStore:
-        """
-        Escape all answer values and return a new AnswerStore instance.
-
-        Returns:
-            A new AnswerStore object with escaped answers for chaining
-        """
-        escaped = []
-        for answer in self:
-            answer = copy(answer)
-            if isinstance(answer.value, str):
-                answer.value = escape(answer.value)
-            escaped.append(answer.to_dict())
-        return self.__class__(existing_answers=escaped)
 
     def get_answer(self, answer_id: str, list_item_id: str = None) -> Optional[Answer]:
         """ Get a single answer from the store
@@ -116,10 +102,7 @@ class AnswerStore:
         Returns:
             A single Answer or None if it doesn't exist
         """
-        answer = self.answer_map.get((answer_id, list_item_id))
-
-        if answer:
-            return Answer.from_dict(answer)
+        return self.answer_map.get((answer_id, list_item_id))
 
     def get_answers_by_answer_id(self, answer_ids: List[str], list_item_id: str = None) -> List[Answer]:
         """ Get multiple answers from the store using the answer_id

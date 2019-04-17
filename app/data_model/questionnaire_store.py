@@ -54,12 +54,12 @@ class QuestionnaireStore:
     def _serialise(self):
         data = {
             'METADATA': self._metadata,
-            'ANSWERS': self.answer_store.serialise(),
+            'ANSWERS': list(self.answer_store),
             'LISTS': self.list_store.serialise(),
             'COMPLETED_BLOCKS': self.completed_blocks,
             'COLLECTION_METADATA': self.collection_metadata,
         }
-        return json.dumps(data, default=self._encode_questionnaire_store)
+        return json.dumps(data, for_json=True)
 
     def delete(self):
         self._storage.delete()
@@ -77,8 +77,3 @@ class QuestionnaireStore:
         """
         self.completed_blocks.remove(location)
 
-    def _encode_questionnaire_store(self, o):
-        if hasattr(o, 'to_dict'):
-            return o.to_dict()
-
-        return json.JSONEncoder.default(self, o)

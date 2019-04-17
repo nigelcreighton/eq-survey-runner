@@ -1,5 +1,5 @@
 # pylint: disable=redefined-outer-name
-import json
+import simplejson as json
 
 import pytest
 
@@ -22,7 +22,6 @@ def basic_answer_store():
     answer_store.add_or_update(Answer(answer_id='another-answer3', value=35))
 
     answer_store.add_or_update(Answer(answer_id='to-escape', value="'Twenty Five'"))
-
     return answer_store
 
 @pytest.fixture()
@@ -99,17 +98,6 @@ def test_get_answer_with_list(basic_answer_store):
         'value': 10
     })
 
-def test_escaped(basic_answer_store):
-    escaped = basic_answer_store.escaped()
-
-    assert len(basic_answer_store) == len(escaped)
-    assert escaped.get_answer('to-escape').value == '&#39;Twenty Five&#39;'
-    assert escaped.get_answer('answer1', 'abc123').value == 10
-
-    # answers in the store have not been escaped
-    assert basic_answer_store.get_answer('answer3').value == 30
-    assert basic_answer_store.get_answer('to-escape').value == "'Twenty Five'"
-
 def test_get_answer_does_not_escape_values(basic_answer_store):
     normal_answer = basic_answer_store.get_answer('answer3')
     answer_needs_escaping = basic_answer_store.get_answer('to-escape')
@@ -149,7 +137,7 @@ def test_list_serialisation(store_to_serialise):
     ]
 
 def test_serialise_and_deserialise(basic_answer_store):
-    json_serialised = json.dumps(basic_answer_store.serialise())
+    json_serialised = json.dumps(basic_answer_store.serialise(), for_json=True)
     deserialised = AnswerStore(json.loads(json_serialised))
 
     assert deserialised == basic_answer_store
