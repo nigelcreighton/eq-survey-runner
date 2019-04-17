@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import flask_babel
 import humanize
 import simplejson as json
 from dateutil.tz import tzutc
@@ -152,7 +153,9 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
 
     transformed_block = transform_variants(block, schema, metadata, answer_store)
 
-    placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
+    placeholder_renderer = PlaceholderRenderer(language=flask_babel.get_locale().language,
+                                               answer_store=answer_store,
+                                               metadata=metadata)
     rendered_block = placeholder_renderer.render(transformed_block)
 
     form = _generate_wtf_form(request.form, rendered_block, schema)

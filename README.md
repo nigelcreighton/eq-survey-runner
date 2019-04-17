@@ -66,10 +66,10 @@ pipenv run scripts/run_tests_unit.sh
 
 
 ### Pre-Requisites
-In order to run locally you'll need PostgreSQL, Node.js, sqlite3, snappy and pyenv installed
+In order to run locally you'll need PostgreSQL, Node.js, sqlite3, snappy, pyenv and Jsonnet installed
 
 ```
-brew install postgres snappy npm sqlite3 pyenv
+brew install postgres snappy npm sqlite3 pyenv jsonnet
 ```
 
 Note that npm currently requires Python 2.x for some of the setup steps,
@@ -355,6 +355,8 @@ The following env variables can be used
 | EQ_STORAGE_BACKEND                        | datastore             |                                                                                               |
 | EQ_DATASTORE_EMULATOR_CREDENTIALS         | False                 |                                                                                               |
 | EQ_DYNAMODB_ENDPOINT                      |                       |                                                                                               |
+| EQ_REDIS_HOST                             |                       | Hostname of Redis instance used for ephemeral storage                                         |
+| EQ_REDIS_PORT                             |                       | Port number of Redis instance used for ephemeral storage                                      |
 | EQ_DYNAMODB_MAX_RETRIES                   | 5                     |                                                                                               |
 | EQ_DYNAMODB_MAX_POOL_CONNECTIONS          | 30                    |                                                                                               |
 | EQ_SUBMITTED_RESPONSES_TABLE_NAME         |                       |                                                                                               |
