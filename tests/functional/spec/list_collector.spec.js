@@ -56,7 +56,6 @@ describe('@watch List Collector', function() {
         .click(ListCollectorAddPage.submit())
 
         // Remove Mark Twain - Ensure list is empty
-
     });
   });
 });

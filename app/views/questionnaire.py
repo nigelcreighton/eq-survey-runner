@@ -169,22 +169,21 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
         answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store,
                                                   rendered_block.get('question'))
 
-        list_action_result = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, questionnaire_store, list_store, list_item_id)
-        if list_action_result:
-            return list_action_result
+        list_collection_block = schema.is_block_list_collector_child(current_location.block_id) or block['type'] == 'ListCollector'
 
-        if block['type'] == 'ListCollector':
+        if not list_collection_block:
             answer_store_updater.save_answers(form)
-            if list(form.data.values())[0] == block['add_answer_value']:
-                add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
-                return redirect(add_url)
+            next_location = path_finder.get_next_location(current_location=current_location)
 
-        next_location = path_finder.get_next_location(current_location=current_location)
+            if _is_end_of_questionnaire(block, next_location):
+                return submit_answers(routing_path, schema)
 
-        if _is_end_of_questionnaire(block, next_location):
-            return submit_answers(routing_path, schema)
+            return redirect(next_location.url())
+        else:
+            next_url = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id)
+            if next_url:
+                return redirect(next_url)
 
-        return redirect(next_location.url())
 
     context = build_view_context(block['type'], metadata, schema, list_store, answer_store, rendered_block,
                                  current_location, form)
@@ -192,27 +191,30 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
     return _render_page(block['type'], context, current_location, schema)
 
 
-def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, questionnaire_store, list_store, list_item_id):
+def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id):
     list_collector_child = schema.is_block_list_collector_child(current_location.block_id)
 
     block = schema.get_block(current_location.block_id)
 
     parent_block = schema.get_list_collector_for_block_id(current_location.block_id)
 
+    if block['type'] == 'ListCollector':
+        answer_store_updater.save_answers(form)
+        if list(form.data.values())[0] == block['add_answer_value']:
+            add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
+            return add_url
     if block['type'] == 'ListRemoveQuestion':
         if list(form.data.values())[0] == parent_block['remove_answer_value']:
-            list_store.delete_list_item_id(parent_block['populates_list'], list_item_id)
-            answer_store_updater.remove_all_answers_with_list_item_id(list_item_id)
+            list_name = parent_block['populates_list']
+            answer_store_updater.remove_all_answers_with_list_item_id(list_name, list_item_id)
         else:
-            return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
+            return url_for('questionnaire.get_block', block_id=parent_block['id'])
     elif block['type'] == 'ListAddQuestion':
-        new_list_item_id = list_store.add_list_item(parent_block['populates_list'])
-        current_location = Location(current_location.block_id, list_name=current_location.list_name, list_item_id=new_list_item_id)
-        answer_store_updater = AnswerStoreUpdater(current_location, schema,
-                                                  questionnaire_store, rendered_block.get('question'))
-        answer_store_updater.save_answers(form, False)
+        answer_store_updater.add_new_list_item_answers(form, parent_block['populates_list'])
+    elif block['type'] == 'ListEditQuestion':
+        answer_store_updater.save_answers(form, save_completed_blocks=False)
     else:
-        answer_store_updater.save_answers(form)
+        raise NotImplementedError('List collection block type: {block["type"]} not implemented')
 
     if list_collector_child:
         # Clear the answer from the confirmation question on the list collector question
@@ -222,7 +224,7 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
 
         list_collector_url = url_for('questionnaire.get_block', block_id=parent_block['id'])
 
-        return redirect(list_collector_url)
+        return list_collector_url
 
 
 @questionnaire_blueprint.route('<block_id>', methods=['POST'])

@@ -79,8 +79,7 @@ def build_view_context_for_list_collector(rendered_block, list_store, answer_sto
 def build_view_context_for_final_summary(metadata, schema, answer_store, block_type, rendered_block):
     section_list = schema.json['sections']
 
-    context = build_view_context_for_summary(schema, section_list, answer_store, metadata,
-                                             block_type)
+    context = build_view_context_for_summary(schema, section_list, answer_store, metadata, block_type)
 
     context['summary'].update({
         'is_view_submission_response_enabled': _is_view_submitted_response_enabled(schema.json),

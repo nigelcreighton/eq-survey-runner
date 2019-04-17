@@ -13,6 +13,7 @@ class AnswerStoreUpdater:
         self._schema = schema
         self._questionnaire_store = questionnaire_store
         self._answer_store = self._questionnaire_store.answer_store
+        self._list_store = self._questionnaire_store.list_store
 
     def save_answers(self, form, save_completed_blocks=True):
         self._update_questionnaire_store_with_form_data(form.data)
@@ -22,6 +23,16 @@ class AnswerStoreUpdater:
                 self._questionnaire_store.completed_blocks.append(self._current_location)
 
         self._questionnaire_store.add_or_update()
+
+    def add_new_list_item_answers(self, form, list_name):
+        new_list_item_id = self._list_store.add_list_item(list_name)
+
+        self._current_location.list_item_id = new_list_item_id
+
+        self.save_answers(form, False)
+
+        return self._current_location
+
 
     def _update_questionnaire_store_with_form_data(self, form_data):
         answer_ids_for_question = self._schema.get_answer_ids_for_question(self._current_question)
@@ -43,8 +54,13 @@ class AnswerStoreUpdater:
                 else:
                     self._answer_store.remove_answer(answer_id)
 
-    def remove_all_answers_with_list_item_id(self, list_item_id):
+    def remove_all_answers_with_list_item_id(self, list, list_item_id):
+        """ Remove answers from the answer store and update the list store to remove it
+        """
+        self._list_store.delete_list_item_id(list, list_item_id)
+
         self._answer_store.remove_all_answers_for_list_item_id(list_item_id=list_item_id)
+
         self._questionnaire_store.add_or_update()
         self._answer_store.dirty = True
 
