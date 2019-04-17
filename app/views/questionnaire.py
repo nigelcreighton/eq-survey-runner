@@ -212,7 +212,7 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
                                                   questionnaire_store, rendered_block.get('question'))
         answer_store_updater.save_answers(form, False)
     else:
-        answer_store_updater.save_answers(form, False)
+        answer_store_updater.save_answers(form)
 
     if list_collector_child:
         # Clear the answer from the confirmation question on the list collector question
