@@ -143,13 +143,15 @@ class AnswerStore:
 
         *Not efficient.*
         """
-        trimmed_answers = self.answer_map.copy()
+
+        keys_to_delete = []
 
         for answer in self:
             if answer.list_item_id == list_item_id:
-                del trimmed_answers[(answer.answer_id, answer.list_item_id)]
+                keys_to_delete.append((answer.answer_id, answer.list_item_id))
 
-        self.answer_map = trimmed_answers
+        for key in keys_to_delete:
+            del self.answer_map[key]
 
     def serialise(self):
         return list(self.answer_map.values())
