@@ -168,9 +168,7 @@ class QuestionnaireSchema:  # pylint: disable=too-many-public-methods
         if not block:
             return False
 
-        parent = self.get_block(block['parent_id'])
-
-        return parent and parent['type'] == 'ListCollector'
+        return block['type'] in LIST_COLLECTOR_CHILDREN
 
     def _parse_schema(self):
         self._list_collectors = defaultdict(list)
