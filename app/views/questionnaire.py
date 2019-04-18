@@ -216,8 +216,6 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
         answer_store_updater.add_new_list_item_answers(form, parent_block['populates_list'])
     elif block['type'] == 'ListEditQuestion':
         answer_store_updater.save_answers(form, save_completed_blocks=False)
-    else:
-        raise NotImplementedError(f'List collection block type: {block["type"]} not implemented')
 
     if list_collector_child:
         # Clear the answer from the confirmation question on the list collector question
