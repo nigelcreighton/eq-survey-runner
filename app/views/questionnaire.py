@@ -599,7 +599,9 @@ def _render_block(schema, metadata, answer_store, block_id, current_location):
     block = schema.get_block(block_id)
     transformed_block = transform_variants(block, schema, metadata, answer_store)
 
-    placeholder_renderer = PlaceholderRenderer(answer_store=answer_store, metadata=metadata)
+    placeholder_renderer = PlaceholderRenderer(language=flask_babel.get_locale().language,
+                                               answer_store=answer_store,
+                                               metadata=metadata)
     rendered_block = placeholder_renderer.render(transformed_block)
 
     context = _get_context(rendered_block, current_location, schema)
