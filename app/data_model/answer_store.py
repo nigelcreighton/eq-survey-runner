@@ -46,11 +46,7 @@ class AnswerStore:
         answer_map = {}
 
         for answer in answers:
-            if isinstance(answer, dict):
-                answer_map[answer['answer_id'], answer.get('list_item_id')] = Answer.from_dict(answer)
-            else:
-                list_item_id = answer.list_item_id
-                answer_map[answer.answer_id, list_item_id] = answer
+            answer_map[answer['answer_id'], answer.get('list_item_id')] = Answer.from_dict(answer)
 
         return answer_map
 

@@ -141,3 +141,7 @@ def test_serialise_and_deserialise(basic_answer_store):
     deserialised = AnswerStore(json.loads(json_serialised))
 
     assert deserialised == basic_answer_store
+
+def test_bad_answer_type(basic_answer_store):
+    with pytest.raises(TypeError):
+        basic_answer_store.add_or_update({'answer_id': 'test', 'value': 20})

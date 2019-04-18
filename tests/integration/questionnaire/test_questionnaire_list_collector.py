@@ -94,6 +94,18 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
 
         self.assertInBody('Are you sure you want to remove this person?')
 
+        # Cancel
+
+        self.post({
+            'remove-confirmation': 'No'
+        })
+
+        self.assertEqualUrl('/questionnaire/list-collector')
+
+        # Remove again
+
+        self.get(mistake_remove_link)
+
         self.post({
             'remove-confirmation': 'Yes'
         })
