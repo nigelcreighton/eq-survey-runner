@@ -43,12 +43,8 @@ class AnswerStore:
     @staticmethod
     def _build_map(answers: List[Union[Answer, Dict]]):
         """ Builds the answer_store's data structure from a list of Answer objects"""
-        answer_map = {}
 
-        for answer in answers:
-            answer_map[answer['answer_id'], answer.get('list_item_id')] = Answer.from_dict(answer)
-
-        return answer_map
+        return {(answer['answer_id'], answer.get('list_item_id')): Answer.from_dict(answer) for answer in answers}
 
     @staticmethod
     def _validate(answer):
