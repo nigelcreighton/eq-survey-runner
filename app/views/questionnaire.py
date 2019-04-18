@@ -21,11 +21,11 @@ from app.globals import get_session_store
 from app.helpers.form_helper import post_form_for_block
 from app.helpers.path_finder_helper import path_finder, full_routing_path_required
 from app.helpers.schema_helpers import with_schema
-from app.helpers.session_helpers import with_list_store, with_questionnaire_store
+from app.helpers.session_helpers import with_questionnaire_store
 from app.helpers.template_helper import (with_session_timeout, with_analytics,
                                          with_legal_basis, render_template, safe_content)
 from app.keys import KEY_PURPOSE_SUBMISSION
-from app.questionnaire.answer_store_updater import AnswerStoreUpdater
+from app.questionnaire.questionnaire_store_updater import QuestionnaireStoreUpdater
 from app.questionnaire.location import Location
 from app.questionnaire.router import Router
 from app.questionnaire.placeholder_renderer import PlaceholderRenderer
@@ -138,7 +138,12 @@ def validate_location(schema, routing_path, list_store, current_location):
 
     if schema.is_block_list_collector_child(current_location.block_id):
         list_item_id = current_location.list_item_id
-        if list_item_id and list_item_id not in list_store[current_location.list_name]:
+        block = schema.get_block(current_location.block_id)
+
+        if block['type'] == 'ListAddQuestion':
+            return
+
+        if list_item_id not in list_store[current_location.list_name]:
             parent_block = schema.get_list_collector_for_block_id(current_location.block_id)
             return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
     else:
@@ -201,8 +206,8 @@ def post_block_handler(routing_path, schema, questionnaire_store,  # noqa: C901
 
     _set_started_at_metadata_if_required(form, collection_metadata)
     questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
-    answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store,
-                                              rendered_block.get('question'))
+    answer_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store,
+                                                     rendered_block.get('question'))
 
     list_collection_block = block['type'] in ['ListCollector', 'ListAddQuestion', 'ListEditQuestion', 'ListRemoveQuestion']
 
@@ -238,7 +243,7 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
         else:
             return url_for('questionnaire.get_block', block_id=parent_block['id'])
     elif block['type'] == 'ListAddQuestion':
-        answer_store_updater.add_new_list_item_answers(form, parent_block['populates_list'])
+        answer_store_updater.save_new_list_item_answers(form, parent_block['populates_list'])
     elif block['type'] == 'ListEditQuestion':
         answer_store_updater.save_answers(form, save_completed_blocks=False)
 
@@ -528,7 +533,7 @@ def _save_sign_out(current_location, current_question, form, schema):
     block = schema.get_block(current_location.block_id)
 
     if form.validate():
-        answer_store_updater = AnswerStoreUpdater(current_location, schema, questionnaire_store, current_question)
+        answer_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store, current_question)
         answer_store_updater.save_answers(form)
 
         questionnaire_store.remove_completed_blocks(location=current_location)

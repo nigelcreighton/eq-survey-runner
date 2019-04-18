@@ -2,7 +2,7 @@ from typing import List
 from app.data_model.answer_store import Answer
 
 
-class AnswerStoreUpdater:
+class QuestionnaireStoreUpdater:
     """ Component responsible for any actions that need to happen as a result of updating the answer store
     """
 
@@ -25,7 +25,7 @@ class AnswerStoreUpdater:
 
         self._questionnaire_store.add_or_update()
 
-    def add_new_list_item_answers(self, form, list_name):
+    def save_new_list_item_answers(self, form, list_name):
         new_list_item_id = self._list_store.add_list_item(list_name)
 
         self._current_location.list_item_id = new_list_item_id

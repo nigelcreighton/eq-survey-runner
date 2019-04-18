@@ -4,6 +4,8 @@ from collections import OrderedDict
 
 from structlog import get_logger
 
+from app.settings import EQ_LIST_ITEM_ID_LENGTH
+
 logger = get_logger()
 
 
@@ -30,7 +32,7 @@ class ListStore:
     def _generate_identifier(self):
         """ Generate an unused random 6 character string"""
         while True:
-            candidate = random_string(6)
+            candidate = random_string(EQ_LIST_ITEM_ID_LENGTH)
             if candidate not in self.list_item_ids():
                 return candidate
 

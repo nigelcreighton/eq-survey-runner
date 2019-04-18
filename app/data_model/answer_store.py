@@ -60,14 +60,14 @@ class AnswerStore:
         Add a new answer into the answer store, or update if it exists.
         """
         self._validate(answer)
-        store_key = (answer.answer_id, answer.list_item_id)
+        key = (answer.answer_id, answer.list_item_id)
 
-        existing_answer = self.answer_map.get(store_key)
+        existing_answer = self.answer_map.get(key)
 
         if existing_answer != answer:
             self.dirty = True
 
-        self.answer_map[store_key] = answer
+        self.answer_map[key] = answer
 
     def get_answer(self, answer_id: str, list_item_id: str = None) -> Optional[Answer]:
         """ Get a single answer from the store
