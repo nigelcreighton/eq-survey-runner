@@ -23,7 +23,7 @@ function checkPeopleInList(peopleExpected) {
   return chain;
 }
 
-describe('@watch List Collector', function() {
+describe('List Collector', function() {
 
   describe('List Collector Without Variants', function() {
     before('Load the survey', function() {
