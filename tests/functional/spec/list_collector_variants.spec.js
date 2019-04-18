@@ -12,7 +12,7 @@ function checkPeopleInList(peopleExpected) {
 
   for (let i=1; i<=peopleExpected.length; i++) {
     chain = chain.then(() => {
-      return browser.getText(ListCollectorPage.listLabel(i)).should.eventually.equal(peopleExpected[i-1])
+      return browser.getText(ListCollectorPage.listLabel(i)).should.eventually.equal(peopleExpected[i-1]);
     });
   }
 
@@ -70,7 +70,7 @@ describe('List Collector With Variants', function() {
       return browser
         .click(ConfirmationPage.submit())
         .getUrl().should.eventually.contain('thank-you');
-    })
+    });
 
   });
 
