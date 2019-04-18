@@ -1,35 +1,50 @@
 local placeholders = import '../../../lib/placeholders.libsonnet';
 local rules = import '../../../lib/rules.libsonnet';
 
-local question(title, options) = {
+local question(proxyOptions, regionOptions) = {
   id: 'language-question',
-  title: title,
+  title: proxyOptions.title,
   type: 'General',
-  definitions: [
-    {
-      title: "What do we mean by 'main language'?",
-      content: [
-        {
-          description: 'Main language is your first or preferred language.',
-        },
-      ],
-    },
-  ],
+  definitions: proxyOptions.definitionContent,
   answers: [
     {
       id: 'language-answer',
       mandatory: true,
       type: 'Radio',
-    } + options,
+    } + regionOptions,
   ],
 };
 
-local nonProxyTitle = 'What is your main language?';
-local proxyTitle = {
-  text: 'What is <em>{person_name_possessive}</em> main language?',
-  placeholders: [
-    placeholders.personNamePossessive,
-  ],
+local nonProxyOptions = {
+  title: 'What is your main language?',
+  definitionContent: [
+    {
+      title: "What do we mean by “main language”?",
+      content: [
+        {
+          description: 'Your main language is the language you use most naturally. It could be the language you use at home.',
+        }
+      ]
+    }
+  ]
+};
+local isProxyOptions = {
+  title: {
+    text: 'What is <em>{person_name_possessive}</em> main language?',
+    placeholders: [
+      placeholders.personNamePossessive,
+    ]
+  },
+  definitionContent: [
+    {
+      title: "What do we mean by “main language”?",
+      content: [
+        {
+          description: 'Your main language is the language they use most naturally. It could be the language they use at home.',
+        }
+      ]
+    }
+  ]
 };
 
 local englandOptions = {
@@ -77,19 +92,19 @@ local walesOptions = {
   id: 'language',
   question_variants: [
     {
-      question: question(nonProxyTitle, englandOptions),
+      question: question(nonProxyOptions, englandOptions),
       when: [rules.proxyNo, rules.regionNotWales],
     },
     {
-      question: question(proxyTitle, englandOptions),
+      question: question(isProxyOptions, englandOptions),
       when: [rules.proxyYes, rules.regionNotWales],
     },
     {
-      question: question(nonProxyTitle, walesOptions),
+      question: question(nonProxyOptions, walesOptions),
       when: [rules.proxyNo, rules.regionWales],
     },
     {
-      question: question(proxyTitle, walesOptions),
+      question: question(isProxyOptions, walesOptions),
       when: [rules.proxyYes, rules.regionWales],
     },
   ],

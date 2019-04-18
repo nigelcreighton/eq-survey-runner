@@ -1,17 +1,11 @@
 local placeholders = import '../../../lib/placeholders.libsonnet';
 local rules = import '../../../lib/rules.libsonnet';
 
-local question(title) = {
+local question(title, regionOptions) = {
   id: 'nvq-level-question',
   title: title,
   type: 'MutuallyExclusive',
-  guidance: {
-    content: [
-      {
-        title: 'Include equivalent qualifications achieved anywhere outside England and Wales',
-      },
-    ],
-  },
+  guidance: regionOptions.guidance,
   mandatory: true,
   answers: [
     {
@@ -58,17 +52,44 @@ local proxyTitle = {
   ],
 };
 
+local englandOptions = {
+  guidance: {
+    content: [
+      {
+        title: 'Include equivalent qualifications achieved anywhere outside England and Wales'
+      },
+    ],
+  }
+};
+local walesOptions = {
+  guidance: {
+    content: [
+      {
+        title: 'Include equivalent qualifications achieved anywhere outside Wales and England'
+      },
+    ],
+  }
+};
+
 {
   type: 'Question',
   id: 'nvq-level',
   question_variants: [
     {
-      question: question(nonProxyTitle),
-      when: [rules.proxyNo],
+      question: question(nonProxyTitle, englandOptions),
+      when: [rules.proxyNo, rules.regionNotWales],
     },
     {
-      question: question(proxyTitle),
-      when: [rules.proxyYes],
+      question: question(proxyTitle, englandOptions),
+      when: [rules.proxyYes, rules.regionNotWales],
     },
-  ],
+    {
+      question: question(nonProxyTitle, walesOptions),
+      when: [rules.proxyNo, rules.regionWales],
+    },
+    {
+      question: question(proxyTitle, walesOptions),
+      when: [rules.proxyYes, rules.regionWales],
+    }
+  ]
 }

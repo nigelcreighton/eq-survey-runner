@@ -1,21 +1,14 @@
 local placeholders = import '../../../lib/placeholders.libsonnet';
 local rules = import '../../../lib/rules.libsonnet';
 
-local question(title) = {
+local question(proxyOptions) = {
   id: 'disability-question',
-  title: title,
+  title: proxyOptions.title,
   definitions: [
     {
-      title: 'What do we mean by physical and mental health conditions or illness?',
-      content: [
-        {
-          description: 'Physical and mental health conditions or illnesses may also be described as disabilities.',
-        },
-        {
-          description: 'For example sensory impairments such as sight or hearing loss, developmental conditions such as autism or Asperger’s syndrome, and learning impairment such as Down’s syndrome or dyslexia.',
-        },
-      ],
-    },
+      title: 'What do we mean by “physical and mental health conditions or illness”?',
+      content: proxyOptions.definitionContent
+    }
   ],
   type: 'General',
   answers: [
@@ -37,12 +30,32 @@ local question(title) = {
   ],
 };
 
-local nonProxyTitle = 'Do you have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?';
-local proxyTitle = {
-  text: 'Does <em>{person_name}</em> have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?',
-  placeholders: [
-    placeholders.personName,
-  ],
+local nonProxyOptions = {
+  title:  'Do you have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?',
+  definitionContent: [
+    {
+      description: 'This refers to health conditions, illnesses or impairments you may have.',
+    },
+    {
+      description: 'Consider conditions that always affect you and those that flare up from time to time. These may include, for example, sensory conditions, developmental conditions or learning impairments.',
+    }
+  ]
+};
+local isProxyOptions = {
+  title: {
+    text: 'Does <em>{person_name}</em> have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?',
+    placeholders: [
+      placeholders.personName,
+    ]
+  },
+  definitionContent: [
+    {
+      description: 'This refers to health conditions, illnesses or impairments they may have.',
+    },
+    {
+      description: 'Consider conditions that always affect them and those that flare up from time to time. These may include, for example, sensory conditions, developmental conditions or learning impairments.',
+    }
+  ]
 };
 
 {
@@ -50,11 +63,11 @@ local proxyTitle = {
   id: 'disability',
   question_variants: [
     {
-      question: question(nonProxyTitle),
+      question: question(nonProxyOptions),
       when: [rules.proxyNo],
     },
     {
-      question: question(proxyTitle),
+      question: question(isProxyOptions),
       when: [rules.proxyYes],
     },
   ],

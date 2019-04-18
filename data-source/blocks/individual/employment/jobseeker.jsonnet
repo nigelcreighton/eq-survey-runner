@@ -1,21 +1,13 @@
 local placeholders = import '../../../lib/placeholders.libsonnet';
 local rules = import '../../../lib/rules.libsonnet';
 
-local question(title) = {
+local question(proxyOptions) = {
   id: 'jobseeker-question',
-  title: title,
+  title: proxyOptions.title,
   type: 'General',
   answers: [
     {
-      guidance: {
-        show_guidance: 'Why do I need to answer if I am retired or long term sick or disabled?',
-        hide_guidance: 'Why do I need to answer if I am retired or long term sick or disabled',
-        content: [
-          {
-            description: 'To get a true picture of the UK working population, we ask this question to everyone who is not currently working. We ask people who are retired because the number of people continuing to work after retirement age is increasing. We ask people who are long-term sick or disabled because some intend to go back to work.',
-          },
-        ],
-      },
+      guidance: proxyOptions.guidance,
       id: 'jobseeker-answer',
       mandatory: true,
       options: [
@@ -33,12 +25,34 @@ local question(title) = {
   ],
 };
 
-local nonProxyTitle = 'In the last four weeks, were you actively looking for any kind of paid work?';
-local proxyTitle = {
-  text: 'In the last four weeks, was <em>{person_name}</em> actively looking for any kind of paid work?',
-  placeholders: [
-    placeholders.personName,
-  ],
+local nonProxyOptions = {
+  title: 'In the last four weeks, were you actively looking for any kind of paid work?',
+  guidance: {
+    show_guidance: 'Why do I need to answer if I am retired or long term sick or disabled?',
+    hide_guidance: 'Why do I need to answer if I am retired or long term sick or disabled',
+    content: [
+      {
+        description: 'To get a true picture of the UK working population, we ask this question of everyone who is not currently working. We ask people who are retired because the number of people continuing to work after retirement age is increasing. We ask people who are long-term sick or disabled because some intend to go back to work.',
+      },
+    ],
+  }
+};
+local isProxyOptions = {
+  title: {
+    text: 'In the last four weeks, was <em>{person_name}</em> actively looking for any kind of paid work?',
+    placeholders: [
+      placeholders.personName,
+    ]
+  },
+  guidance: {
+    show_guidance: 'Why do I need to answer if they have retired or are long term sick or disabled?',
+    hide_guidance: 'Why do I need to answer if they have retired or are long term sick or disabled',
+    content: [
+      {
+        description: 'To get a true picture of the UK working population, we ask this question of everyone who is not currently working. We ask people who are retired because the number of people continuing to work after retirement age is increasing. We ask people who are long-term sick or disabled because some intend to go back to work.',
+      },
+    ],
+  },
 };
 
 {
@@ -46,11 +60,11 @@ local proxyTitle = {
   id: 'jobseeker',
   question_variants: [
     {
-      question: question(nonProxyTitle),
+      question: question(nonProxyOptions),
       when: [rules.proxyNo],
     },
     {
-      question: question(proxyTitle),
+      question: question(isProxyOptions),
       when: [rules.proxyYes],
     },
   ],
