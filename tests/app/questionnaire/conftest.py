@@ -70,8 +70,14 @@ def list_collector_variant_schema():
                                 'id': 'block1',
                                 'type': 'ListCollector',
                                 'populates_list': 'people',
-                                'add_answer_value': 'Yes',
-                                'remove_answer_value': 'Yes',
+                                'add_answer': {
+                                    'id': 'answer1',
+                                    'value': 'Yes'
+                                },
+                                'remove_answer': {
+                                    'id': 'remove-confirmation',
+                                    'value': 'Yes'
+                                },
                                 'question_variants': [
                                     {
                                         'question': {

@@ -57,8 +57,14 @@
                     "id": "list-collector",
                     "type": "ListCollector",
                     "populates_list": "people",
-                    "add_answer_value": "Yes",
-                    "remove_answer_value": "Yes",
+                    "add_answer": {
+                        "id": "anyone-else",
+                        "value": "Yes"
+                    },
+                    "remove_answer": {
+                        "id": "remove-confirmation",
+                        "value": "Yes"
+                    },
                     "question_variants": [{
                             "question": {
                                 "id": "confirmation-question",

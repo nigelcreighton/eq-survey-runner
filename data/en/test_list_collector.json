@@ -34,8 +34,14 @@
                         "id": "list-collector",
                         "type": "ListCollector",
                         "populates_list": "people",
-                        "add_answer_value": "Yes",
-                        "remove_answer_value": "Yes",
+                        "add_answer": {
+                            "id": "anyone-else",
+                            "value": "Yes"
+                        },
+                        "remove_answer": {
+                            "id": "remove-confirmation",
+                            "value": "Yes"
+                        },
                         "question": {
                             "id": "confirmation-question",
                             "type": "General",
@@ -140,8 +146,14 @@
                         "id": "another-list-collector-block",
                         "type": "ListCollector",
                         "populates_list": "people",
-                        "add_answer_value": "Yes",
-                        "remove_answer_value": "Yes",
+                        "add_answer": {
+                            "id": "another-anyone-else",
+                            "value": "Yes"
+                        },
+                        "remove_answer": {
+                            "id": "another-remove-confirmation",
+                            "value": "Yes"
+                        },
                         "question": {
                             "id": "another-confirmation-question",
                             "type": "General",

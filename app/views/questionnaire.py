@@ -227,12 +227,12 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
 
     if block['type'] == 'ListCollector':
         answer_store_updater.save_answers(form)
-        if list(form.data.values())[0] == block['add_answer_value']:
+        if form.data[block['add_answer']['id']] == block['add_answer']['value']:
             add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
             return add_url
         return
     elif block['type'] == 'ListRemoveQuestion':
-        if list(form.data.values())[0] == parent_block['remove_answer_value']:
+        if form.data[parent_block['remove_answer']['id']] == parent_block['remove_answer']['value']:
             list_name = parent_block['populates_list']
             answer_store_updater.remove_all_answers_with_list_item_id(list_name, list_item_id)
         else:
