@@ -21,14 +21,6 @@ class Location:
     def __hash__(self):
         return hash(frozenset(self.__dict__.values()))
 
-    def __str__(self):
-        """
-        String representation of the location, handy for debug messages
-
-        :return:
-        """
-        return '{}'.format(self.block_id)
-
     @classmethod
     def from_dict(cls, location_dict: dict):
         block_id = location_dict['block_id']

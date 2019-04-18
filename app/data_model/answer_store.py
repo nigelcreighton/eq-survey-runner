@@ -44,9 +44,6 @@ class AnswerStore:
     def __eq__(self, other):
         return self.answer_map == other.answer_map
 
-    def __getitem__(self, key):
-        return self.answer_map[key]
-
     @staticmethod
     def _build_map(answers: List[Union[Answer, Dict]]):
         """ Builds the answer_store's data structure from a list of Answer objects"""
@@ -66,12 +63,6 @@ class AnswerStore:
         if not isinstance(answer, Answer):
             raise TypeError('Method only supports Answer argument type')
 
-    def copy(self) -> AnswerStore:
-        """
-        Create a new instance of answer_store with the same values.
-        """
-        return self.__class__(self.answer_map.copy())
-
     def add_or_update(self, answer: Answer):
         """
         Add a new answer into the answer store, or update if it exists.
@@ -85,12 +76,6 @@ class AnswerStore:
             self.dirty = True
 
         self.answer_map[store_key] = answer
-
-    def values(self) -> List[str]:
-        """
-        Return a flat list of all answer values in the answer store.
-        """
-        return [answer.value for answer in self]
 
     def get_answer(self, answer_id: str, list_item_id: str = None) -> Optional[Answer]:
         """ Get a single answer from the store

@@ -72,3 +72,9 @@ def test_get_item():
     store = ListStore()
 
     assert store['not_an_list'] == []
+
+def test_delete_list_item_id():
+    store = ListStore()
+    person = store.add_list_item('people')
+    store.delete_list_item_id('people', person)
+    assert not store._lists # pylint: disable=protected-access

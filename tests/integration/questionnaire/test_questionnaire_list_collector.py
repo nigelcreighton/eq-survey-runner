@@ -25,6 +25,27 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
         selected = self.getHtmlSoup().select(selector)
         return selected[0].get('href')
 
+    def test_invalid_list_collector(self):
+        self.launchSurvey('test', 'list_collector')
+
+        self.get('/questionnaire/invalid/some-list-id/edit-person')
+
+        self.assertInUrl('list-collector')
+
+    def test_invalid_block(self):
+        self.launchSurvey('test', 'list_collector')
+
+        self.get('/questionnaire/bad-block')
+
+        self.assertInUrl('introduction')
+
+    def test_invalid_list_item_id(self):
+        self.launchSurvey('test', 'list_collector')
+
+        self.get('/questionnaire/people/123/edit-person')
+
+        self.assertInUrl('list-collector')
+
     def test_happy_path(self):
         self.launchSurvey('test', 'list_collector')
 

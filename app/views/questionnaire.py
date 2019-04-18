@@ -11,7 +11,6 @@ from flask_themes2 import render_theme_template
 from jwcrypto.common import base64url_decode
 from sdc.crypto.encrypter import encrypt
 from structlog import get_logger
-from werkzeug.exceptions import NotFound
 
 from app.authentication.no_token_exception import NoTokenException
 from app.data_model.answer_store import AnswerStore
@@ -193,7 +192,6 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
         return submit_answers(routing_path, schema)
 
     return redirect(next_location.url())
-
 
 
 def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id):
@@ -581,17 +579,7 @@ class InvalidListItemId(Exception):
 
 
 @with_list_store
-def validate_list_collector_route(list_store, schema, block_id, list_name=None, list_item_id=None):
-    current_block = schema.get_block(block_id)
-
-    list_collector_block = schema.get_list_collector_for_block_id(block_id)
-
-    if not list_collector_block:
-        raise NotFound(f'List collector populating {list_name} not found')
-
-    if not current_block:
-        raise NotFound(f'Block id: {block_id} not found')
-
+def validate_list_collector_route(list_store, list_name=None, list_item_id=None):
     if list_item_id and list_item_id not in list_store[list_name]:
         raise InvalidListItemId(f'List item id: {list_item_id} not found for list {list_name}')
 
@@ -614,6 +602,6 @@ def validate_list_block(schema, block_id, list_name, list_item_id=None):
     parent_block = schema.get_list_collector_for_block_id(block_id)
 
     try:
-        validate_list_collector_route(schema, block_id, list_name, list_item_id)
+        validate_list_collector_route(list_name, list_item_id)
     except InvalidListItemId:
         return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
