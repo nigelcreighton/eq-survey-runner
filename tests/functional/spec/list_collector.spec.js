@@ -12,9 +12,15 @@ const NextInterstitialPage = require('../generated_pages/list_collector/next-int
 const SummaryPage = require('../generated_pages/list_collector/summary.page.js');
 
 function checkPeopleInList(peopleExpected) {
+  let chain = browser.waitForVisible(ListCollectorPage.listLabel(1)).should.eventually.be.true;
+
   for (let i=1; i<=peopleExpected.length; i++) {
-    browser.getText(ListCollectorPage.listLabel(i)).should.eventually.include(peopleExpected[i-1])
+    chain = chain.then(() => {
+      browser.getText(ListCollectorPage.listLabel(i)).should.eventually.contain(peopleExpected[i-1])
+    });
   }
+
+  return chain;
 }
 
 describe('@watch List Collector', function() {
@@ -29,8 +35,8 @@ describe('@watch List Collector', function() {
         .click(IntroductionPage.getStarted())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
-        .setValue(ListCollectorAddPage.firstName(), 'Mark')
-        .setValue(ListCollectorAddPage.lastName(), 'Twain')
+        .setValue(ListCollectorAddPage.firstName(), 'Mebin')
+        .setValue(ListCollectorAddPage.lastName(), 'Twainy')
         .click(ListCollectorAddPage.submit())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
@@ -51,10 +57,10 @@ describe('@watch List Collector', function() {
 
     it('Shows all of the household members in the summary', function() {
       const peopleExpected = ['Mark Twain', 'Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens']
-      checkPeopleInList(peopleExpected)
+      return checkPeopleInList(peopleExpected)
     });
 
-    it('Allows me to remove a person from the summary', function() {
+    it('Allows me to remove the first person (Mark Twain) from the summary', function() {
       return browser
         .click(ListCollectorPage.listRemoveLink(1))
         .click(ListCollectorRemovePage.yes())
@@ -63,7 +69,7 @@ describe('@watch List Collector', function() {
 
     it('Does not show Mark Twain anymore.', function() {
       return browser
-        .getText(ListCollectorPage.listLabel()).should.not.include('Mark Twain')
+        .getText(ListCollectorPage.listLabel(1)).should.not.eventually.have.string('Mark Twain')
     })
 
     it('Allows more people to be added', function() {

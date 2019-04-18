@@ -133,7 +133,7 @@ CALCULATED_SUMMARY_LABEL_GETTER = Template(r"""  ${answerName}Label() { return '
 
 """)
 
-LIST_SUMMARY_LABEL_GETTER = r"""  listLabel(instance) { return `[data-qa="list-summary-${instance}"]>.list__item-name`; }
+LIST_SUMMARY_LABEL_GETTER = r"""  listLabel(instance) { return `[data-qa="list-summary-${instance}"] .list__item-name`; }
 
 """
 
