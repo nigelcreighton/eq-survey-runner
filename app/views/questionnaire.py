@@ -97,9 +97,7 @@ def get_add_list_item(schema, questionnaire_store, list_name, add_block_id):
     return get_block_handler(
         None,
         schema,
-        questionnaire_store.metadata,
-        questionnaire_store.answer_store,
-        questionnaire_store.list_store,
+        questionnaire_store,
         add_block_id,
         list_name
     )
@@ -113,9 +111,7 @@ def get_list_item_block_id(schema, questionnaire_store, list_name, list_item_id,
     return get_block_handler(
         None,
         schema,
-        questionnaire_store.metadata,
-        questionnaire_store.answer_store,
-        questionnaire_store.list_store,
+        questionnaire_store,
         block_id,
         list_name,
         list_item_id
@@ -131,9 +127,7 @@ def get_block(routing_path, schema, questionnaire_store, block_id):
     return get_block_handler(
         routing_path,
         schema,
-        questionnaire_store.metadata,
-        questionnaire_store.answer_store,
-        questionnaire_store.list_store,
+        questionnaire_store,
         block_id
     )
 
@@ -153,7 +147,11 @@ def validate_location(schema, routing_path, list_store, current_location):
             return _redirect_to_location(next_location)
 
 
-def get_block_handler(routing_path, schema, metadata, answer_store, list_store, block_id, list_name=None, list_item_id=None):
+def get_block_handler(routing_path, schema, questionnaire_store, block_id, list_name=None, list_item_id=None):
+    list_store = questionnaire_store.list_store
+    metadata = questionnaire_store.metadata
+    answer_store = questionnaire_store.answer_store
+
     current_location = Location(block_id, list_name, list_item_id)
 
     to_redirect = validate_location(schema, routing_path, list_store, current_location)
@@ -165,8 +163,14 @@ def get_block_handler(routing_path, schema, metadata, answer_store, list_store, 
 
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-return-statements
-def post_block_handler(routing_path, schema, metadata, collection_metadata, list_store,  # noqa: C901
-                       answer_store, block_id, list_name=None, list_item_id=None):
+def post_block_handler(routing_path, schema, questionnaire_store,  # noqa: C901
+                       block_id, list_name=None, list_item_id=None):
+
+    metadata = questionnaire_store.metadata
+    collection_metadata = questionnaire_store.collection_metadata
+    list_store = questionnaire_store.list_store
+    answer_store = questionnaire_store.answer_store
+
     current_location = Location(block_id, list_name, list_item_id)
 
     to_redirect = validate_location(schema, routing_path, list_store, current_location)
@@ -259,10 +263,7 @@ def post_block(routing_path, schema, questionnaire_store, block_id):
     return post_block_handler(
         routing_path,
         schema,
-        questionnaire_store.metadata,
-        questionnaire_store.collection_metadata,
-        questionnaire_store.list_store,
-        questionnaire_store.answer_store,
+        questionnaire_store,
         block_id
     )
 
@@ -275,10 +276,7 @@ def post_add_list_item(schema, questionnaire_store, list_name, block_id):
     return post_block_handler(
         None,
         schema,
-        questionnaire_store.metadata,
-        questionnaire_store.collection_metadata,
-        questionnaire_store.list_store,
-        questionnaire_store.answer_store,
+        questionnaire_store,
         block_id,
         list_name,
         None
@@ -293,10 +291,7 @@ def post_list_item_block(schema, questionnaire_store, list_name, list_item_id, b
     return post_block_handler(
         None,
         schema,
-        questionnaire_store.metadata,
-        questionnaire_store.collection_metadata,
-        questionnaire_store.list_store,
-        questionnaire_store.answer_store,
+        questionnaire_store,
         block_id,
         list_name,
         list_item_id
