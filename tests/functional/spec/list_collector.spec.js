@@ -130,11 +130,45 @@ describe('@watch List Collector', function() {
         .getText(AnotherListCollectorPage.listLabel(6)).should.eventually.equal('Someone Else')
     });
 
-    it('Allows the user to remove a person again and redirects the summary when the user goes back to the remove confirmation', function() {
+    it('Allows the user to remove a person again', function() {
       return browser
         .click(AnotherListCollectorPage.listRemoveLink(6))
         .click(AnotherListCollectorRemovePage.yes())
         .click(AnotherListCollectorRemovePage.submit())
     });
+
+    it('Redirects to the summary when the user visits a non-existant list item id', function() {
+      return browser
+        .url('/questionnaire/people/somerandomid/another-edit-person')
+        .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName)
+    });
+
+    it('Returns to the summary when the previous link is clicked.', function() {
+      return browser
+        .click(AnotherListCollectorPage.listRemoveLink(1))
+        .click(AnotherListCollectorRemovePage.previous())
+        .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName)
+        .click(AnotherListCollectorPage.listEditLink(1))
+        .click(AnotherListCollectorEditPage.previous())
+        .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName)
+        .click(AnotherListCollectorPage.yes())
+        .click(AnotherListCollectorPage.submit())
+        .click(AnotherListCollectorEditPage.previous())
+        .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName)
+    });
+
+    it('Shows the confirmation page when no more people to add', function() {
+      return browser
+        .click(AnotherListCollectorPage.no())
+        .click(AnotherListCollectorPage.submit())
+        .getUrl().should.eventually.contain(SummaryPage.pageName)
+    })
+
+    it('Allows submission', function() {
+      return browser
+        .click(SummaryPage.submit())
+        .getUrl().should.eventually.contain('thank-you')
+    })
+
   });
 });
