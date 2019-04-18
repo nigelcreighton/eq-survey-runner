@@ -28,11 +28,7 @@ class AnswerStore:
         Args:
             existing_answers: If a list of answer objects is provided, this will be used to initialise the store.
         """
-        if isinstance(existing_answers, list):
-            self.answer_map = self._build_map(existing_answers or [])
-        else:
-            self.answer_map = existing_answers or {}
-
+        self.answer_map = self._build_map(existing_answers or [])
         self.dirty = False
 
     def __iter__(self):
@@ -106,7 +102,7 @@ class AnswerStore:
             if answer:
                 output.append(answer)
 
-        return AnswerStore(output)
+        return output
 
     def clear(self):
         """
