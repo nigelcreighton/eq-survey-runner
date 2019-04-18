@@ -16,7 +16,7 @@ function checkPeopleInList(peopleExpected) {
 
   for (let i=1; i<=peopleExpected.length; i++) {
     chain = chain.then(() => {
-      browser.getText(ListCollectorPage.listLabel(i)).should.eventually.contain(peopleExpected[i-1])
+      return browser.getText(ListCollectorPage.listLabel(i)).should.eventually.equal(peopleExpected[i-1])
     });
   }
 
@@ -35,8 +35,8 @@ describe('@watch List Collector', function() {
         .click(IntroductionPage.getStarted())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
-        .setValue(ListCollectorAddPage.firstName(), 'Mebin')
-        .setValue(ListCollectorAddPage.lastName(), 'Twainy')
+        .setValue(ListCollectorAddPage.firstName(), 'Mark')
+        .setValue(ListCollectorAddPage.lastName(), 'Twain')
         .click(ListCollectorAddPage.submit())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
@@ -86,8 +86,6 @@ describe('@watch List Collector', function() {
         .setValue(ListCollectorAddPage.firstName(), 'Jean')
         .setValue(ListCollectorAddPage.lastName(), 'Clemens')
         .click(ListCollectorAddPage.submit())
-
-        // Remove Mark Twain - Ensure list is empty
     });
   });
 });
