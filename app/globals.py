@@ -84,7 +84,7 @@ def get_answer_store(user):
 
 
 def get_list_store(user):
-    questionnaire_store = get_questionnaire_store(user.user_id, user.user_ik)
+    return get_questionnaire_store(user.user_id, user.user_ik).list_store
     return questionnaire_store.list_store
 
 
