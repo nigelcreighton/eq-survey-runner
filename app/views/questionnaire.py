@@ -93,9 +93,10 @@ def before_post_submission_request():
 @login_required
 @with_questionnaire_store
 @with_schema
-def get_add_list_item(schema, questionnaire_store, list_name, add_block_id):
+@full_routing_path_required
+def get_add_list_item(routing_path, schema, questionnaire_store, list_name, add_block_id):
     return get_block_handler(
-        None,
+        routing_path,
         schema,
         questionnaire_store,
         add_block_id,
@@ -107,9 +108,10 @@ def get_add_list_item(schema, questionnaire_store, list_name, add_block_id):
 @login_required
 @with_questionnaire_store
 @with_schema
-def get_list_item_block_id(schema, questionnaire_store, list_name, list_item_id, block_id):
+@full_routing_path_required
+def get_list_item_block_id(routing_path, schema, questionnaire_store, list_name, list_item_id, block_id):
     return get_block_handler(
-        None,
+        routing_path,
         schema,
         questionnaire_store,
         block_id,
