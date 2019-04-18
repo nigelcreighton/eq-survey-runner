@@ -29,7 +29,7 @@ describe('List Collector With Variants', function() {
     it('Asks questions about whether you live there', function() {
       return browser
         .click(IntroductionPage.getStarted())
-        .click(YouLiveHerePage.no())
+        .click(YouLiveHerePage.yes())
         .click(YouLiveHerePage.submit())
         .getText(ListCollectorPage.questionText()).should.eventually.equal('Does anyone else live at 1 Pleasant Lane?');
     });
