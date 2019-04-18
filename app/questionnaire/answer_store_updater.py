@@ -1,3 +1,4 @@
+from typing import List
 from app.data_model.answer_store import Answer
 
 
@@ -53,17 +54,17 @@ class AnswerStoreUpdater:
                 else:
                     self._answer_store.remove_answer(answer_id)
 
-    def remove_all_answers_with_list_item_id(self, list, list_item_id):
+    def remove_all_answers_with_list_item_id(self, list_name: str, list_item_id: str):
         """ Remove answers from the answer store and update the list store to remove it
         """
-        self._list_store.delete_list_item_id(list, list_item_id)
+        self._list_store.delete_list_item_id(list_name, list_item_id)
 
         self._answer_store.remove_all_answers_for_list_item_id(list_item_id=list_item_id)
 
         self._questionnaire_store.add_or_update()
         self._answer_store.dirty = True
 
-    def remove_answer_ids(self, answer_ids: list):
+    def remove_answer_ids(self, answer_ids: List):
         for answer_id in answer_ids:
             self._answer_store.remove_answer(answer_id)
         self._questionnaire_store.add_or_update()

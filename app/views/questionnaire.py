@@ -189,7 +189,7 @@ def post_block_handler(routing_path, schema, metadata, collection_metadata, list
             return submit_answers(routing_path, schema)
 
         return redirect(next_location.url())
-        
+
     next_url = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id)
     if next_url:
         return redirect(next_url)
