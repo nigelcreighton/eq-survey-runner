@@ -19,14 +19,14 @@ function checkPeopleInList(peopleExpected) {
   return chain;
 }
 
-describe('List Collector With Variants', function() {
+describe('@watch List Collector With Variants', function() {
 
-  describe('Person lives in house', function() {
+  describe('Given that a person lives in house', function() {
     before('Load the survey', function() {
       return helpers.openQuestionnaire('test_list_collector_variants.json');
     });
 
-    it('Asks questions about whether you live there', function() {
+    it('The user is asked questions about whether they live there', function() {
       return browser
         .click(IntroductionPage.getStarted())
         .click(YouLiveHerePage.yes())
@@ -34,7 +34,7 @@ describe('List Collector With Variants', function() {
         .getText(ListCollectorPage.questionText()).should.eventually.equal('Does anyone else live at 1 Pleasant Lane?');
     });
 
-    it('Given a normal journey through the list collector, the user is able to add members of the household', function() {
+    it('The user is able to add members of the household', function() {
       return browser
         .click(ListCollectorPage.anyoneElseYes())
         .click(ListCollectorPage.submit())
@@ -44,12 +44,12 @@ describe('List Collector With Variants', function() {
         .click(ListCollectorAddPage.submit());
     });
 
-    it('Shows all of the household members in the summary', function() {
+    it('The user can see all household members in the summary', function() {
       const peopleExpected = ['Samuel Clemens'];
       return checkPeopleInList(peopleExpected);
     });
 
-    it('Has the correct question text on the change and remove pages', function() {
+    it('The questionnaire has the correct question text on the change and remove pages', function() {
       return browser
         .click(ListCollectorPage.listEditLink(1))
         .getText(ListCollectorEditPage.questionText()).should.eventually.equal('What is the name of the person?')
@@ -59,14 +59,14 @@ describe('List Collector With Variants', function() {
         .click(ListCollectorRemovePage.previous());
     });
 
-    it('Shows the confirmation page when no more people to add', function() {
+    it('The questionnaire shows the confirmation page when no more people to add', function() {
       return browser
         .click(ListCollectorPage.anyoneElseNo())
         .click(ListCollectorPage.submit())
         .getUrl().should.eventually.contain(ConfirmationPage.pageName);
     });
 
-    it('Allows submission', function() {
+    it('The questionnaire allows submission', function() {
       return browser
         .click(ConfirmationPage.submit())
         .getUrl().should.eventually.contain('thank-you');
@@ -74,12 +74,12 @@ describe('List Collector With Variants', function() {
 
   });
 
-  describe('Person lives in house', function() {
+  describe('Given a person does not live in house', function() {
     before('Load the survey', function () {
       return helpers.openQuestionnaire('test_list_collector_variants.json');
     });
 
-    it('Asks questions about whether you live there', function () {
+    it('The user is asked questions about whether they live there', function() {
       return browser
         .click(IntroductionPage.getStarted())
         .click(YouLiveHerePage.no())
@@ -87,7 +87,7 @@ describe('List Collector With Variants', function() {
         .getText(ListCollectorPage.questionText()).should.eventually.equal('Does anyone live at 1 Pleasant Lane?');
     });
 
-    it('Given a normal journey through the list collector, the user is able to add members of the household', function () {
+    it('The user is able to add members of the household', function() {
       return browser
         .click(ListCollectorPage.anyoneElseYes())
         .click(ListCollectorPage.submit())
@@ -97,12 +97,12 @@ describe('List Collector With Variants', function() {
         .click(ListCollectorAddPage.submit());
     });
 
-    it('Shows all of the household members in the summary', function () {
+    it('The user can see all household members in the summary', function() {
       const peopleExpected = ['Samuel Clemens'];
       return checkPeopleInList(peopleExpected);
     });
 
-    it('Has the correct question text on the change and remove pages', function () {
+    it('The questionnaire has the correct question text on the change and remove pages', function() {
       return browser
         .click(ListCollectorPage.listEditLink(1))
         .getText(ListCollectorEditPage.questionText()).should.eventually.equal('What is the name of the person who isn\'t you?')
@@ -112,17 +112,18 @@ describe('List Collector With Variants', function() {
         .click(ListCollectorRemovePage.previous());
     });
 
-    it('Shows the confirmation page when no more people to add', function () {
+    it('The questionnaire shows the confirmation page when no more people to add', function() {
       return browser
         .click(ListCollectorPage.anyoneElseNo())
         .click(ListCollectorPage.submit())
         .getUrl().should.eventually.contain(ConfirmationPage.pageName);
     });
 
-    it('Allows submission', function () {
+    it('The questionnaire allows submission', function() {
       return browser
         .click(ConfirmationPage.submit())
         .getUrl().should.eventually.contain('thank-you');
     });
+
   });
 });

@@ -23,14 +23,14 @@ function checkPeopleInList(peopleExpected) {
   return chain;
 }
 
-describe('List Collector', function() {
+describe('@watch List Collector', function() {
 
-  describe('List Collector Without Variants', function() {
+  describe('Given a normal journey through the list collector without variants', function() {
     before('Load the survey', function() {
       return helpers.openQuestionnaire('test_list_collector.json');
     });
 
-    it('Given a normal journey through the list collector, the user is able to add members of the household', function() {
+    it('The user is able to add members of the household', function() {
       return browser
         .click(IntroductionPage.getStarted())
         .click(ListCollectorPage.yes())
@@ -55,12 +55,12 @@ describe('List Collector', function() {
         .click(ListCollectorAddPage.submit());
     });
 
-    it('Shows all of the household members in the summary', function() {
+    it('The collector shows all of the household members in the summary', function() {
       const peopleExpected = ['Marcus Twin', 'Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens'];
       return checkPeopleInList(peopleExpected);
     });
 
-    it('Allows the name of a person to be changed', function() {
+    it('The questionnaire allows the name of a person to be changed', function() {
       return browser
         .click(ListCollectorPage.listEditLink(1))
         .setValue(ListCollectorEditPage.firstName(), 'Mark')
@@ -69,20 +69,20 @@ describe('List Collector', function() {
         .getText(ListCollectorPage.listLabel(1)).should.eventually.equal('Mark Twain');
     });
 
-    it('Allows me to remove the first person (Mark Twain) from the summary', function() {
+    it('The questionnaire allows me to remove the first person (Mark Twain) from the summary', function() {
       return browser
         .click(ListCollectorPage.listRemoveLink(1))
         .click(ListCollectorRemovePage.yes())
         .click(ListCollectorRemovePage.submit());
     });
 
-    it('Does not show Mark Twain anymore.', function() {
+    it('The collector summary does not show Mark Twain anymore.', function() {
       return browser
         .getText(ListCollectorPage.listLabel(1)).should.not.eventually.have.string('Mark Twain')
         .getText(ListCollectorPage.listLabel(3)).should.eventually.equal('Suzy Clemens');
     });
 
-    it('Allows more people to be added', function() {
+    it('The questionnaire allows more people to be added', function() {
       return browser
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
@@ -97,12 +97,12 @@ describe('List Collector', function() {
         .click(ListCollectorAddPage.submit());
     });
 
-    it('Shows everyone on the summary', function() {
+    it('The collector shows everyone on the summary', function() {
       const peopleExpected = ['Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens', 'Clara Clemens', 'Jean Clemens'];
       return checkPeopleInList(peopleExpected);
     });
 
-    it('Shows an interstitial when No is answered on the list collector', function() {
+    it('When No is answered on the list collector the user sees an interstitial', function() {
       return browser
         .click(ListCollectorPage.no())
         .click(ListCollectorPage.submit())
@@ -110,17 +110,17 @@ describe('List Collector', function() {
         .click(NextInterstitialPage.submit());
     });
 
-    it('Should be on the second list collector page', function() {
+    it('After the interstitial, the user should be on the second list collector page', function() {
       return browser
         .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName);
     });
 
-    it('Still shows the same list of people on the summary', function() {
+    it('The collector still shows the same list of people on the summary', function() {
       const peopleExpected = ['Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens', 'Clara Clemens', 'Jean Clemens'];
       return checkPeopleInList(peopleExpected);
     });
 
-    it('Allows the user to add another person to the same list', function() {
+    it('The collector allows the user to add another person to the same list', function() {
       return browser
         .click(AnotherListCollectorPage.yes())
         .click(AnotherListCollectorPage.submit())
@@ -130,20 +130,20 @@ describe('List Collector', function() {
         .getText(AnotherListCollectorPage.listLabel(6)).should.eventually.equal('Someone Else');
     });
 
-    it('Allows the user to remove a person again', function() {
+    it('The collector allows the user to remove a person again', function() {
       return browser
         .click(AnotherListCollectorPage.listRemoveLink(6))
         .click(AnotherListCollectorRemovePage.yes())
         .click(AnotherListCollectorRemovePage.submit());
     });
 
-    it('Redirects to the summary when the user visits a non-existant list item id', function() {
+    it('The user is redirected to the summary when the user visits a non-existant list item id', function() {
       return browser
         .url('/questionnaire/people/somerandomid/another-edit-person')
         .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName);
     });
 
-    it('Returns to the summary when the previous link is clicked.', function() {
+    it('The user is returned to the list collector when the previous link is clicked.', function() {
       return browser
         .click(AnotherListCollectorPage.listRemoveLink(1))
         .click(AnotherListCollectorRemovePage.previous())
@@ -157,14 +157,14 @@ describe('List Collector', function() {
         .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName);
     });
 
-    it('Shows the confirmation page when no more people to add', function() {
+    it('The questionnaire shows the confirmation page when no more people to add', function() {
       return browser
         .click(AnotherListCollectorPage.no())
         .click(AnotherListCollectorPage.submit())
         .getUrl().should.eventually.contain(SummaryPage.pageName);
     });
 
-    it('Allows submission', function() {
+    it('The questionnaire allows submission', function() {
       return browser
         .click(SummaryPage.submit())
         .getUrl().should.eventually.contain('thank-you');

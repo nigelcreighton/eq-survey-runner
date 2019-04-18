@@ -24,8 +24,8 @@ def with_list_store(function):
     May error unless there is a `current_user`."""
     @wraps(function)
     def wrapped_function(*args, **kwargs):
-        answer_store = get_list_store(current_user)
-        return function(answer_store, *args, **kwargs)
+        list_store = get_list_store(current_user)
+        return function(list_store, *args, **kwargs)
     return wrapped_function
 
 
