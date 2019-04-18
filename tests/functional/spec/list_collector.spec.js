@@ -35,8 +35,8 @@ describe('@watch List Collector', function() {
         .click(IntroductionPage.getStarted())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
-        .setValue(ListCollectorAddPage.firstName(), 'Mark')
-        .setValue(ListCollectorAddPage.lastName(), 'Twain')
+        .setValue(ListCollectorAddPage.firstName(), 'Marcus')
+        .setValue(ListCollectorAddPage.lastName(), 'Twin')
         .click(ListCollectorAddPage.submit())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
@@ -56,8 +56,17 @@ describe('@watch List Collector', function() {
     });
 
     it('Shows all of the household members in the summary', function() {
-      const peopleExpected = ['Mark Twain', 'Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens']
+      const peopleExpected = ['Marcus Twin', 'Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens']
       return checkPeopleInList(peopleExpected)
+    });
+
+    it('Allows the name of a person to be changed', function() {
+      return browser
+        .click(ListCollectorPage.listEditLink(1))
+        .setValue(ListCollectorEditPage.firstName(), 'Mark')
+        .setValue(ListCollectorEditPage.lastName(), 'Twain')
+        .click(ListCollectorEditPage.submit())
+        .getText(ListCollectorPage.listLabel(1)).should.eventually.equal('Mark Twain')
     });
 
     it('Allows me to remove the first person (Mark Twain) from the summary', function() {
@@ -65,19 +74,19 @@ describe('@watch List Collector', function() {
         .click(ListCollectorPage.listRemoveLink(1))
         .click(ListCollectorRemovePage.yes())
         .click(ListCollectorRemovePage.submit())
-    })
+    });
 
     it('Does not show Mark Twain anymore.', function() {
       return browser
         .getText(ListCollectorPage.listLabel(1)).should.not.eventually.have.string('Mark Twain')
-    })
+        .getText(ListCollectorPage.listLabel(3)).should.eventually.equal('Suzy Clemens')
+    });
 
     it('Allows more people to be added', function() {
-      browser
-        // Correct name spelling, ensure reflected in summary
-        .click(ListCollectorAddPage.submit())
+      return browser
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
+        .getText(ListCollectorAddPage.questionText()).should.eventually.contain('What is the name of the person')
         .setValue(ListCollectorAddPage.firstName(), 'Clara')
         .setValue(ListCollectorAddPage.lastName(), 'Clemens')
         .click(ListCollectorAddPage.submit())
@@ -86,6 +95,46 @@ describe('@watch List Collector', function() {
         .setValue(ListCollectorAddPage.firstName(), 'Jean')
         .setValue(ListCollectorAddPage.lastName(), 'Clemens')
         .click(ListCollectorAddPage.submit())
+    });
+
+    it('Shows everyone on the summary', function() {
+      const peopleExpected = ['Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens', 'Clara Clemens', 'Jean Clemens'];
+      return checkPeopleInList(peopleExpected)
+    });
+
+    it('Shows an interstitial when No is answered on the list collector', function() {
+      return browser
+        .click(ListCollectorPage.no())
+        .click(ListCollectorPage.submit())
+        .getUrl().should.eventually.contain(NextInterstitialPage.pageName)
+        .click(NextInterstitialPage.submit())
+    });
+
+    it('Should be on the second list collector page', function() {
+      return browser
+        .getUrl().should.eventually.contain(AnotherListCollectorPage.pageName)
+    });
+
+    it('Still shows the same list of people on the summary', function() {
+      const peopleExpected = ['Samuel Clemens', 'Olivia Clemens', 'Suzy Clemens', 'Clara Clemens', 'Jean Clemens'];
+      return checkPeopleInList(peopleExpected)
+    });
+
+    it('Allows the user to add another person to the same list', function() {
+      return browser
+        .click(AnotherListCollectorPage.yes())
+        .click(AnotherListCollectorPage.submit())
+        .setValue(AnotherListCollectorAddPage.firstName(), 'Someone')
+        .setValue(AnotherListCollectorAddPage.lastName(), 'Else')
+        .click(AnotherListCollectorAddPage.submit())
+        .getText(AnotherListCollectorPage.listLabel(6)).should.eventually.equal('Someone Else')
+    });
+
+    it('Allows the user to remove a person again and redirects the summary when the user goes back to the remove confirmation', function() {
+      return browser
+        .click(AnotherListCollectorPage.listRemoveLink(6))
+        .click(AnotherListCollectorRemovePage.yes())
+        .click(AnotherListCollectorRemovePage.submit())
     });
   });
 });
