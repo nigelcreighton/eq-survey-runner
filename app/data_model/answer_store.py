@@ -41,7 +41,7 @@ class AnswerStore:
         return self.answer_map == other.answer_map
 
     @staticmethod
-    def _build_map(answers: List[Union[Answer, Dict]]):
+    def _build_map(answers: List[Answer]):
         """ Builds the answer_store's data structure from a list of Answer objects"""
 
         return {(answer['answer_id'], answer.get('list_item_id')): Answer.from_dict(answer) for answer in answers}
