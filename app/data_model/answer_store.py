@@ -130,6 +130,7 @@ class AnswerStore:
 
         for key in keys_to_delete:
             del self.answer_map[key]
+            self._dirty = True
 
 
     def serialise(self):
