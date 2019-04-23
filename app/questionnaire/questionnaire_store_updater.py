@@ -62,10 +62,8 @@ class QuestionnaireStoreUpdater:
         self._answer_store.remove_all_answers_for_list_item_id(list_item_id=list_item_id)
 
         self._questionnaire_store.add_or_update()
-        self._answer_store.dirty = True
 
     def remove_answer_ids(self, answer_ids: List):
         for answer_id in answer_ids:
             self._answer_store.remove_answer(answer_id)
         self._questionnaire_store.add_or_update()
-        self._answer_store.dirty = True

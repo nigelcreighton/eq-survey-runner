@@ -29,7 +29,7 @@ class AnswerStore:
             existing_answers: If a list of answer objects is provided, this will be used to initialise the store.
         """
         self.answer_map = self._build_map(existing_answers or [])
-        self.dirty = False
+        self._dirty = False
 
     def __iter__(self):
         return iter(self.answer_map.values())
@@ -51,6 +51,10 @@ class AnswerStore:
         if not isinstance(answer, Answer):
             raise TypeError('Method only supports Answer argument type')
 
+    @property
+    def dirty(self):
+        return self._dirty
+
     def add_or_update(self, answer: Answer):
         """
         Add a new answer into the answer store, or update if it exists.
@@ -61,7 +65,7 @@ class AnswerStore:
         existing_answer = self.answer_map.get(key)
 
         if existing_answer != answer:
-            self.dirty = True
+            self._dirty = True
 
         self.answer_map[key] = answer
 
@@ -109,6 +113,7 @@ class AnswerStore:
 
         if self.answer_map.get((answer_id, list_item_id)):
             del self.answer_map[(answer_id, list_item_id)]
+            self._dirty = True
 
     def remove_all_answers_for_list_item_id(self, list_item_id: str):
         """Remove all answers associated with a particular list_item_id
@@ -121,10 +126,11 @@ class AnswerStore:
 
         for answer in self:
             if answer.list_item_id == list_item_id:
-                keys_to_delete.append((answer.answer_id, answer.list_item_id))
+                self.remove_answer(answer.answer_id, answer.list_item_id)
 
         for key in keys_to_delete:
             del self.answer_map[key]
+
 
     def serialise(self):
         return list(self.answer_map.values())
