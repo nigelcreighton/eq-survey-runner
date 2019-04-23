@@ -59,7 +59,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(self.metadata, self.collection_metadata, QuestionnaireSchema(questionnaire), AnswerStore(user_answer), {})
@@ -72,7 +72,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
             self.metadata['ref_p_end_date'] = None
             answer_object = convert_answers(self.metadata, self.collection_metadata, QuestionnaireSchema(questionnaire), AnswerStore(user_answer), {})
@@ -88,7 +88,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(self.metadata, self.collection_metadata, QuestionnaireSchema(questionnaire), AnswerStore(user_answer), {})
@@ -101,7 +101,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(
@@ -115,7 +115,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(
@@ -129,7 +129,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
             collection_metadata_copy = copy.copy(self.collection_metadata)
             metadata = self.metadata.copy()
@@ -147,7 +147,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(self.metadata, self.collection_metadata, QuestionnaireSchema(questionnaire), AnswerStore(user_answer), {})
@@ -160,7 +160,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(self.metadata, self.collection_metadata, QuestionnaireSchema(questionnaire), AnswerStore(), {})
@@ -172,7 +172,7 @@ class TestConverter(AppContextTestCase):  # pylint: disable=too-many-public-meth
 
             questionnaire = {
                 'survey_id': '021',
-                'data_version': '0.0.2'
+                'data_version': '0.0.3'
             }
 
             answer_object = convert_answers(self.metadata, self.collection_metadata, QuestionnaireSchema(questionnaire), AnswerStore(), {})
