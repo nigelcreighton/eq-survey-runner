@@ -10,7 +10,6 @@ import boto3
 import redis
 import sqlalchemy
 import yaml
-from aws_xray_sdk.core import patch_all
 from botocore.config import Config
 from flask import Flask, url_for, session as cookie_session
 from flask_babel import Babel
@@ -51,8 +50,6 @@ CSP_POLICY = {
     'connect-src': ["'self'", 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk'],
     'img-src': ["'self'", 'data:', 'https://www.google-analytics.com', 'https://cdn.ons.gov.uk'],
 }
-
-patch_all()
 
 cache = Cache()
 
@@ -96,8 +93,10 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
     application.eq = {}
 
     if application.config['AWS_XRAY_SDK_ENABLED']:
-        from aws_xray_sdk.core import xray_recorder
+        from aws_xray_sdk.core import patch_all, xray_recorder
         from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+        patch_all()
 
         xray_recorder.configure(service='Survey Runner')
         XRayMiddleware(application, xray_recorder)
