@@ -1,7 +1,7 @@
 FROM ubuntu:18.04 as builder
 
 RUN apt-get update \
-    && apt-get install -y curl git locales make build-essential unzip
+    && apt-get install -y curl git locales make build-essential
 
 RUN locale-gen en_US.UTF-8
 
@@ -12,9 +12,6 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
 
 RUN apt-get update \
     && apt-get install -y yarn nodejs
-
-RUN curl https://s3.dualstack.eu-west-1.amazonaws.com/aws-xray-assets.eu-west-1/xray-daemon/aws-xray-daemon-linux-2.x.zip -o ./aws-xray-daemon-linux-2.x.zip \
-     && unzip -o aws-xray-daemon-linux-2.x.zip -d .
 
 
 RUN git clone --branch v0.12.1 --depth 1 https://github.com/google/jsonnet.git /tmp/jsonnet \
@@ -47,8 +44,6 @@ FROM python:3.7-slim-stretch
 EXPOSE 5000
 
 RUN apt update && apt install -y libsnappy-dev build-essential
-
-COPY --from=builder xray /usr/bin/xray-daemon
 
 RUN mkdir -p /runner
 WORKDIR /runner

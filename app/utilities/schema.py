@@ -14,7 +14,7 @@ logger = get_logger()
 DEFAULT_SCHEMA_DIR = 'data'
 
 
-@xray_recorder.capture('schema.load_schema_from_metadata')
+@xray_recorder.capture()
 def load_schema_from_metadata(metadata):
     if metadata.get('survey_url'):
         return load_schema_from_url(metadata['survey_url'], metadata.get('language_code'))

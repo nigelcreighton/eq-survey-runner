@@ -10,7 +10,7 @@ from app.questionnaire.path_finder import PathFinder
 
 
 @login_required
-@xray_recorder.capture('path_finder_helper.get_path_finder')
+@xray_recorder.capture()
 def get_path_finder():
     finder = getattr(g, 'path_finder', None)
 

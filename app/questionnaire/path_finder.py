@@ -28,7 +28,7 @@ class PathFinder:
     def _block_index_for_location(blocks, location):
         return next((index for (index, block) in enumerate(blocks) if block['id'] == location.block_id), None)
 
-    @xray_recorder.capture('PathFinder.build_path')
+    @xray_recorder.capture()
     def build_path(self):
         """
         Visits all the blocks from a location forwards and returns path

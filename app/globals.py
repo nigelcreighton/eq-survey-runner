@@ -11,7 +11,7 @@ from app.settings import EQ_SESSION_ID, USER_IK
 logger = get_logger()
 
 
-@xray_recorder.capture('globals.get_questionnaire_store')
+@xray_recorder.capture()
 def get_questionnaire_store(user_id, user_ik):
     from app.storage.encrypted_questionnaire_storage import EncryptedQuestionnaireStorage
 
@@ -25,7 +25,7 @@ def get_questionnaire_store(user_id, user_ik):
     return store
 
 
-@xray_recorder.capture('globals.get_session_store')
+@xray_recorder.capture()
 def get_session_store():
     from app.data_model.session_store import SessionStore
 
@@ -56,7 +56,7 @@ def get_session_timeout_in_seconds(schema):
     return timeout
 
 
-@xray_recorder.capture('globals.create_session_store')
+@xray_recorder.capture()
 def create_session_store(eq_session_id, user_id, user_ik, session_data):
     from app.data_model.session_store import SessionStore
 
