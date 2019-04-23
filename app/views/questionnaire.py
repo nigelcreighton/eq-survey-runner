@@ -554,11 +554,11 @@ def _redirect_to_location(location):
 
 
 def _get_context(block, current_location, schema, form=None):
-    metadata = get_metadata(current_user)
+    questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
 
-    answer_store = get_answer_store(current_user)
-
-    list_store = get_list_store(current_user)
+    list_store = questionnaire_store.list_store
+    metadata = questionnaire_store.metadata
+    answer_store = questionnaire_store.answer_store
 
     return build_view_context(block['type'], metadata, schema, list_store, answer_store, block, current_location, form=form)
 

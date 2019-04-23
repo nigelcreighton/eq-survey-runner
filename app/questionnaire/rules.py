@@ -220,7 +220,6 @@ def get_answer_store_value(answer_id, answer_store, schema, routing_path=None):
     If answer is not on the routing path, return None
     If routing_path empty, return answer value
     """
-
     answer = answer_store.get_answer(answer_id)
     if not answer:
         return None
