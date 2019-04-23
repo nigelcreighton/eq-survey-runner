@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from aws_xray_sdk.core import xray_recorder
+from app import tracing
 from blinker import ANY
 from dateutil.tz import tzutc
 from flask import session as cookie_session, current_app
@@ -69,7 +69,7 @@ def _is_session_valid(session_store):
     return True
 
 
-@xray_recorder.capture()
+@tracing.trace()
 def load_user():
     """
     Checks for the present of the JWT in the users sessions
@@ -97,7 +97,7 @@ def load_user():
     return None
 
 
-@xray_recorder.capture()
+@tracing.trace()
 def _create_session_data_from_metadata(metadata):
     """
     Creates a SessionData object from metadata
@@ -121,7 +121,7 @@ def _create_session_data_from_metadata(metadata):
     return session_data
 
 
-@xray_recorder.capture()
+@tracing.trace()
 def store_session(metadata):
     """
     Store new session and metadata
@@ -152,7 +152,7 @@ def store_session(metadata):
     logger.info('user authenticated')
 
 
-@xray_recorder.capture()
+@tracing.trace()
 def decrypt_token(encrypted_token):
     if not encrypted_token:
         raise NoTokenException('Please provide a token')

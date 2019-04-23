@@ -1,7 +1,7 @@
 import os
 import requests
 import simplejson as json
-from aws_xray_sdk.core import xray_recorder
+from app import tracing
 
 from structlog import get_logger
 from werkzeug.exceptions import NotFound
@@ -14,7 +14,7 @@ logger = get_logger()
 DEFAULT_SCHEMA_DIR = 'data'
 
 
-@xray_recorder.capture()
+@tracing.trace()
 def load_schema_from_metadata(metadata):
     if metadata.get('survey_url'):
         return load_schema_from_url(metadata['survey_url'], metadata.get('language_code'))

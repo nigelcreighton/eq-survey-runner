@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import flask_babel
 import humanize
 import simplejson as json
-from aws_xray_sdk.core import xray_recorder
+from app import tracing
 from dateutil.tz import tzutc
 from flask import Blueprint, g, redirect, request, url_for, current_app, jsonify
 from flask import session as cookie_session
@@ -287,7 +287,7 @@ def _set_started_at_metadata_if_required(form, collection_metadata):
 
         collection_metadata['started_at'] = started_at
 
-@xray_recorder.capture()
+@tracing.trace()
 def _render_page(block_type, context, current_location, schema):
     if request_wants_json():
         return jsonify(context)
