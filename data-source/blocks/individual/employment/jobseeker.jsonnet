@@ -35,14 +35,14 @@ local nonProxyOptions = {
         description: 'To get a true picture of the UK working population, we ask this question of everyone who is not currently working. We ask people who are retired because the number of people continuing to work after retirement age is increasing. We ask people who are long-term sick or disabled because some intend to go back to work.',
       },
     ],
-  }
+  },
 };
 local isProxyOptions = {
   title: {
     text: 'In the last four weeks, was <em>{person_name}</em> actively looking for any kind of paid work?',
     placeholders: [
       placeholders.personName,
-    ]
+    ],
   },
   guidance: {
     show_guidance: 'Why do I need to answer if they have retired or are long term sick or disabled?',

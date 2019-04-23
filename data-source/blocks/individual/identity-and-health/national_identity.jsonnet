@@ -7,8 +7,8 @@ local question(proxyOptions, regionOptions) = {
   type: 'General',
   definitions: [
     {
-      title: "What do we mean by “national identity”?",
-      content: proxyOptions.definitionContent
+      title: 'What do we mean by “national identity”?',
+      content: proxyOptions.definitionContent,
     },
   ],
   answers: [
@@ -24,12 +24,12 @@ local nonProxyOptions = {
   title: 'How would you describe your national identity?',
   definitionContent: [
     {
-      description: 'National identity is not dependent on your ethnic group or citizenship.'
+      description: 'National identity is not dependent on your ethnic group or citizenship.',
     },
     {
-      description: 'It is about the country or countries where you feel you belong or think of as home.'
-    }
-  ]
+      description: 'It is about the country or countries where you feel you belong or think of as home.',
+    },
+  ],
 };
 local isProxyOptions = {
   title: {
@@ -40,35 +40,35 @@ local isProxyOptions = {
   },
   definitionContent: [
     {
-      description: 'National identity is not dependent on their ethnic group or citizenship.'
+      description: 'National identity is not dependent on their ethnic group or citizenship.',
     },
     {
-      description: 'It is about the country or countries where they feel they belong or think of as home.'
-    }
-  ]
+      description: 'It is about the country or countries where they feel they belong or think of as home.',
+    },
+  ],
 };
 
 local englandOptions = {
   options: [
     {
       label: 'English',
-      value: 'English'
+      value: 'English',
     },
     {
       label: 'Welsh',
-      value: 'Welsh'
+      value: 'Welsh',
     },
     {
       label: 'Scottish',
-      value: 'Scottish'
+      value: 'Scottish',
     },
     {
       label: 'Northern Irish',
-      value: 'Northern Irish'
+      value: 'Northern Irish',
     },
     {
       label: 'British',
-      value: 'British'
+      value: 'British',
     },
     {
       label: 'Other',
@@ -78,32 +78,32 @@ local englandOptions = {
         type: 'TextField',
         mandatory: false,
         label: 'Please describe your national identity',
-      }
-    }
-  ]
+      },
+    },
+  ],
 };
 
 local walesOptions = {
   options: [
     {
       label: 'Welsh',
-      value: 'Welsh'
+      value: 'Welsh',
     },
     {
       label: 'English',
-      value: 'English'
+      value: 'English',
     },
     {
       label: 'Scottish',
-      value: 'Scottish'
+      value: 'Scottish',
     },
     {
       label: 'Northern Irish',
-      value: 'Northern Irish'
+      value: 'Northern Irish',
     },
     {
       label: 'British',
-      value: 'British'
+      value: 'British',
     },
     {
       label: 'Other',
@@ -112,10 +112,10 @@ local walesOptions = {
         id: 'national-identity-answer-other',
         type: 'TextField',
         mandatory: false,
-        label: 'Please describe your national identity'
-      }
-    }
-  ]
+        label: 'Please describe your national identity',
+      },
+    },
+  ],
 };
 
 {
@@ -124,19 +124,19 @@ local walesOptions = {
   question_variants: [
     {
       question: question(nonProxyOptions, englandOptions),
-      when: [rules.proxyNo, rules.regionNotWales]
+      when: [rules.proxyNo, rules.regionNotWales],
     },
     {
       question: question(isProxyOptions, englandOptions),
-      when: [rules.proxyYes, rules.regionNotWales]
+      when: [rules.proxyYes, rules.regionNotWales],
     },
     {
       question: question(nonProxyOptions, walesOptions),
-      when: [rules.proxyNo, rules.regionWales]
+      when: [rules.proxyNo, rules.regionWales],
     },
     {
       question: question(isProxyOptions, walesOptions),
-      when: [rules.proxyYes, rules.regionWales]
-    }
-  ]
+      when: [rules.proxyYes, rules.regionWales],
+    },
+  ],
 }

@@ -11,7 +11,7 @@ local question(title, regionOptions) = {
       id: 'other-qualifications-answer',
       mandatory: false,
       type: 'Checkbox',
-      options: regionOptions
+      options: regionOptions,
     },
     {
       id: 'other-qualifications-answer-exclusive',
@@ -41,9 +41,9 @@ local englandOptions = [
     value: 'Yes, in England or Wales',
   },
   {
-      label: 'Yes, anywhere outside of England and Wales',
+    label: 'Yes, anywhere outside of England and Wales',
     value: 'Yes, anywhere outside of England and Wales',
-  }
+  },
 ];
 
 local walesOptions = [
@@ -54,7 +54,7 @@ local walesOptions = [
   {
     label: 'Yes, anywhere outside of Wales and England',
     value: 'Yes, anywhere outside of Wales and England',
-  }
+  },
 ];
 
 {
@@ -76,7 +76,7 @@ local walesOptions = [
     {
       question: question(proxyTitle, walesOptions),
       when: [rules.proxyYes, rules.regionWales],
-    }
+    },
   ],
   routing_rules: [
     {

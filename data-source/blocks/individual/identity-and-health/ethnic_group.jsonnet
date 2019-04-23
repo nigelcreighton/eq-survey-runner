@@ -15,7 +15,7 @@ local question(title, description) = {
             description: 'Your answer will help to support equality and fairness in your community. Councils and government use information on ethnic group to make sure they:',
             list: [
               'provide services and share funding fairly',
-              'understand and represent everyone’s interests'
+              'understand and represent everyone’s interests',
             ],
           },
         ],

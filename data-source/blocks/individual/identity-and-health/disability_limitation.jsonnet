@@ -49,7 +49,7 @@ local nonProxyOptions = {
         },
       ],
     },
-  ]
+  ],
 };
 local isProxyOptions = {
   title: {
@@ -76,7 +76,7 @@ local isProxyOptions = {
         },
       ],
     },
-  ]
+  ],
 };
 
 {

@@ -51,38 +51,38 @@ local commonOptions = [
     label: 'Basic skills course',
     value: 'Basic skills course',
     description: 'Skills for life, literacy, numeracy and language',
-  }
+  },
 ];
 
 local englandOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside England and Wales'
-      }
-    ]
+        title: 'Include equivalent qualifications achieved anywhere outside England and Wales',
+      },
+    ],
   },
-  answerOptions: commonOptions
+  answerOptions: commonOptions,
 };
 
 local walesOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside Wales and England'
-      }
-    ]
+        title: 'Include equivalent qualifications achieved anywhere outside Wales and England',
+      },
+    ],
   },
   answerOptions: commonOptions + [
     {
-    label: 'Intermediate or National Welsh Baccalaureate',
-    value: 'Intermediate or National Welsh Baccalaureate'
-  },
-  {
-    label: 'Foundation Welsh Baccalaureate',
-    value: 'Foundation Welsh Baccalaureate'
-  }
-  ]
+      label: 'Intermediate or National Welsh Baccalaureate',
+      value: 'Intermediate or National Welsh Baccalaureate',
+    },
+    {
+      label: 'Foundation Welsh Baccalaureate',
+      value: 'Foundation Welsh Baccalaureate',
+    },
+  ],
 };
 
 {
@@ -91,20 +91,20 @@ local walesOptions = {
   question_variants: [
     {
       question: question(nonProxyTitle, englandOptions),
-      when: [rules.proxyNo, rules.regionNotWales]
+      when: [rules.proxyNo, rules.regionNotWales],
     },
     {
       question: question(proxyTitle, englandOptions),
-      when: [rules.proxyYes, rules.regionNotWales]
+      when: [rules.proxyYes, rules.regionNotWales],
     },
     {
       question: question(nonProxyTitle, walesOptions),
-      when: [rules.proxyNo, rules.regionWales]
+      when: [rules.proxyNo, rules.regionWales],
     },
     {
       question: question(proxyTitle, walesOptions),
-      when: [rules.proxyYes, rules.regionWales]
-    }
+      when: [rules.proxyYes, rules.regionWales],
+    },
   ],
   routing_rules: [
     {

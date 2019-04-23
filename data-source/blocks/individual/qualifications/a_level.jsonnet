@@ -12,7 +12,7 @@ local question(title, regionOptions) = {
       id: 'a-level-answer',
       mandatory: false,
       type: 'Checkbox',
-      options: regionOptions.answerOptions
+      options: regionOptions.answerOptions,
     },
     {
       id: 'a-level-answer-exclusive',
@@ -23,61 +23,61 @@ local question(title, regionOptions) = {
           label: 'None of these apply',
           value: 'None of these apply',
           description: 'Questions on GCSEs and equivalents will follow',
-        }
-      ]
-    }
-  ]
+        },
+      ],
+    },
+  ],
 };
 
 local nonProxyTitle = 'Have you achieved an AS, A level or equivalent qualification?';
 local proxyTitle = {
   text: 'Has <em>{person_name}</em> achieved an AS, A level or equivalent qualification?',
   placeholders: [
-    placeholders.personName
-  ]
+    placeholders.personName,
+  ],
 };
 
 local commonOptions = [
   {
     label: '2 or more A levels',
     value: '2 or more A levels',
-    description: 'Include 4 or more AS levels'
+    description: 'Include 4 or more AS levels',
   },
   {
     label: '1 A level',
     value: '1 A level',
-    description: 'Include 2 to 3 AS levels'
+    description: 'Include 2 to 3 AS levels',
   },
   {
     label: '1 AS level',
-    value: '1 AS level'
-  }
+    value: '1 AS level',
+  },
 ];
 
 local englandOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside England and Wales'
-      }
-    ]
+        title: 'Include equivalent qualifications achieved anywhere outside England and Wales',
+      },
+    ],
   },
-  answerOptions: commonOptions
+  answerOptions: commonOptions,
 };
 local walesOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside Wales and England'
-      }
-    ]
+        title: 'Include equivalent qualifications achieved anywhere outside Wales and England',
+      },
+    ],
   },
   answerOptions: commonOptions + [
-        {
-          label: 'Advanced Welsh Baccalaureate',
-          value: 'Advanced Welsh Baccalaureate'
-        }
-      ]
+    {
+      label: 'Advanced Welsh Baccalaureate',
+      value: 'Advanced Welsh Baccalaureate',
+    },
+  ],
 };
 
 {
@@ -99,6 +99,6 @@ local walesOptions = {
     {
       question: question(proxyTitle, walesOptions),
       when: [rules.proxyYes, rules.regionWales],
-    }
-  ]
+    },
+  ],
 }

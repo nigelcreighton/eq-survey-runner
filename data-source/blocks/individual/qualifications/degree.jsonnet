@@ -21,10 +21,10 @@ local question(title, regionOptions) = {
           label: 'No',
           value: 'No',
           description: 'Questions on other NVQs, A levels, GCSEs and equivalents will follow',
-        }
-      ]
-    }
-  ]
+        },
+      ],
+    },
+  ],
 };
 
 local nonProxyTitle = 'Have you achieved a qualification at degree level or above?';
@@ -32,26 +32,26 @@ local proxyTitle = {
   text: 'Has <em>{person_name}</em> achieved a qualification at degree level or above?',
   placeholders: [
     placeholders.personName,
-  ]
+  ],
 };
 
 local englandOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside England and Wales'
-      }
-    ]
-  }
+        title: 'Include equivalent qualifications achieved anywhere outside England and Wales',
+      },
+    ],
+  },
 };
 local walesOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside Wales and England'
-      }
-    ]
-  }
+        title: 'Include equivalent qualifications achieved anywhere outside Wales and England',
+      },
+    ],
+  },
 };
 
 {
@@ -60,19 +60,19 @@ local walesOptions = {
   question_variants: [
     {
       question: question(nonProxyTitle, englandOptions),
-      when: [rules.proxyNo, rules.regionNotWales]
+      when: [rules.proxyNo, rules.regionNotWales],
     },
     {
       question: question(proxyTitle, englandOptions),
-      when: [rules.proxyYes, rules.regionNotWales]
+      when: [rules.proxyYes, rules.regionNotWales],
     },
     {
       question: question(nonProxyTitle, walesOptions),
-      when: [rules.proxyNo, rules.regionWales]
+      when: [rules.proxyNo, rules.regionWales],
     },
     {
       question: question(proxyTitle, walesOptions),
-      when: [rules.proxyYes, rules.regionWales]
-    }
-  ]
+      when: [rules.proxyYes, rules.regionWales],
+    },
+  ],
 }

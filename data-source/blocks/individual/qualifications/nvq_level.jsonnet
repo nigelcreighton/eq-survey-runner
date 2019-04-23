@@ -56,19 +56,19 @@ local englandOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside England and Wales'
+        title: 'Include equivalent qualifications achieved anywhere outside England and Wales',
       },
     ],
-  }
+  },
 };
 local walesOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent qualifications achieved anywhere outside Wales and England'
+        title: 'Include equivalent qualifications achieved anywhere outside Wales and England',
       },
     ],
-  }
+  },
 };
 
 {
@@ -90,6 +90,6 @@ local walesOptions = {
     {
       question: question(proxyTitle, walesOptions),
       when: [rules.proxyYes, rules.regionWales],
-    }
-  ]
+    },
+  ],
 }

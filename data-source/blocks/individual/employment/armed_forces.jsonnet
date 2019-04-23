@@ -7,7 +7,7 @@ local question(title) = {
   guidance: {
     content: [
       {
-        title: "Current serving members should select “No”",
+        title: 'Current serving members should select “No”',
       },
     ],
   },

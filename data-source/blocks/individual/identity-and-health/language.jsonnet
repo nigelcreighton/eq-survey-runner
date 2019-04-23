@@ -19,32 +19,32 @@ local nonProxyOptions = {
   title: 'What is your main language?',
   definitionContent: [
     {
-      title: "What do we mean by “main language”?",
+      title: 'What do we mean by “main language”?',
       content: [
         {
           description: 'Your main language is the language you use most naturally. It could be the language you use at home.',
-        }
-      ]
-    }
-  ]
+        },
+      ],
+    },
+  ],
 };
 local isProxyOptions = {
   title: {
     text: 'What is <em>{person_name_possessive}</em> main language?',
     placeholders: [
       placeholders.personNamePossessive,
-    ]
+    ],
   },
   definitionContent: [
     {
-      title: "What do we mean by “main language”?",
+      title: 'What do we mean by “main language”?',
       content: [
         {
           description: 'Your main language is the language they use most naturally. It could be the language they use at home.',
-        }
-      ]
-    }
-  ]
+        },
+      ],
+    },
+  ],
 };
 
 local englandOptions = {

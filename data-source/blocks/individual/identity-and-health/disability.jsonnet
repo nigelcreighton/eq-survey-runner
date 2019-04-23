@@ -7,8 +7,8 @@ local question(proxyOptions) = {
   definitions: [
     {
       title: 'What do we mean by “physical and mental health conditions or illness”?',
-      content: proxyOptions.definitionContent
-    }
+      content: proxyOptions.definitionContent,
+    },
   ],
   type: 'General',
   answers: [
@@ -31,22 +31,22 @@ local question(proxyOptions) = {
 };
 
 local nonProxyOptions = {
-  title:  'Do you have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?',
+  title: 'Do you have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?',
   definitionContent: [
     {
       description: 'This refers to health conditions, illnesses or impairments you may have.',
     },
     {
       description: 'Consider conditions that always affect you and those that flare up from time to time. These may include, for example, sensory conditions, developmental conditions or learning impairments.',
-    }
-  ]
+    },
+  ],
 };
 local isProxyOptions = {
   title: {
     text: 'Does <em>{person_name}</em> have any physical or mental health conditions or illnesses lasting or expected to last 12 months or more?',
     placeholders: [
       placeholders.personName,
-    ]
+    ],
   },
   definitionContent: [
     {
@@ -54,8 +54,8 @@ local isProxyOptions = {
     },
     {
       description: 'Consider conditions that always affect them and those that flare up from time to time. These may include, for example, sensory conditions, developmental conditions or learning impairments.',
-    }
-  ]
+    },
+  ],
 };
 
 {

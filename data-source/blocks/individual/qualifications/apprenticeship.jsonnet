@@ -14,16 +14,16 @@ local question(title, regionOptions) = {
         {
           label: 'Yes',
           value: 'Yes',
-          description: 'For example trade, advanced, foundation, modern'
+          description: 'For example trade, advanced, foundation, modern',
         },
         {
           label: 'No',
-          value: 'No'
-        }
+          value: 'No',
+        },
       ],
       type: 'Radio',
-    }
-  ]
+    },
+  ],
 };
 
 local nonProxyTitle = 'Have you completed an apprenticeship?';
@@ -38,19 +38,19 @@ local englandOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent apprenticeships completed anywhere outside England and Wales'
-      }
-    ]
-  }
+        title: 'Include equivalent apprenticeships completed anywhere outside England and Wales',
+      },
+    ],
+  },
 };
 local walesOptions = {
   guidance: {
     content: [
       {
-        title: 'Include equivalent apprenticeships completed anywhere outside Wales and England'
-      }
-    ]
-  }
+        title: 'Include equivalent apprenticeships completed anywhere outside Wales and England',
+      },
+    ],
+  },
 };
 
 {
@@ -59,19 +59,19 @@ local walesOptions = {
   question_variants: [
     {
       question: question(nonProxyTitle, englandOptions),
-      when: [rules.proxyNo, rules.regionNotWales]
+      when: [rules.proxyNo, rules.regionNotWales],
     },
     {
       question: question(proxyTitle, englandOptions),
-      when: [rules.proxyYes, rules.regionNotWales]
+      when: [rules.proxyYes, rules.regionNotWales],
     },
     {
       question: question(nonProxyTitle, walesOptions),
-      when: [rules.proxyNo, rules.regionWales]
+      when: [rules.proxyNo, rules.regionWales],
     },
     {
       question: question(proxyTitle, walesOptions),
-      when: [rules.proxyYes, rules.regionWales]
-    }
-  ]
+      when: [rules.proxyYes, rules.regionWales],
+    },
+  ],
 }
