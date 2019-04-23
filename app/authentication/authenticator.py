@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from app import tracing
 from blinker import ANY
 from dateutil.tz import tzutc
 from flask import session as cookie_session, current_app
@@ -9,6 +8,7 @@ from flask_login import LoginManager, user_logged_out
 from sdc.crypto.decrypter import decrypt
 from structlog import get_logger
 
+from app import tracing
 from app.authentication.no_token_exception import NoTokenException
 from app.authentication.user import User
 from app.data_model.session_data import SessionData

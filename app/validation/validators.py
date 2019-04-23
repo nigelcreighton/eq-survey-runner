@@ -71,6 +71,7 @@ class NumberRange:
         The maximum value of the number. If not provided, maximum value
         will not be checked.
     """
+
     def __init__(self, minimum=None, minimum_exclusive=False,
                  maximum=None, maximum_exclusive=False,
                  messages=None, currency=None):
@@ -124,6 +125,7 @@ class DecimalPlaces:
     :param max_decimals:
         The maximum allowed number of decimal places.
     """
+
     def __init__(self, max_decimals=0, messages=None):
         self.max_decimals = max_decimals
         self.messages = messages or error_messages

@@ -1,10 +1,10 @@
 import uuid
 from datetime import datetime
 
-from app import tracing
+from sdc.crypto.exceptions import InvalidTokenException
 from structlog import get_logger
 
-from sdc.crypto.exceptions import InvalidTokenException
+from app import tracing
 
 logger = get_logger()
 

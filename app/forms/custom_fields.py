@@ -21,6 +21,7 @@ class CustomIntegerField(IntegerField):
     further validation steps by using a separate NumberCheck and
     DecimalPlace validators
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.data = None
@@ -43,6 +44,7 @@ class CustomDecimalField(DecimalField):
     further validation steps by using a separate NumberCheck and
     DecimalPlace validators
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.data = None
@@ -61,6 +63,7 @@ class CustomSelectMultipleField(SelectMultipleField):
     This custom field allows us to add the additional detail_answer_id to choices/options.
     This saves us having to later map options with their detail_answer.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -84,6 +87,7 @@ class CustomSelectField(SelectField):
     This custom field allows us to add the additional detail_answer_id to choices/options.
     This saves us having to later map options with their detail_answer.
     """
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 

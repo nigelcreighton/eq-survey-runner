@@ -1,11 +1,11 @@
 import os
+
 import requests
 import simplejson as json
-from app import tracing
-
 from structlog import get_logger
 from werkzeug.exceptions import NotFound
 
+from app import tracing
 from app.questionnaire.questionnaire_schema import QuestionnaireSchema, DEFAULT_LANGUAGE_CODE
 from app.setup import cache
 

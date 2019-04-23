@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import flask_babel
 import humanize
 import simplejson as json
-from app import tracing
 from dateutil.tz import tzutc
 from flask import Blueprint, g, redirect, request, url_for, current_app, jsonify
 from flask import session as cookie_session
@@ -13,6 +12,7 @@ from jwcrypto.common import base64url_decode
 from sdc.crypto.encrypter import encrypt
 from structlog import get_logger
 
+from app import tracing
 from app.authentication.no_token_exception import NoTokenException
 from app.data_model.answer_store import AnswerStore
 from app.data_model.app_models import SubmittedResponse
@@ -286,6 +286,7 @@ def _set_started_at_metadata_if_required(form, collection_metadata):
                     started_at=started_at)
 
         collection_metadata['started_at'] = started_at
+
 
 @tracing.trace()
 def _render_page(block_type, context, current_location, schema):

@@ -1,8 +1,8 @@
 import copy
 
-from app import tracing
 from structlog import get_logger
 
+from app import tracing
 from app.questionnaire.location import Location
 from app.questionnaire.routing_path import RoutingPath
 from app.questionnaire.rules import (

@@ -92,14 +92,7 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
 
     application.eq = {}
 
-    if application.config['AWS_XRAY_SDK_ENABLED']:
-        from aws_xray_sdk.core import patch_all, xray_recorder
-        from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
-
-        patch_all()
-
-        xray_recorder.configure(service='Survey Runner')
-        XRayMiddleware(application, xray_recorder)
+    setup_tracing(application)
 
     with open(application.config['EQ_SECRETS_FILE']) as secrets_file:
         secrets = yaml.safe_load(secrets_file)
@@ -192,6 +185,18 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
         return dict(url_for=versioned_url_for)
 
     return application
+
+
+def setup_tracing(application):
+
+    if application.config['AWS_XRAY_SDK_ENABLED']:
+        from aws_xray_sdk.core import patch_all, xray_recorder
+        from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+        patch_all()
+
+        xray_recorder.configure(service='Survey Runner')
+        XRayMiddleware(application, xray_recorder)
 
 
 def setup_secure_headers(application):

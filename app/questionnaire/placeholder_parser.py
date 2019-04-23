@@ -7,6 +7,7 @@ class PlaceholderParser:
     Parses placeholder statements from a schema dict and returns a map of their
     final values
     """
+
     def __init__(self, language, answer_store=None, metadata=None):
         self._answer_store = answer_store or AnswerStore()
         self._metadata = metadata

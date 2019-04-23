@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-from app import tracing
 from dateutil.tz import tzutc
 from flask import g, current_app, session as cookie_session
 from structlog import get_logger
