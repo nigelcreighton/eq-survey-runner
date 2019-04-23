@@ -10,8 +10,7 @@ import boto3
 import redis
 import sqlalchemy
 import yaml
-from aws_xray_sdk.core import xray_recorder, patch_all
-from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+from aws_xray_sdk.core import patch_all
 from botocore.config import Config
 from flask import Flask, url_for, session as cookie_session
 from flask_babel import Babel
@@ -96,8 +95,12 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
 
     application.eq = {}
 
-    xray_recorder.configure(service='Survey Runner')
-    XRayMiddleware(application, xray_recorder)
+    if application.config['AWS_XRAY_SDK_ENABLED']:
+        from aws_xray_sdk.core import xray_recorder
+        from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+
+        xray_recorder.configure(service='Survey Runner')
+        XRayMiddleware(application, xray_recorder)
 
     with open(application.config['EQ_SECRETS_FILE']) as secrets_file:
         secrets = yaml.safe_load(secrets_file)

@@ -89,5 +89,7 @@ DEFAULT_LOCALE = 'en_GB'
 
 SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
 
+AWS_XRAY_SDK_ENABLED = parse_mode(os.getenv('AWS_XRAY_SDK_ENABLED', 'False'))
+
 USER_IK = 'user_ik'
 EQ_SESSION_ID = 'eq-session-id'
