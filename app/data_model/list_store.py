@@ -21,7 +21,7 @@ class ListStore:
         if not existing_items:
             existing_items = []
 
-        self._lists = OrderedDict(existing_items)
+        self._lists = dict(existing_items)
 
     def __getitem__(self, item):
         try:
