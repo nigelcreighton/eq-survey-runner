@@ -2,7 +2,7 @@ from functools import wraps
 
 from flask_login import current_user
 
-from app.globals import get_answer_store, get_metadata, get_collection_metadata, get_list_store, get_questionnaire_store
+from app.globals import get_questionnaire_store
 
 def with_questionnaire_store(function):
     """Adds the `questionnaire_store` as an argument, where the `current_user` is defined.

@@ -68,8 +68,6 @@ class ListStore:
     def serialise(self):
         return [{'name': name, 'items': list_items} for name, list_items in self._lists.items()]
 
-        return serialised
-
     @classmethod
     def deserialise(cls, serialised: list):
         if not serialised:

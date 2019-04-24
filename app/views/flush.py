@@ -4,8 +4,7 @@ from sdc.crypto.decrypter import decrypt
 
 
 from app.authentication.user import User
-from app.globals import (get_answer_store, get_metadata, get_questionnaire_store,
-                         get_completed_blocks, get_collection_metadata)
+from app.globals import get_answer_store, get_questionnaire_store, get_completed_blocks
 from app.questionnaire.path_finder import PathFinder
 from app.keys import KEY_PURPOSE_AUTHENTICATION, KEY_PURPOSE_SUBMISSION
 from app.submitter.converter import convert_answers

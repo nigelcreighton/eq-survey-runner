@@ -41,11 +41,12 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
 
     return list(temp_answers.answer_map.values())
 
-def convert_list_collector_answers(answer_store, list_store, schema, location):
+
+def convert_list_collector_answers(answer_store, list_store, schema, location) -> List[Answer]:
     """For the given location, check for list collector and generate submission payload
 
     Returns:
-        A list of answer dictionaries (or None)
+        A list of answer objects (or None)
     """
     answer_output = []
     block = schema.get_block(location.block_id)
@@ -62,7 +63,7 @@ def convert_list_collector_answers(answer_store, list_store, schema, location):
             for answer_id in add_block_answer_ids:
                 found_answer = answer_store.get_answer(answer_id, list_item_id)
                 if found_answer:
-                    answer_output.append(Answer.from_dict(found_answer))
+                    answer_output.append(found_answer)
 
     return answer_output
 

@@ -137,3 +137,36 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
         self.get(self.get_previous_link())
 
         self.assertEqualUrl('/questionnaire/list-collector')
+
+    def test_submission(self):
+        self.launchSurvey('test', 'list_collector')
+
+        self.post(action='start_questionnaire')
+
+        self.assertInBody('Does anyone else live here?')
+
+        self.post({
+            'anyone-else': 'Yes'
+        })
+
+        self.add_person('Marie Claire', 'Doe')
+
+        self.assertInSelector('Marie Claire Doe', 'li[data-qa="list-summary-1"]')
+
+        self.add_person('John', 'Doe')
+
+        self.assertInSelector('John Doe', 'li[data-qa="list-summary-2"]')
+
+        self.post({
+            'anyone-else': 'No'
+        })
+
+        self.post(action='save_continue')
+
+        self.post({
+            'another-anyone-else': 'No'
+        })
+
+        self.post()
+
+        self.assertInBody('Submission successful')

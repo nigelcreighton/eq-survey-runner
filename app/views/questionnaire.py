@@ -15,8 +15,7 @@ from structlog import get_logger
 from app.authentication.no_token_exception import NoTokenException
 from app.data_model.answer_store import AnswerStore
 from app.data_model.app_models import SubmittedResponse
-from app.globals import (get_answer_store, get_list_store, get_completed_blocks, get_metadata, get_questionnaire_store,
-                         get_collection_metadata)
+from app.globals import (get_answer_store, get_completed_blocks, get_metadata, get_questionnaire_store)
 from app.globals import get_session_store
 from app.helpers.form_helper import post_form_for_block
 from app.helpers.path_finder_helper import path_finder, full_routing_path_required
