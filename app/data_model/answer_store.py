@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional, Dict, Union
+from typing import List, Optional, Dict
 
 from structlog import get_logger
 
@@ -22,11 +22,11 @@ class AnswerStore:
     }
     """
 
-    def __init__(self, existing_answers: List[Answer] = None):
+    def __init__(self, existing_answers: List[Dict] = None):
         """ Instantiate an answer_store.
 
         Args:
-            existing_answers: If a list of answer objects is provided, this will be used to initialise the store.
+            existing_answers: If a list of answer dictionaries is provided, this will be used to initialise the store.
         """
         self.answer_map = self._build_map(existing_answers or [])
         self._dirty = False
@@ -41,15 +41,14 @@ class AnswerStore:
         return self.answer_map == other.answer_map
 
     @staticmethod
-    def _build_map(answers: List[Answer]):
-        """ Builds the answer_store's data structure from a list of Answer objects"""
-
+    def _build_map(answers: List[Dict]):
+        """ Builds the answer_store's data structure from a list of answer dictionaries"""
         return {(answer['answer_id'], answer.get('list_item_id')): Answer.from_dict(answer) for answer in answers}
 
     @staticmethod
     def _validate(answer):
         if not isinstance(answer, Answer):
-            raise TypeError('Method only supports Answer argument type')
+            raise TypeError(f'Method only supports Answer argument type, found type: {type(answer)}')
 
     @property
     def dirty(self):
@@ -92,13 +91,7 @@ class AnswerStore:
         Returns:
             A list of Answer objects
         """
-        output = []
-        for answer_id in answer_ids:
-            answer = self.answer_map.get((answer_id, list_item_id))
-            if answer:
-                output.append(answer)
-
-        return output
+        return [self.answer_map.get((answer_id, list_item_id)) for answer_id in answer_ids]
 
     def clear(self):
         """

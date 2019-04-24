@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Union, Optional
 from dataclasses import dataclass, field, asdict
 from typing import Dict
 
@@ -10,8 +11,8 @@ logger = get_logger()
 @dataclass
 class Answer:
     answer_id: str
-    value: str
-    list_item_id: str = field(default=None)
+    value: Union[str, int, float, list]
+    list_item_id: Optional[str] = field(default=None)
 
     @classmethod
     def from_dict(cls, answer_dict: Dict) -> Answer:

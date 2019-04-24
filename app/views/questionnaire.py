@@ -453,20 +453,15 @@ def _is_end_of_questionnaire(block, next_location):
 
 
 def submit_answers(routing_path, schema):
-    metadata = get_metadata(current_user)
-    collection_metadata = get_collection_metadata(current_user)
-    answer_store = get_answer_store(current_user)
+    questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
+    answer_store = questionnaire_store.answer_store
+    metadata = questionnaire_store.metadata
 
-    message = json.dumps(convert_answers(
-        metadata,
-        collection_metadata,
-        schema,
-        answer_store,
-        routing_path,
-    ), for_json=True)
+    message = json.dumps(convert_answers(schema, questionnaire_store, routing_path), for_json=True)
 
     encrypted_message = encrypt(message, current_app.eq['key_store'], KEY_PURPOSE_SUBMISSION)
-    sent = current_app.eq['submitter'].send_message(encrypted_message, case_id=metadata.get('case_id'),
+    sent = current_app.eq['submitter'].send_message(encrypted_message,
+                                                    case_id=metadata.get('case_id'),
                                                     tx_id=metadata.get('tx_id'))
 
     if not sent:

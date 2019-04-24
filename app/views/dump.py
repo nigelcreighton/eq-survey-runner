@@ -6,8 +6,7 @@ import simplejson as json
 
 
 from app.authentication.roles import role_required
-from app.globals import (get_answer_store, get_metadata, get_completed_blocks, get_session_store,
-                         get_collection_metadata)
+from app.globals import get_questionnaire_store, get_session_store, get_answer_store
 from app.submitter.converter import convert_answers
 from app.utilities.schema import load_schema_from_session_data
 from app.questionnaire.path_finder import PathFinder
@@ -28,12 +27,12 @@ def dump_answers():
 @login_required
 @role_required('dumper')
 def dump_submission():
-    answer_store = get_answer_store(current_user)
-    metadata = get_metadata(current_user)
-    collection_metadata = get_collection_metadata(current_user)
+    questionnaire_store = get_questionnaire_store(current_user.user_id, current_user.user_ik)
+    answer_store = questionnaire_store.answer_store
+    metadata = questionnaire_store.metadata
     session_data = get_session_store().session_data
     schema = load_schema_from_session_data(session_data)
-    completed_blocks = get_completed_blocks(current_user)
+    completed_blocks = questionnaire_store.completed_blocks
     routing_path = PathFinder(schema, answer_store, metadata, completed_blocks).get_full_routing_path()
-    response = {'submission': convert_answers(metadata, collection_metadata, schema, answer_store, routing_path)}
+    response = {'submission': convert_answers(schema, questionnaire_store, routing_path)}
     return json.dumps(response, for_json=True), 200

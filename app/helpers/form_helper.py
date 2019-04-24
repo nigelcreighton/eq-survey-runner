@@ -98,6 +98,6 @@ def get_mapped_answers(schema, answer_store, location):
     answer_ids = schema.get_answer_ids_for_block(block_id)
 
     answers = answer_store.get_answers_by_answer_id(answer_ids=answer_ids, list_item_id=location.list_item_id)
-    result = {answer.answer_id: answer.value for answer in answers}
+    result = {answer.answer_id: answer.value for answer in answers if answer}
 
     return OrderedDict(sorted(result.items()))
