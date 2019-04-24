@@ -16,7 +16,7 @@ SIGNED_OUT_URL = '/signed-out'
 
 
 class Feedback(IntegrationTestCase):
-    def setUp(self):
+    def setUp(self, setting_overrides=None):
         self.patcher = patch('app.setup.LogSubmitter')
         mock_class = self.patcher.start()
 

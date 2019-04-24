@@ -92,6 +92,9 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
 
     application.eq = {}
 
+    if setting_overrides:
+        application.config.update(setting_overrides)
+
     setup_tracing(application)
 
     with open(application.config['EQ_SECRETS_FILE']) as secrets_file:
@@ -104,9 +107,6 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
     validate_required_keys(keys, KEY_PURPOSE_SUBMISSION)
     application.eq['secret_store'] = SecretStore(secrets)
     application.eq['key_store'] = KeyStore(keys)
-
-    if setting_overrides:
-        application.config.update(setting_overrides)
 
     if application.config['EQ_APPLICATION_VERSION']:
         logger.info('starting eq survey runner', version=application.config['EQ_APPLICATION_VERSION'])
