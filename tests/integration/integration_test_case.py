@@ -88,6 +88,7 @@ class IntegrationTestCase(unittest.TestCase):  # pylint: disable=too-many-public
     def tearDown(self):
         self._ds.stop()
         self._redis.stop()
+        super().tearDown()
 
     def launchSurvey(self, eq_id='test', form_type_id='dates', **payload_kwargs):
         """
