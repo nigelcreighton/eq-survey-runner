@@ -1,3 +1,5 @@
+import simplejson as json
+
 from app.data_model.answer_store import AnswerStore
 from app.data_model.answer import Answer
 from app.data_model.list_store import ListStore
@@ -351,7 +353,7 @@ def test_list_item_conversion(fake_questionnaire_store):
         Location(block_id='summary'),
     ]
 
-    answers = AnswerStore([
+    answer_objects = [
         {
             "answer_id": "first-name",
             "value": "1",
@@ -379,8 +381,15 @@ def test_list_item_conversion(fake_questionnaire_store):
         {
             "answer_id": "another-anyone-else",
             "value": "No"
+        },
+        {
+            "answer_id": "extraneous-answer",
+            "value": "Bad",
+            "list_item_id": "123"
         }
-    ])
+    ]
+
+    answers = AnswerStore(answer_objects)
 
     list_store = ListStore({
         'people': [
@@ -394,9 +403,14 @@ def test_list_item_conversion(fake_questionnaire_store):
 
     schema = load_schema('test', 'list_collector')
 
-    answer_object = convert_answers(schema, fake_questionnaire_store, routing_path)
+    output = convert_answers(schema, fake_questionnaire_store, routing_path)
 
-    assert len(answer_object['data']) == len(answers)
+    del answer_objects[-1]
+
+    data_dict = json.loads(json.dumps(output['data'], for_json=True))
+
+    assert sorted(answer_objects, key=lambda x: x['answer_id']) == sorted(data_dict, key=lambda x: x['answer_id'])
+
 
 
 
