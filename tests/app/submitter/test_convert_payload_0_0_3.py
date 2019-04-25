@@ -1,9 +1,10 @@
 from app.data_model.answer_store import AnswerStore
 from app.data_model.answer import Answer
+from app.data_model.list_store import ListStore
 from app.questionnaire.questionnaire_schema import QuestionnaireSchema
 from app.questionnaire.location import Location
 from app.submitter.converter import convert_answers
-from tests.app.submitter.schema import make_schema
+from tests.app.submitter.schema import make_schema, load_schema
 
 
 def test_convert_answers_to_payload_0_0_3(fake_questionnaire_store):
@@ -339,3 +340,63 @@ def test_unit_answer(fake_questionnaire_store):
 
     assert len(answer_object['data']) == 1
     assert answer_object['data'][0].value == 10
+
+
+def test_list_item_conversion(fake_questionnaire_store):
+    routing_path = [
+        Location(block_id='introduction'),
+        Location(block_id='list-collector'),
+        Location(block_id='next-interstitial'),
+        Location(block_id='another-list-collector-block'),
+        Location(block_id='summary'),
+    ]
+
+    answers = AnswerStore([
+        {
+            "answer_id": "first-name",
+            "value": "1",
+            "list_item_id": "xJlKBy"
+        },
+        {
+            "answer_id": "last-name",
+            "value": "1",
+            "list_item_id": "xJlKBy"
+        },
+        {
+            "answer_id": "first-name",
+            "value": "2",
+            "list_item_id": "RfAGDc"
+        },
+        {
+            "answer_id": "last-name",
+            "value": "2",
+            "list_item_id": "RfAGDc"
+        },
+        {
+            "answer_id": "anyone-else",
+            "value": "No"
+        },
+        {
+            "answer_id": "another-anyone-else",
+            "value": "No"
+        }
+    ])
+
+    list_store = ListStore({
+        'people': [
+            'xJlKBy',
+            'RfAGDc'
+        ]
+    })
+
+    fake_questionnaire_store.answer_store = answers
+    fake_questionnaire_store.list_store = list_store
+
+    schema = load_schema('test', 'list_collector')
+
+    answer_object = convert_answers(schema, fake_questionnaire_store, routing_path)
+
+    assert len(answer_object['data']) == len(answers)
+
+
+

@@ -1,6 +1,5 @@
 import random
 from string import ascii_letters
-from collections import OrderedDict
 
 from structlog import get_logger
 

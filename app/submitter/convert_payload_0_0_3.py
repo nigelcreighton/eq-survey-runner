@@ -26,20 +26,20 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
     Returns:
         A list of answer dictionaries.
     """
-    temp_answers = AnswerStore()
+    answers = AnswerStore()
 
     for location in routing_path:
         for answer in convert_list_collector_answers(answer_store, list_store, schema, location):
             if answer:
-                temp_answers.add_or_update(answer)
+                answers.add_or_update(answer)
 
         answer_ids = schema.get_answer_ids_for_block(location.block_id)
         answers_in_block = answer_store.get_answers_by_answer_id(answer_ids, list_item_id=location.list_item_id)
         for answer_in_block in answers_in_block:
             if answer_in_block:
-                temp_answers.add_or_update(answer_in_block)
+                answers.add_or_update(answer_in_block)
 
-    return list(temp_answers.answer_map.values())
+    return list(answers.answer_map.values())
 
 
 def convert_list_collector_answers(answer_store, list_store, schema, location) -> List[Answer]:
@@ -50,7 +50,6 @@ def convert_list_collector_answers(answer_store, list_store, schema, location) -
     """
     answer_output = []
     block = schema.get_block(location.block_id)
-
     if block['type'] == 'ListCollector':
         add_block_answer_ids = schema.get_answer_ids_for_block(block['add_block']['id'])
         list_name = block['populates_list']
@@ -58,6 +57,7 @@ def convert_list_collector_answers(answer_store, list_store, schema, location) -
             list_item_ids = list_store[list_name]
         except KeyError:
             return
+
 
         for list_item_id in list_item_ids:
             for answer_id in add_block_answer_ids:
