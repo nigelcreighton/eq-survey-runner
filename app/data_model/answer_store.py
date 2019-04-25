@@ -125,6 +125,5 @@ class AnswerStore:
             del self.answer_map[key]
             self._dirty = True
 
-
     def serialise(self):
         return list(self.answer_map.values())

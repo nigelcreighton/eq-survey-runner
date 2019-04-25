@@ -42,7 +42,8 @@ def test_started_at_should_be_set_in_payload_if_present_in_collection_metadata(f
     assert answer_object['started_at'] == fake_questionnaire_store.collection_metadata['started_at']
 
 
-def test_started_at_should_not_be_set_in_payload_if_absent_in_metadata(fake_questionnaire_schema, fake_questionnaire_store, fake_collection_metadata, fake_metadata):
+def test_started_at_should_not_be_set_in_payload_if_absent_in_metadata(
+        fake_questionnaire_schema, fake_questionnaire_store, fake_collection_metadata, fake_metadata):
     del fake_metadata['started_at']
     del fake_collection_metadata['started_at']
 

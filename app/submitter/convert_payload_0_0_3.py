@@ -58,7 +58,6 @@ def convert_list_collector_answers(answer_store, list_store, schema, location) -
         except KeyError:
             return
 
-
         for list_item_id in list_item_ids:
             for answer_id in add_block_answer_ids:
                 found_answer = answer_store.get_answer(answer_id, list_item_id)
@@ -66,5 +65,3 @@ def convert_list_collector_answers(answer_store, list_store, schema, location) -
                     answer_output.append(found_answer)
 
     return answer_output
-
-

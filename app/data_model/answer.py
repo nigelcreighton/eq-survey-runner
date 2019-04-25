@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Union, Optional
+from typing import Union, Optional, Dict
 from dataclasses import dataclass, field, asdict
-from typing import Dict
+
 
 from structlog import get_logger
 

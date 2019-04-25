@@ -99,7 +99,7 @@ def get_add_list_item(routing_path, schema, questionnaire_store, list_name, add_
         schema,
         questionnaire_store,
         add_block_id,
-        list_name
+        list_name,
     )
 
 
@@ -115,7 +115,7 @@ def get_list_item_block_id(routing_path, schema, questionnaire_store, list_name,
         questionnaire_store,
         block_id,
         list_name,
-        list_item_id
+        list_item_id,
     )
 
 
@@ -129,7 +129,7 @@ def get_block(routing_path, schema, questionnaire_store, block_id):
         routing_path,
         schema,
         questionnaire_store,
-        block_id
+        block_id,
     )
 
 
@@ -237,13 +237,15 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
             add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
             return add_url
         return
-    elif block['type'] == 'ListRemoveQuestion':
+
+    if block['type'] == 'ListRemoveQuestion':
         if form.data[parent_block['remove_answer']['id']] == parent_block['remove_answer']['value']:
             list_name = parent_block['populates_list']
             answer_store_updater.remove_all_answers_with_list_item_id(list_name, list_item_id)
         else:
             return url_for('questionnaire.get_block', block_id=parent_block['id'])
-    elif block['type'] == 'ListAddQuestion':
+
+    if block['type'] == 'ListAddQuestion':
         answer_store_updater.save_new_list_item_answers(form, parent_block['populates_list'])
     elif block['type'] == 'ListEditQuestion':
         answer_store_updater.save_answers(form, save_completed_blocks=False)
@@ -270,7 +272,7 @@ def post_block(routing_path, schema, questionnaire_store, block_id):
         routing_path,
         schema,
         questionnaire_store,
-        block_id
+        block_id,
     )
 
 
@@ -285,7 +287,7 @@ def post_add_list_item(schema, questionnaire_store, list_name, block_id):
         questionnaire_store,
         block_id,
         list_name,
-        None
+        None,
     )
 
 
@@ -300,7 +302,7 @@ def post_list_item_block(schema, questionnaire_store, list_name, list_item_id, b
         questionnaire_store,
         block_id,
         list_name,
-        list_item_id
+        list_item_id,
     )
 
 
@@ -620,5 +622,3 @@ def _render_block(schema, metadata, answer_store, block_id, current_location):
     context = _get_context(rendered_block, current_location, schema)
 
     return _render_page(rendered_block['type'], context, current_location, schema)
-
-

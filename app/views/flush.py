@@ -47,8 +47,6 @@ def _submit_data(user):
     if answer_store:
         questionnaire_store = get_questionnaire_store(user.user_id, user.user_ik)
         answer_store = questionnaire_store.answer_store
-        collection_metadata = questionnaire_store.collection_metadata
-        list_store = questionnaire_store.list_store
         metadata = questionnaire_store.metadata
 
         schema = load_schema_from_metadata(metadata)

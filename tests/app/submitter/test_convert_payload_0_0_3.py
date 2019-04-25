@@ -81,7 +81,7 @@ def test_convert_answers_to_payload_0_0_3(fake_questionnaire_store):
 
 def test_convert_payload_0_0_3_multiple_answers(fake_questionnaire_store):
     routing_path = [Location(block_id='crisps')]
-    answers = AnswerStore([ Answer('crisps-answer', ['Ready salted', 'Sweet chilli']).to_dict() ])
+    answers = AnswerStore([Answer('crisps-answer', ['Ready salted', 'Sweet chilli']).to_dict()])
     fake_questionnaire_store.answer_store = answers
 
     questionnaire = make_schema('0.0.3', 'section-1', 'favourite-food', 'crisps', {
@@ -355,37 +355,37 @@ def test_list_item_conversion(fake_questionnaire_store):
 
     answer_objects = [
         {
-            "answer_id": "first-name",
-            "value": "1",
-            "list_item_id": "xJlKBy"
+            'answer_id': 'first-name',
+            'value': '1',
+            'list_item_id': 'xJlKBy'
         },
         {
-            "answer_id": "last-name",
-            "value": "1",
-            "list_item_id": "xJlKBy"
+            'answer_id': 'last-name',
+            'value': '1',
+            'list_item_id': 'xJlKBy'
         },
         {
-            "answer_id": "first-name",
-            "value": "2",
-            "list_item_id": "RfAGDc"
+            'answer_id': 'first-name',
+            'value': '2',
+            'list_item_id': 'RfAGDc'
         },
         {
-            "answer_id": "last-name",
-            "value": "2",
-            "list_item_id": "RfAGDc"
+            'answer_id': 'last-name',
+            'value': '2',
+            'list_item_id': 'RfAGDc'
         },
         {
-            "answer_id": "anyone-else",
-            "value": "No"
+            'answer_id': 'anyone-else',
+            'value': 'No'
         },
         {
-            "answer_id": "another-anyone-else",
-            "value": "No"
+            'answer_id': 'another-anyone-else',
+            'value': 'No'
         },
         {
-            "answer_id": "extraneous-answer",
-            "value": "Bad",
-            "list_item_id": "123"
+            'answer_id': 'extraneous-answer',
+            'value': 'Bad',
+            'list_item_id': '123'
         }
     ]
 
@@ -410,7 +410,3 @@ def test_list_item_conversion(fake_questionnaire_store):
     data_dict = json.loads(json.dumps(output['data'], for_json=True))
 
     assert sorted(answer_objects, key=lambda x: x['answer_id']) == sorted(data_dict, key=lambda x: x['answer_id'])
-
-
-
-

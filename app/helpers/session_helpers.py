@@ -4,6 +4,7 @@ from flask_login import current_user
 
 from app.globals import get_questionnaire_store
 
+
 def with_questionnaire_store(function):
     """Adds the `questionnaire_store` as an argument, where the `current_user` is defined.
     Use on flask request handlers or methods called by flask request handlers.

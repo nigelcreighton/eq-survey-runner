@@ -31,4 +31,3 @@ def load_schema(eq_id, form_type, language_code=None):
     schema_json = _load_schema_file('{}_{}.json'.format(eq_id, form_type), language_code)
 
     return QuestionnaireSchema(schema_json, language_code)
-

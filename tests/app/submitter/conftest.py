@@ -1,11 +1,13 @@
-import pytest
+# pylint: disable=redefined-outer-name
 import uuid
+from unittest.mock import MagicMock
+
+import pytest
 
 from app.data_model.answer_store import AnswerStore
 from app.data_model.answer import Answer
 from app.data_model.questionnaire_store import QuestionnaireStore
 from app.storage.metadata_parser import validate_metadata, parse_runner_claims
-from unittest.mock import MagicMock
 from app.questionnaire.questionnaire_schema import QuestionnaireSchema
 
 
@@ -83,4 +85,3 @@ def fake_questionnaire_schema():
     }
 
     return QuestionnaireSchema(questionnaire)
-
