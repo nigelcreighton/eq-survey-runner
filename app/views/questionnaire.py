@@ -26,8 +26,8 @@ from app.helpers.template_helper import (with_session_timeout, with_analytics,
 from app.keys import KEY_PURPOSE_SUBMISSION
 from app.questionnaire.questionnaire_store_updater import QuestionnaireStoreUpdater
 from app.questionnaire.location import Location
-from app.questionnaire.router import Router
 from app.questionnaire.placeholder_renderer import PlaceholderRenderer
+from app.questionnaire.router import Router
 from app.questionnaire.schema_utils import transform_variants
 from app.storage.storage_encryption import StorageEncryption
 from app.submitter.converter import convert_answers

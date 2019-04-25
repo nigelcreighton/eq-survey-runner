@@ -1,6 +1,7 @@
 import logging
 import re
 from datetime import datetime
+
 from dateutil.relativedelta import relativedelta
 
 from app.questionnaire.location import Location
@@ -32,10 +33,9 @@ def evaluate_rule(when, answer_value):
     :return (bool): The result of the evaluation
     """
 
-    match_value = when['value'] if 'value' in when else None
+    match_value = when.get('value', when.get('values'))
 
     condition = when['condition']
-
     # Evaluate the condition on the routing rule
     return evaluate_condition(condition, answer_value, match_value)
 
@@ -57,8 +57,8 @@ def evaluate_date_rule(when, answer_store, schema, metadata, answer_value):
 def evaluate_condition(condition, answer_value, match_value):
     """
     :param condition: string representation of comparison operator
-    :param answer_value: the left hand operand in the comparison
-    :param match_value: the right hand operand in the comparison
+    :param answer_value: the left hand side operand in the comparison
+    :param match_value: the right hand side operand in the comparison
     :return: boolean value of comparing lhs and rhs using the specified operator
     """
     answer_and_match = answer_value is not None and match_value is not None
@@ -66,10 +66,14 @@ def evaluate_condition(condition, answer_value, match_value):
     comparison_operators = {
         'equals': lambda answer_value, match_value: answer_value == match_value,
         'not equals': lambda answer_value, match_value: answer_value != match_value,
-        'contains': lambda answer_value, match_value: isinstance(answer_value, list) and match_value in answer_value,
-        'not contains': lambda answer_value, match_value: isinstance(answer_value, list) and match_value not in answer_value,
-        'set': lambda answer_value, _: answer_value is not None and answer_value != [],
-        'not set': lambda answer_value, _: answer_value is None or answer_value == [],
+        'equals any': lambda answer_value, match_values: answer_value in match_values,
+        'not equals any': lambda answer_value, match_values: answer_value not in match_values,
+        'contains': lambda answer_values, match_value: match_value in answer_values,
+        'not contains': lambda answer_values, match_value: match_value not in answer_values,
+        'contains any': lambda answer_values, match_values: answer_and_match and any(match_value in answer_values for match_value in match_values),
+        'contains all': lambda answer_values, match_values: answer_and_match and all(match_value in answer_values for match_value in match_values),
+        'set': lambda answer_value, _: answer_value not in (None, []),
+        'not set': lambda answer_value, _: answer_value in (None, []),
         'greater than': lambda answer_value, match_value: answer_and_match and answer_value > match_value,
         'greater than or equal to': lambda answer_value, match_value: answer_and_match and answer_value >= match_value,
         'less than': lambda answer_value, match_value: answer_and_match and answer_value < match_value,
@@ -160,7 +164,6 @@ def evaluate_skip_conditions(skip_conditions, schema, metadata, answer_store, ro
     :param answer_store: store of answers to evaluate
     :return: True if the when condition has been met otherwise False
     """
-
     no_skip_condition = skip_conditions is None or len(skip_conditions) == 0
     if no_skip_condition:
         return False
