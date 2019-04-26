@@ -82,7 +82,8 @@
     "legend": question_title,
     "description": question.description,
     "questionMode": true,
-    "classes": "field--exclusive" if mutually_exclusive_quesstion else ""
+    "classes": " field--exclusive" if mutually_exclusive_quesstion else "",
+    "legendClasses": "question__title"
   }) %}
     {{ question_markup }}
   {% endcall %}
