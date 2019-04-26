@@ -8,11 +8,10 @@ cd "${DIR}"/.. || exit
 echo "Loading Templates"
 "${DIR}"/load_templates.sh
 
-  echo "Building schemas"
-  "${DIR}"/build_schemas.sh
+echo "Building schemas"
+"${DIR}"/build_schemas.sh
 
-  echo "Compiling translated schemas"
-  "${DIR}"/translate_schemas.sh
-fi
+echo "Compiling translated schemas"
+"${DIR}"/translate_schemas.sh
 
 printf $(git rev-parse HEAD) > .application-version
