@@ -5,8 +5,6 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 from wtforms import Form, StringField, FormField
-from flask_babel import gettext as _, get_locale
-from babel.dates import get_month_names
 
 from app.forms.custom_fields import CustomIntegerField
 from app.questionnaire.rules import get_metadata_value, get_answer_store_value, convert_to_datetime

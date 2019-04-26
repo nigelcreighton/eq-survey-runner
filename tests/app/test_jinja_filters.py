@@ -154,7 +154,7 @@ class TestJinjaFilters(AppContextTestCase):  # pylint: disable=too-many-public-m
         format_value = format_date(self.autoescape_context, date)
 
         # Then
-        assert date is None
+        self.assertIsNone(format_value)
 
     def test_format_date_time_in_bst(self):
         # Given a date after DST started

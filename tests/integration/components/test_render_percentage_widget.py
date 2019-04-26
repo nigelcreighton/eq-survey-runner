@@ -8,7 +8,7 @@ class TestRenderPercentageWidget(IntegrationTestCase):
         self.launchSurvey('test', 'percentage')
 
     def test_percentage_widget_has_icon(self):
-        self.assertInSelectorCSS('%', 'abbr', { 'class': 'input-type__type' })
+        self.assertInSelectorCSS('%', 'abbr', {'class': 'input-type__type'})
 
     def test_entering_invalid_number_displays_error(self):
         self.post({'answer': 'not a percentage'})

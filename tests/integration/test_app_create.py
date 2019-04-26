@@ -7,7 +7,7 @@ from flask import Flask, request
 from flask_babel import Babel
 
 from app import settings
-from app.setup import create_app, versioned_url_for, get_database_uri, EmulatorCredentials
+from app.setup import create_app, get_database_uri, EmulatorCredentials
 from app.storage.datastore import DatastoreStorage
 from app.storage.dynamodb import DynamodbStorage
 from app.submitter.submitter import LogSubmitter, RabbitMQSubmitter, GCSSubmitter
