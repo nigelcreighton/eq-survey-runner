@@ -440,7 +440,7 @@ class SummaryAnswer():
         if value is None or value == '':
             self.values = [SummaryAnswerValue(no_answer_provided)]
         elif answer_type == 'checkbox':
-            self.values = [SummaryAnswerValue(val['label'], val['detail_answer_value']) for val in value]
+            self.values = [SummaryAnswerValue(val.label, val.detail_answer_value) for val in value]
         elif answer_type == 'currency':
             self.values = [SummaryAnswerValue(get_formatted_currency(value, answer['currency']))]
         elif answer_type in ['date', 'monthyeardate', 'yeardate']:
