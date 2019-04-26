@@ -8,8 +8,9 @@ cd "${DIR}"/.. || exit
 DESIGN_SYSTEM_VERSION="3.0.3"
 
 rm -rf /tmp/templates*
-wget -O /tmp/templates.zip "https://github.com/ONSdigital/design-system/releases/download/$DESIGN_SYSTEM_VERSION/templates.zip"
+curl -L --url "https://github.com/ONSdigital/design-system/releases/download/$DESIGN_SYSTEM_VERSION/templates.zip" --output /tmp/templates.zip
 unzip /tmp/templates.zip -d /tmp/templates
 rm -rf app/templates/components
 rm -rf app/templates/layout
 mv /tmp/templates/templates/* app/templates/
+rm -rf /tmp/templates*
