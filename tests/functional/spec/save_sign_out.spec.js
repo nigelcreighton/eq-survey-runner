@@ -10,7 +10,7 @@ const IntroThankYouPagePage = require('../base_pages/thank-you.page');
 
 const FeedbackForm = require('../base_pages/feedback-form');
 
-describe.skip('SaveSignOut', function() {
+describe('SaveSignOut', function() {
 
   const collectionId = helpers.getRandomString(10);
 
