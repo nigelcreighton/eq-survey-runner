@@ -1,20 +1,45 @@
-{% extends theme('layouts/_questionnaire.html') %}
+{% extends 'layouts/_questionnaire.html' %}
+{% from "components/button/_macro.njk" import onsButton %}
 
 {% set save_on_signout = true %}
 
-{% block page_title %}{{_("Submit answers")}} - {{survey_title}}{% endblock %}
+{% set page_title = summary_page_title | default(_("Submit answers") + " - " + page_title) %}
 
 {% block submit_button %}
-
-{% if content.summary and content.summary.summary_type in ('SectionSummary', 'AnswerSummary') %}
-    <button type="submit" class="btn btn--loader u-mb-s js-btn-submit" data-qa="btn-submit">{{ _("Continue") }}</button>
-{% elif content.summary and content.summary.summary_type == 'CalculatedSummary' %}
-    <button type="submit" class="btn btn--loader u-mb-s js-btn-submit" data-qa="btn-submit">{{ _("Yes, I confirm these are correct") }}</button>
-{% else  %}
-  {% if block and block.content %}
-    {% set content_block = content.block.content %}
-    {% include 'partials/content-block.html' %}
+  {% if content.summary and content.summary.summary_type in ('SectionSummary', 'AnswerSummary') %}
+    {{
+      onsButton({
+        "text": _("Continue"),
+        "classes": "btn--loader js-btn-submit",
+        "attributes": {
+          "data-qa": "btn-submit"
+        }
+      })
+    }}
+  {% elif content.summary and content.summary.summary_type == 'CalculatedSummary' %}
+    {{
+      onsButton({
+        "text": _("Yes, I confirm these are correct"),
+        "classes": "btn--loader js-btn-submit",
+        "attributes": {
+          "data-qa": "btn-submit"
+        }
+      })
+    }}
+  {% else  %}
+    {% if block and block.content %}
+      {% set content_block = content.block.content %}
+      {% include 'partials/content-block.html' %}
+    {% endif %}
+    {{
+      onsButton({
+        "text": _("Submit answers"),
+        "classes": "btn--loader js-btn-submit",
+        "attributes": {
+          "data-qa": "btn-submit",
+          "data-loading-msg": _("Submitting") + "&hellip;"
+        }
+      })
+    }}
   {% endif %}
-    <button type="submit" class="btn btn--loader u-mb-s js-btn-submit" data-qa="btn-submit" data-loading-msg='{{ _("Submitting") }}&hellip;'>{{ _("Submit answers") }}</button>
-{% endif %}
 {% endblock %}

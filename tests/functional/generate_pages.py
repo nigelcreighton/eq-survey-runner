@@ -54,31 +54,31 @@ CLASS_NAME = Template(r"""class ${pageName}Page extends $basePage {
 
 """)
 
-QUESTION_DEFINITION_TITLE_GETTER = Template(r"""  definitionTitle${definitionIndex}() { return '[data-definition-title-index="${definitionIndex}"]'; }
+QUESTION_DEFINITION_TITLE_GETTER = Template(r"""  definitionTitle${definitionIndex}() { return '.details:nth-child(${definitionIndex}) > .details__summary'; }
 
 """)
 
-QUESTION_DEFINITION_CONTENT_GETTER = Template(r"""  definitionContent${definitionIndex}() { return '[data-definition-content-index="${definitionIndex}"]'; }
+QUESTION_DEFINITION_CONTENT_GETTER = Template(r"""  definitionContent${definitionIndex}() { return '.details:nth-child(${definitionIndex}) > .details__content'; }
 
 """)
 
-QUESTION_DEFINITION_BUTTON_GETTER = Template(r"""  definitionButton${definitionIndex}() { return '[data-definition-hide-button-index="${definitionIndex}"]'; }
+QUESTION_DEFINITION_BUTTON_GETTER = Template(r"""  definitionButton${definitionIndex}() { return '.details:nth-child(${definitionIndex}) .js-collapsible-button'; }
 
 """)
 
-ANSWER_LABEL_GETTER = Template(r"""  ${answerName}Label() { 
-    return '#label-${answerId}';
+ANSWER_LABEL_GETTER = Template(r"""  ${answerName}Label() {
+    return '[for=${answerId}]';
   }
 
 """)
 
-ANSWER_ERROR_GETTER = Template(r"""  ${answerName}ErrorItem() { 
-    return '#container-${answerId} > aside > div.panel__header > ul > li';
+ANSWER_ERROR_GETTER = Template(r"""  ${answerName}ErrorItem() {
+    return '[data-qa=error-body] div.panel__body > ul';
   }
 
 """)
 
-ANSWER_LABEL_DESCRIPTION_GETTER = Template(r"""  ${answerName}LabelDescription() { return '#label-${answerId} > .label__description'; }
+ANSWER_LABEL_DESCRIPTION_GETTER = Template(r"""  ${answerName}LabelDescription() { return 'label[for=${answerId}] > .label__description'; }
 
 """)
 
@@ -100,7 +100,7 @@ ANSWER_UNIT_TYPE_GETTER = Template(r"""  ${answerName}Unit() {
 
 """)
 
-SECTION_SUMMARY_ANSWER_GETTER = Template(r"""  ${answerName}() { return '#${answerId}-answer'; }
+SECTION_SUMMARY_ANSWER_GETTER = Template(r"""  ${answerName}() { return '[data-qa="${answerId}"]'; }
 
 """)
 
@@ -108,7 +108,7 @@ SECTION_SUMMARY_ANSWER_EDIT_GETTER = Template(r"""  ${answerName}Edit() { return
 
 """)
 
-SUMMARY_ANSWER_GETTER = Template(r"""  ${answerName}() { return '#${answerId}-answer'; }
+SUMMARY_ANSWER_GETTER = Template(r"""  ${answerName}() { return '[data-qa="${answerId}"]'; }
 
 """)
 
@@ -121,15 +121,15 @@ SUMMARY_TITLE_GETTER = Template(r"""  ${group_id_camel}Title() { return '#${grou
 
 """)
 
-SUMMARY_SHOW_ALL_BUTTON = Template(r"""  summaryShowAllButton() { return 'div.collapsible__controls > button'; }
+SUMMARY_SHOW_ALL_BUTTON = Template(r"""  summaryShowAllButton() { return '.js-collapsible-all'; }
 
 """)
 
-SUMMARY_QUESTION_GETTER = Template(r"""  ${questionName}() { return '#${questionId}'; }
+SUMMARY_QUESTION_GETTER = Template(r"""  ${questionName}() { return '[data-qa=${questionId}]'; }
 
 """)
 
-CALCULATED_SUMMARY_LABEL_GETTER = Template(r"""  ${answerName}Label() { return '#${answerId}-label'; } 
+CALCULATED_SUMMARY_LABEL_GETTER = Template(r"""  ${answerName}Label() { return '[data-qa=${answerId}-label]'; }
 
 """)
 

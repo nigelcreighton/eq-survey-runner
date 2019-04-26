@@ -1,1 +1,9 @@
-<button class="btn qa-btn-get-started" type="submit" name="action[start_questionnaire]">{{ _("Start survey") }}</button>
+{% from "components/button/_macro.njk" import onsButton %}
+
+{{
+  onsButton({
+    "text": _("Start survey"),
+    "classes": "u-mt-l qa-btn-get-started",
+    "name": "action[start_questionnaire]"
+  })
+}}

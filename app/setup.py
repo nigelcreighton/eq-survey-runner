@@ -87,7 +87,7 @@ class AWSReverseProxied:
 
 
 def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-complex
-    application = Flask(__name__, static_url_path='/s', static_folder='../static')
+    application = Flask(__name__)
     application.config.from_object(settings)
 
     application.eq = {}
@@ -157,6 +157,7 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
 
     # pylint: disable=no-member
     application.jinja_env.globals['theme'] = flask_theme_cache.get_global_theme_template(cache)
+    application.jinja_env.add_extension('jinja2.ext.do')
 
     @application.before_request
     def before_request():  # pylint: disable=unused-variable

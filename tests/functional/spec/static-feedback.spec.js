@@ -1,7 +1,7 @@
 const helpers = require('../helpers');
 const form = require('../base_pages/feedback-form');
 
-describe('Feedback Form', function() {
+describe.skip('Feedback Form', function() {
   const schema = 'test_textfield.json';
   const formUrl = '/feedback';
   const thankyouUrlMatcher = /\/feedback\/thank-you$/;

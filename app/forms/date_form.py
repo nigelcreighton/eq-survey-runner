@@ -4,7 +4,7 @@ from datetime import datetime
 
 from dateutil.relativedelta import relativedelta
 
-from wtforms import Form, SelectField, StringField, FormField
+from wtforms import Form, StringField, FormField
 from flask_babel import gettext as _, get_locale
 from babel.dates import get_month_names
 
@@ -27,7 +27,7 @@ class DateField(FormField):
             substrings = data.split('-')
             data = {
                 'year': substrings[0],
-                'month': substrings[1].lstrip('0'),
+                'month': substrings[1],
                 'day': substrings[2],
             }
 
@@ -45,7 +45,7 @@ class MonthYearField(FormField):
             substrings = data.split('-')
             data = {
                 'year': substrings[0],
-                'month': substrings[1].lstrip('0'),
+                'month': substrings[1],
             }
 
         super().process(formdata, data)
@@ -82,6 +82,7 @@ def get_date_form(answer_store, metadata, answer=None, error_messages=None):
     class DateForm(Form):
         day = StringField()
         year = StringField()
+        month = StringField()
 
         @property
         def data(self):
@@ -108,8 +109,7 @@ def get_date_form(answer_store, metadata, answer=None, error_messages=None):
         min_max_validation = validate_min_max_date(answer, answer_store, metadata, 'yyyy-mm-dd')
         validate_with.append(min_max_validation)
 
-    # Set up all the calendar month choices for select
-    DateForm.month = get_month_selection_field(validate_with)
+    DateForm.month = StringField(validators=validate_with)
 
     return DateForm
 
@@ -125,6 +125,7 @@ def get_month_year_form(answer, answer_store, metadata, error_messages):
     """
     class MonthYearDateForm(Form):
         year = StringField()
+        month = StringField()
 
         @property
         def data(self):
@@ -149,7 +150,7 @@ def get_month_year_form(answer, answer_store, metadata, error_messages):
         min_max_validation = validate_min_max_date(answer, answer_store, metadata, 'yyyy-mm')
         validate_with.append(min_max_validation)
 
-    MonthYearDateForm.month = get_month_selection_field(validate_with)
+    MonthYearDateForm.month = StringField(validators=validate_with)
 
     return MonthYearDateForm
 
@@ -209,12 +210,6 @@ def get_bespoke_message(answer, message_type):
         return answer['validation']['messages'][message_type]
 
     return None
-
-
-def get_month_selection_field(validate_with):
-    month_names = get_month_names(locale=get_locale())
-    month_choices = [('', _('Select month'))] + [(str(key), month_names[key]) for key in range(1, 13)]
-    return SelectField(choices=month_choices, default='', validators=validate_with)
 
 
 def validate_min_max_date(answer, answer_store, metadata, date_format):

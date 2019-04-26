@@ -1,27 +1,24 @@
-{% set input = form.fields[answer['id']] %}
-<div class="field">
-    {% set label = {
-    'for': answer.id,
-    'text': answer.label,
-    'description': answer.description
-    } %}
-    {% include 'partials/forms/label.html' %}
-    {% if answer.calculated %}
-    {% set input_classes = 'input-type__input js-totaliser-input-calculated' %}
-    {% else %}
-    {% set input_classes = 'input-type__input' %}
-    {% endif %}
+{% from "components/input/_macro.njk" import onsInput %}
 
-    <div class="input-type">
-        {% set input = {
-        'type': 'text',
-        'classes': input_classes,
-        'hasType': true,
-        'data': input._value(),
-        'name': input.name,
-        'id': answer.id
-        } %}
-        {% include 'partials/forms/input.html' %}
-        <abbr title="{{ _(answer.label) }}" class="input-type__type" id="{{answer.id}}-type">{{ format_unit_input_label(answer.unit, unit_length=answer.unit_length) }}</abbr>
-    </div>
-</div>
+{% set input = form.fields[answer['id']] %}
+
+{{ onsInput({
+  "id": answer.id,
+  "type": "number",
+  "classes": "js-totaliser-input-calculated" if answer.calculated,
+  "name": input.name,
+  "value": input._value(),
+  "label": {
+    "text": answer.label,
+    "description": answer.description
+  },
+  "suffix": {
+    "id": answer.id + "-type",
+    "title": _(answer.label),
+    "text": format_unit_input_label(answer.unit, unit_length=answer.unit_length)
+  },
+  "attributes": {
+    "data-qa": "input-text"
+  },
+  "mutuallyExclusive": mutuallyExclusive
+}) }}

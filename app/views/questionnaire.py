@@ -427,7 +427,7 @@ def get_page_title_for_location(schema, current_location, context):
     if block['type'] == 'Interstitial':
         group = schema.get_group(schema.get_group_by_block_id(block['id'])['id'])
         page_title = '{group_title} - {survey_title}'.format(group_title=group['title'], survey_title=schema.json['title'])
-    elif block['type'] == 'Question':
+    elif block['type'] == 'Question' :
         question_title = context['block']['question'].get('title')
 
         page_title = '{question_title} - {survey_title}'.format(question_title=question_title, survey_title=schema.json['title'])
