@@ -5,7 +5,7 @@ ROOT="$( cd "$( dirname "${DIR}"/../../)" && pwd )"
 
 cd "${DIR}"/.. || exit
 
-DESIGN_SYSTEM_VERSION="3.0.2"
+DESIGN_SYSTEM_VERSION="3.0.3"
 
 rm -rf /tmp/templates*
 wget -O /tmp/templates.zip "https://github.com/ONSdigital/design-system/releases/download/$DESIGN_SYSTEM_VERSION/templates.zip"
