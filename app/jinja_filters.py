@@ -164,6 +164,9 @@ def answer_is_type(answer, target_answer_type):
 
 @blueprint.app_template_filter()
 def language_urls(languages, current_language):
+    if not any(language[0] == current_language for language in languages):
+        current_language = 'en'
+
     return [LanguageConfig(language, current_language) for language in languages]
 
 
