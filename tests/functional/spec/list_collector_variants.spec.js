@@ -1,5 +1,4 @@
 const helpers = require('../helpers');
-const IntroductionPage = require('../generated_pages/list_collector_variants/introduction.page.js');
 const YouLiveHerePage = require('../generated_pages/list_collector_variants/you-live-here-block.page.js');
 const ListCollectorPage = require('../generated_pages/list_collector_variants/list-collector.page.js');
 const ListCollectorAddPage = require('../generated_pages/list_collector_variants/list-collector-add.page.js');
@@ -28,7 +27,6 @@ describe('List Collector With Variants', function() {
 
     it('The user is asked questions about whether they live there', function() {
       return browser
-        .click(IntroductionPage.getStarted())
         .click(YouLiveHerePage.yes())
         .click(YouLiveHerePage.submit())
         .getText(ListCollectorPage.questionText()).should.eventually.equal('Does anyone else live at 1 Pleasant Lane?');
@@ -81,7 +79,6 @@ describe('List Collector With Variants', function() {
 
     it('The user is asked questions about whether they live there', function() {
       return browser
-        .click(IntroductionPage.getStarted())
         .click(YouLiveHerePage.no())
         .click(YouLiveHerePage.submit())
         .getText(ListCollectorPage.questionText()).should.eventually.equal('Does anyone live at 1 Pleasant Lane?');

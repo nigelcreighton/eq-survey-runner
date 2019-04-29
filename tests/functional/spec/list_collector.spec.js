@@ -3,7 +3,6 @@ const AnotherListCollectorPage = require('../generated_pages/list_collector/anot
 const AnotherListCollectorAddPage = require('../generated_pages/list_collector/another-list-collector-block-add.page.js');
 const AnotherListCollectorEditPage = require('../generated_pages/list_collector/another-list-collector-block-edit.page.js');
 const AnotherListCollectorRemovePage = require('../generated_pages/list_collector/another-list-collector-block-remove.page.js');
-const IntroductionPage = require('../generated_pages/list_collector/introduction.page.js');
 const ListCollectorPage = require('../generated_pages/list_collector/list-collector.page.js');
 const ListCollectorAddPage = require('../generated_pages/list_collector/list-collector-add.page.js');
 const ListCollectorEditPage = require('../generated_pages/list_collector/list-collector-edit.page.js');
@@ -32,7 +31,6 @@ describe('List Collector', function() {
 
     it('The user is able to add members of the household', function() {
       return browser
-        .click(IntroductionPage.getStarted())
         .click(ListCollectorPage.yes())
         .click(ListCollectorPage.submit())
         .setValue(ListCollectorAddPage.firstName(), 'Marcus')

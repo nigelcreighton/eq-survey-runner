@@ -24,12 +24,7 @@
         "groups": [{
             "id": "group",
             "title": "List",
-            "blocks": [{
-                    "type": "Introduction",
-                    "id": "introduction",
-                    "title": "Introduction",
-                    "description": ""
-                },
+            "blocks": [
                 {
                     "type": "Question",
                     "id": "you-live-here-block",
