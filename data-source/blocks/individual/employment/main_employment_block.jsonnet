@@ -9,7 +9,7 @@ local rules = import '../../../lib/rules.libsonnet';
     {
       content: [
         {
-          title: 'Answer the next set of questions for your main job',
+          title: 'Main job',
           description: 'The next set of questions is about your main job. Your main job is the job in which you usually work the most hours',
         },
       ],
@@ -19,8 +19,7 @@ local rules = import '../../../lib/rules.libsonnet';
       content: [
         {
           title: {
-            text: '<em>{person_name_possessive}</em> main job',
-            placeholders: [placeholders.personNamePossessive],
+            text: 'Main job',
           },
           description: 'The next set of questions is about <em>{person_name_possessive}</em> main job. Their main job is the job in which they usually work the most hours',
           placeholders: [placeholders.personNamePossessive],
@@ -31,7 +30,7 @@ local rules = import '../../../lib/rules.libsonnet';
     {
       content: [
         {
-          title: 'Your last main job',
+          title: 'Last main job',
           description: 'The next set of questions is about your last main job. Your main job is the job in which you usually worked the most hours',
         },
       ],
@@ -41,8 +40,7 @@ local rules = import '../../../lib/rules.libsonnet';
       content: [
         {
           title: {
-            text: '<em>{person_name_possessive}</em> last main job',
-            placeholders: [placeholders.personNamePossessive],
+            text: 'Last main job',
           },
           description: 'The next set of questions is about <em>{person_name_possessive}</em> last main job. Their main job is the job in which they usually worked the most hours',
           placeholders: [placeholders.personNamePossessive],

@@ -112,11 +112,6 @@ local walesOptions = {
         block: 'other-qualifications',
         when: [
           {
-            id: 'apprenticeship-answer',
-            condition: 'equals',
-            value: 'No',
-          },
-          {
             id: 'degree-answer',
             condition: 'equals',
             value: 'No',
