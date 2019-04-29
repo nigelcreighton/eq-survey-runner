@@ -147,7 +147,7 @@ class PathFinder:
         :return: List of block location dicts
         """
         if self._full_routing_path and \
-                not self.answer_store.dirty:
+                not self.answer_store.is_dirty:
             return self._full_routing_path
 
         self._full_routing_path = self.build_path()

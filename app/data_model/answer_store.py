@@ -51,7 +51,7 @@ class AnswerStore:
             raise TypeError(f'Method only supports Answer argument type, found type: {type(answer)}')
 
     @property
-    def dirty(self):
+    def is_dirty(self):
         return self._dirty
 
     def add_or_update(self, answer: Answer):
