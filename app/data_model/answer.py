@@ -11,7 +11,7 @@ logger = get_logger()
 @dataclass
 class Answer:
     answer_id: str
-    value: Union[str, int, float, list]
+    value: Union[str, int, float, List]
     list_item_id: Optional[str] = field(default=None)
 
     @classmethod
