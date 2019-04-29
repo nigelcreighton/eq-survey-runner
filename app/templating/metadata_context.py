@@ -11,16 +11,16 @@ def build_metadata_context(metadata):
     :return: metadata context
     """
     eq_context = {
-        'eq_id': json_and_html_safe(metadata['eq_id']),
-        'collection_id': json_and_html_safe(metadata['collection_exercise_sid']),
-        'form_type': json_and_html_safe(metadata['form_type']),
-        'ru_ref': json_and_html_safe(metadata['ru_ref']),
-        'tx_id': json_and_html_safe(metadata['tx_id']),
+        'eq_id': json_and_html_safe(metadata.get('eq_id')),
+        'collection_id': json_and_html_safe(metadata.get('collection_exercise_sid')),
+        'form_type': json_and_html_safe(metadata.get('form_type')),
+        'ru_ref': json_and_html_safe(metadata.get('ru_ref')),
+        'tx_id': json_and_html_safe(metadata.get('tx_id')),
     }
 
-    schema = load_schema_from_metadata(metadata)
-
-    eq_context.update(build_schema_metadata(metadata, schema))
+    if metadata.get('tx_id'):
+        schema = load_schema_from_metadata(metadata)
+        eq_context.update(build_schema_metadata(metadata, schema))
 
     return eq_context
 

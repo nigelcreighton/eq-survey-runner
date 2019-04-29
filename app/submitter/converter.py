@@ -80,16 +80,16 @@ def convert_answers(metadata, collection_metadata, schema, answer_store, routing
 
 def _build_collection(metadata):
     return {
-        'exercise_sid': metadata['collection_exercise_sid'],
-        'instrument_id': metadata['form_type'],
-        'period': metadata['period_id'],
+        'exercise_sid': metadata.get('collection_exercise_sid'),
+        'instrument_id': metadata.get('form_type'),
+        'period': metadata.get('period_id'),
     }
 
 
 def _build_metadata(metadata):
     downstream_metadata = {
-        'user_id': metadata['user_id'],
-        'ru_ref': metadata['ru_ref'],
+        'user_id': metadata.get('user_id'),
+        'ru_ref': metadata.get('ru_ref'),
     }
 
     if metadata.get('ref_p_start_date'):
@@ -128,7 +128,7 @@ def convert_feedback(message, name, email, url, metadata, survey_id):
     """
     submitted_at = datetime.utcnow()
     payload = {
-        'tx_id': metadata['tx_id'],
+        'tx_id': metadata.get('tx_id'),
         'type': 'uk.gov.ons.edc.eq:feedback',
         'version': '0.0.1',
         'origin': 'uk.gov.ons.edc.eq',
