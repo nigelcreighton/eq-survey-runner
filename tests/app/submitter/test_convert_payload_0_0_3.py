@@ -346,7 +346,6 @@ def test_unit_answer(fake_questionnaire_store):
 
 def test_list_item_conversion(fake_questionnaire_store):
     routing_path = [
-        Location(block_id='introduction'),
         Location(block_id='list-collector'),
         Location(block_id='next-interstitial'),
         Location(block_id='another-list-collector-block'),

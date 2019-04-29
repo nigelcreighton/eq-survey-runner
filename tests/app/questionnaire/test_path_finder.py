@@ -31,8 +31,8 @@ class TestPathFinder(AppContextTestCase):  # pylint: disable=too-many-public-met
     def test_previous_block_on_list_collector(self):
         schema = load_schema_from_params('test', 'list_collector')
 
-        current_location = Location(block_id='list-collector')
-        previous_location = Location(block_id='introduction')
+        current_location = Location(list_name='people', block_id='add-person')
+        previous_location = Location(block_id='list-collector')
 
         path_finder = PathFinder(schema, AnswerStore(), metadata={}, completed_blocks=[])
         self.assertEqual(path_finder.get_previous_location(current_location, schema), previous_location)

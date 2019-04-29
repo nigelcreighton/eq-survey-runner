@@ -37,7 +37,7 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
 
         self.get('/questionnaire/bad-block')
 
-        self.assertInUrl('introduction')
+        self.assertInUrl('list-collector')
 
     def test_invalid_list_item_id(self):
         self.launchSurvey('test', 'list_collector')
@@ -48,8 +48,6 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
 
     def test_happy_path(self):
         self.launchSurvey('test', 'list_collector')
-
-        self.post(action='start_questionnaire')
 
         self.assertInBody('Does anyone else live here?')
 
@@ -114,13 +112,6 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
         self.assertInSelector('Johnny Doe', 'li[data-qa="list-summary-3"]')
 
         # Test the previous links
-
-        self.get(self.get_previous_link())
-
-        self.assertInUrl('introduction')
-
-        self.post(action='start_questionnaire')
-
         john_change_link = self.get_link('list-summary-2', 'Change')
         john_remove_link = self.get_link('list-summary-2', 'Remove')
 
