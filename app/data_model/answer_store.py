@@ -29,7 +29,7 @@ class AnswerStore:
             existing_answers: If a list of answer dictionaries is provided, this will be used to initialise the store.
         """
         self.answer_map = self._build_map(existing_answers or [])
-        self._dirty = False
+        self._is_dirty = False
 
     def __iter__(self):
         return iter(self.answer_map.values())
@@ -52,7 +52,7 @@ class AnswerStore:
 
     @property
     def is_dirty(self):
-        return self._dirty
+        return self._is_dirty
 
     def add_or_update(self, answer: Answer):
         """
@@ -64,7 +64,7 @@ class AnswerStore:
         existing_answer = self.answer_map.get(key)
 
         if existing_answer != answer:
-            self._dirty = True
+            self._is_dirty = True
 
         self.answer_map[key] = answer
 
@@ -112,7 +112,7 @@ class AnswerStore:
 
         if self.answer_map.get((answer_id, list_item_id)):
             del self.answer_map[(answer_id, list_item_id)]
-            self._dirty = True
+            self._is_dirty = True
 
     def remove_all_answers_for_list_item_id(self, list_item_id: str):
         """Remove all answers associated with a particular list_item_id
@@ -129,7 +129,7 @@ class AnswerStore:
 
         for key in keys_to_delete:
             del self.answer_map[key]
-            self._dirty = True
+            self._is_dirty = True
 
     def serialise(self):
         return list(self.answer_map.values())
