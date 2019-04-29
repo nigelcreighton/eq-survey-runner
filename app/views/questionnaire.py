@@ -179,17 +179,17 @@ def post_block_handler(routing_path, schema, questionnaire_store,  # noqa: C901
         return _render_page(block['type'], context, current_location, schema)
 
     _set_started_at_metadata_if_required(form, collection_metadata)
-    answer_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store,
+    questionnaire_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store,
                                                      rendered_block.get('question'))
 
     list_collection_block = block['type'] in ['ListCollector', 'ListAddQuestion', 'ListEditQuestion', 'ListRemoveQuestion']
 
     if list_collection_block:
-        next_url = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id)
+        next_url = perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, questionnaire_store_updater, list_item_id)
         if next_url:
             return redirect(next_url)
 
-    answer_store_updater.save_answers(form)
+    questionnaire_store_updater.save_answers(form)
     next_location = path_finder.get_next_location(current_location=current_location)
 
     if _is_end_of_questionnaire(block, next_location):
@@ -198,13 +198,13 @@ def post_block_handler(routing_path, schema, questionnaire_store,  # noqa: C901
     return redirect(next_location.url())
 
 
-def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, answer_store_updater, list_item_id):
+def perform_list_action(schema, metadata, answer_store, current_location, form, rendered_block, questionnaire_store_updater, list_item_id):
     block = schema.get_block(current_location.block_id)
 
     parent_block = schema.get_list_collector_for_block_id(current_location.block_id)
 
     if block['type'] == 'ListCollector':
-        answer_store_updater.save_answers(form)
+        questionnaire_store_updater.save_answers(form)
         if form.data[block['add_answer']['id']] == block['add_answer']['value']:
             add_url = url_for('questionnaire.get_block', list_name=rendered_block['populates_list'], block_id=rendered_block['add_block']['id'])
             return add_url
@@ -213,19 +213,19 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
     if block['type'] == 'ListRemoveQuestion':
         if form.data[parent_block['remove_answer']['id']] == parent_block['remove_answer']['value']:
             list_name = parent_block['populates_list']
-            answer_store_updater.remove_all_answers_with_list_item_id(list_name, list_item_id)
+            questionnaire_store_updater.remove_all_answers_with_list_item_id(list_name, list_item_id)
         else:
             return url_for('questionnaire.get_block', block_id=parent_block['id'])
 
     if block['type'] == 'ListAddQuestion':
-        answer_store_updater.save_new_list_item_answers(form, parent_block['populates_list'])
+        questionnaire_store_updater.save_new_list_item_answers(form, parent_block['populates_list'])
     elif block['type'] == 'ListEditQuestion':
-        answer_store_updater.save_answers(form, save_completed_blocks=False)
+        questionnaire_store_updater.save_answers(form, save_completed_blocks=False)
 
     # Clear the answer from the confirmation question on the list collector question
     transformed_parent = transform_variants(parent_block, schema, metadata, answer_store)
     answer_ids_to_remove = [answer['id'] for answer in transformed_parent['question']['answers']]
-    answer_store_updater.remove_answer_ids(answer_ids_to_remove)
+    questionnaire_store_updater.remove_answer_ids(answer_ids_to_remove)
 
     list_collector_url = url_for('questionnaire.get_block', block_id=parent_block['id'])
 
@@ -476,11 +476,9 @@ def _save_sign_out(current_location, current_question, form, schema):
     block = schema.get_block(current_location.block_id)
 
     if form.validate():
-        answer_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store, current_question)
-        answer_store_updater.save_answers(form)
-
-        questionnaire_store.remove_completed_blocks(location=current_location)
-        questionnaire_store.add_or_update()
+        questionnaire_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store, current_question)
+        questionnaire_store_updater.save_answers(form)
+        questionnaire_store_updater.remove_completed_blocks(location=current_location)
 
         logout_user()
 

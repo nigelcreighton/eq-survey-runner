@@ -65,3 +65,7 @@ class QuestionnaireStoreUpdater:
         for answer_id in answer_ids:
             self._answer_store.remove_answer(answer_id)
         self._questionnaire_store.add_or_update()
+
+    def remove_completed_blocks(self, location):
+        self._questionnaire_store.remove_completed_blocks(location)
+        self._questionnaire_store.add_or_update()
