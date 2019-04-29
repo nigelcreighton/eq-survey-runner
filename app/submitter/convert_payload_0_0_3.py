@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from app.data_model.answer import Answer
 from app.data_model.answer_store import AnswerStore
@@ -34,9 +34,10 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
     answers = AnswerStore()
 
     for location in routing_path:
-        for answer in convert_list_collector_answers(answer_store, list_store, schema, location):
-            if answer:
-                answers.add_or_update(answer)
+        if schema.get_block(location.block_id)['type'] == 'ListCollector':
+            for answer in convert_list_collector_answers(answer_store, list_store, schema, location):
+                if answer:
+                    answers.add_or_update(answer)
 
         answer_ids = schema.get_answer_ids_for_block(location.block_id)
         answers_in_block = answer_store.get_answers_by_answer_id(answer_ids, list_item_id=location.list_item_id)
@@ -47,7 +48,7 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
     return list(answers.answer_map.values())
 
 
-def convert_list_collector_answers(answer_store, list_store, schema, location) -> List[Answer]:
+def convert_list_collector_answers(answer_store, list_store, schema, location) -> Optional[List[Answer]]:
     """For the given location, check for list collector and generate submission payload
 
     Returns:
@@ -55,18 +56,17 @@ def convert_list_collector_answers(answer_store, list_store, schema, location) -
     """
     answer_output = []
     block = schema.get_block(location.block_id)
-    if block['type'] == 'ListCollector':
-        add_block_answer_ids = schema.get_answer_ids_for_block(block['add_block']['id'])
-        list_name = block['populates_list']
-        try:
-            list_item_ids = list_store[list_name]
-        except KeyError:
-            return
+    add_block_answer_ids = schema.get_answer_ids_for_block(block['add_block']['id'])
+    list_name = block['populates_list']
+    try:
+        list_item_ids = list_store[list_name]
+    except KeyError:
+        return
 
-        for list_item_id in list_item_ids:
-            for answer_id in add_block_answer_ids:
-                found_answer = answer_store.get_answer(answer_id, list_item_id)
-                if found_answer:
-                    answer_output.append(found_answer)
+    for list_item_id in list_item_ids:
+        for answer_id in add_block_answer_ids:
+            found_answer = answer_store.get_answer(answer_id, list_item_id)
+            if found_answer:
+                answer_output.append(found_answer)
 
     return answer_output
