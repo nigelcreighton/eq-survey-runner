@@ -27,11 +27,11 @@ local rules = import '../../../lib/rules.libsonnet';
     {
       content: [
         {
-          title: {
-            text: 'Qualifications',
+          title: 'Qualifications',
+          description: {
+            text: 'The next set of questions is about any qualifications <em>{person_name}</em>, has ever achieved in England, Wales or worldwide, including equivalents, even if they are not using them now.',
+            placeholders: [placeholders.personName],
           },
-          description: 'The next set of questions is about any qualifications <em>{person_name}</em>, has ever achieved in England, Wales or worldwide, including equivalents, even if they are not using them now.',
-          placeholders: [placeholders.personName],
         },
       ],
       when: [rules.proxyYes, rules.regionNotWales],
@@ -39,11 +39,11 @@ local rules = import '../../../lib/rules.libsonnet';
     {
       content: [
         {
-          title: {
-            text: 'Qualifications',
+          title: 'Qualifications',
+          description: {
+            text: 'The next set of questions is about any qualifications <em>{person_name}</em>, has ever achieved in Wales, England or worldwide, including equivalents, even if they are not using them now.',
+            placeholders: [placeholders.personName],
           },
-          description: 'The next set of questions is about any qualifications <em>{person_name}</em>, has ever achieved in Wales, England or worldwide, including equivalents, even if they are not using them now.',
-          placeholders: [placeholders.personName],
         },
       ],
       when: [rules.proxyYes, rules.regionWales],

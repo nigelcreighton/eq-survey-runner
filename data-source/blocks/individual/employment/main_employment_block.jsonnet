@@ -18,11 +18,11 @@ local rules = import '../../../lib/rules.libsonnet';
     {
       content: [
         {
-          title: {
-            text: 'Main job',
+          title: 'Main job',
+          description: {
+            text: 'The next set of questions is about <em>{person_name_possessive}</em> main job. Their main job is the job in which they usually work the most hours',
+            placeholders: [placeholders.personNamePossessive],
           },
-          description: 'The next set of questions is about <em>{person_name_possessive}</em> main job. Their main job is the job in which they usually work the most hours',
-          placeholders: [placeholders.personNamePossessive],
         },
       ],
       when: [rules.proxyYes, rules.mainJob],
@@ -39,11 +39,11 @@ local rules = import '../../../lib/rules.libsonnet';
     {
       content: [
         {
-          title: {
-            text: 'Last main job',
+          title: 'Last main job',
+          description: {
+            text: 'The next set of questions is about <em>{person_name_possessive}</em> last main job. Their main job is the job in which they usually worked the most hours',
+            placeholders: [placeholders.personNamePossessive],
           },
-          description: 'The next set of questions is about <em>{person_name_possessive}</em> last main job. Their main job is the job in which they usually worked the most hours',
-          placeholders: [placeholders.personNamePossessive],
         },
       ],
       when: [rules.proxyYes, rules.lastMainJob],
