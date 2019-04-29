@@ -1,12 +1,11 @@
 # coding: utf-8
-import json
 import re
 from datetime import datetime
 
 import flask
 import flask_babel
 from babel import units, numbers
-from jinja2 import Markup, contextfunction, escape, evalcontextfilter, evalcontextfunction
+from jinja2 import Markup, escape, evalcontextfilter
 
 from app.questionnaire.rules import convert_to_datetime
 
@@ -19,13 +18,6 @@ def format_number(value):
         return numbers.format_decimal(value, locale=flask_babel.get_locale())
 
     return ''
-
-
-@evalcontextfunction
-def format_currency(context, value, currency='GBP'):
-    currency_value = get_formatted_currency(value, currency)
-    result = "<span class='date'>{currency_value}</span>".format(currency_value=currency_value)
-    return mark_safe(context, result)
 
 
 def get_formatted_currency(value, currency='GBP'):
@@ -74,29 +66,11 @@ def format_duration(value):
     return ' '.join(parts)
 
 
-@evalcontextfilter
-@blueprint.app_template_filter()
-def format_multilined_string(context, value):
-    return mark_safe(context, get_format_multilined_string(value))
-
-
 def get_format_multilined_string(value):
     escaped_value = escape(value)
     new_line_regex = r'(?:\r\n|\r|\n)+'
     value_with_line_break_tag = re.sub(new_line_regex, '<br>', escaped_value)
     return '{}'.format(value_with_line_break_tag)
-
-
-@evalcontextfilter
-@blueprint.app_template_filter()
-def format_date(context, value):
-    date_formatted = get_format_date(value)
-    if not isinstance(value, str):
-        return date_formatted
-    if date_formatted:
-        return mark_safe(context, date_formatted)
-
-    return date_formatted
 
 
 def get_format_date(value):
@@ -136,30 +110,10 @@ def format_datetime(context, value):
     return mark_safe(context, result)
 
 
-@evalcontextfunction
-def format_date_range(context, start_date, end_date=None):
-    return mark_safe(context, get_format_date_range(start_date, end_date))
-
-
-def get_format_date_range(start_date, end_date=None):
-    if end_date:
-        return flask_babel.gettext('%(from_date)s to %(to_date)s',
-                                   from_date=get_format_date(start_date),
-                                   to_date=get_format_date(end_date))
-
-    return get_format_date(start_date)
-
-
-@blueprint.app_template_filter()
-def answer_is_type(answer, target_answer_type):
-    """
-    :param answer:
-    :param target_answer_type:
-    :return: true if the answer type matches given input
-    'RepeatingAnswer' question type return 'answers' as an object, and dict for all other question types.
-    """
-    answer_type = answer['type'] if isinstance(answer, dict) else answer.type
-    return answer_type == target_answer_type.lower()
+def get_format_date_range(start_date, end_date):
+    return flask_babel.gettext('%(from_date)s to %(to_date)s',
+                               from_date=get_format_date(start_date),
+                               to_date=get_format_date(end_date))
 
 
 @blueprint.app_template_filter()
@@ -168,37 +122,6 @@ def language_urls(languages, current_language):
         current_language = 'en'
 
     return [LanguageConfig(language, current_language) for language in languages]
-
-
-@contextfunction
-@blueprint.app_template_filter()
-def get_answer_label(context, answer_id):
-    """Return the value that should be used as the answer label tries
-    answer.label first then resorts to question title"""
-    parent_context = context.parent
-    question = parent_context['question']
-    answers = question['answers']
-
-    for answer in answers:
-        if answer_id == answer['id']:
-            if answer.get('label') is not None:
-                return answer['label']
-            return question['title']
-
-
-@blueprint.app_context_processor
-def get_answer_label_processor():
-    return dict(get_answer_label=get_answer_label)
-
-
-@blueprint.app_context_processor
-def answer_is_type_processor():
-    return dict(answer_is_type=answer_is_type)
-
-
-@blueprint.app_context_processor
-def start_end_date_check():
-    return dict(format_date_range=format_date_range)
 
 
 @blueprint.app_context_processor
@@ -212,23 +135,8 @@ def format_unit_input_label_processor():
 
 
 @blueprint.app_context_processor
-def format_duration_processor():
-    return dict(format_duration=format_duration)
-
-
-@blueprint.app_context_processor
-def format_currency_processor():
-    return dict(format_currency=format_currency)
-
-
-@blueprint.app_context_processor
 def get_currency_symbol_processor():
     return dict(get_currency_symbol=get_currency_symbol)
-
-
-@blueprint.app_context_processor
-def format_number_processor():
-    return dict(format_number=format_number)
 
 
 @blueprint.app_context_processor
@@ -240,16 +148,6 @@ def mark_safe(context, value):
     if context.autoescape:
         value = Markup(value)
     return value
-
-
-@blueprint.app_template_filter()
-def dump(value):
-    return json.dumps(value)
-
-
-@blueprint.app_template_filter()
-def typeof(value):
-    return type(value).__name__
 
 
 @blueprint.app_template_filter()
