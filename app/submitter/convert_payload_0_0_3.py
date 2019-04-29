@@ -9,13 +9,18 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
     Convert answers into the data format below
     'data': [
         {
-            'value': 'Joe Bloggs',
-            'answer_id': 'household-full-name',
+            'value': 'Joe',
+            'answer_id': 'first-name',
+            'list_item_id': 'axkkdh'
         },
         {
-            'value': 'Husband or wife',
-            'list_item_id': 'abc123',
-            'answer_id': 'who-is-related',
+            'value': 'Joe',
+            'answer_id': 'first-name',
+            'list_item_id': 'axkkdh'
+        },
+        {
+            'value': 'No',
+            'answer_id': 'do-you-live-here'
         }
     ]
 
