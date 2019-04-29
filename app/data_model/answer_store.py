@@ -91,7 +91,13 @@ class AnswerStore:
         Returns:
             A list of Answer objects
         """
-        return [self.answer_map.get((answer_id, list_item_id)) for answer_id in answer_ids]
+        output_answers = []
+        for answer_id in answer_ids:
+            answer = self.answer_map.get((answer_id, list_item_id))
+            if answer:
+                output_answers.append(answer)
+
+        return output_answers
 
     def clear(self):
         """
