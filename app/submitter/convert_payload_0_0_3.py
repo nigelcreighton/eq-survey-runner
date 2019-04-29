@@ -35,7 +35,7 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
 
     for location in routing_path:
         if schema.get_block(location.block_id)['type'] == 'ListCollector':
-            for answer in convert_list_collector_answers(answer_store, list_store, schema, location):
+            for answer in get_answers_for_add_block(answer_store, list_store, schema, location):
                 if answer:
                     answers.add_or_update(answer)
 
@@ -48,8 +48,8 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
     return list(answers.answer_map.values())
 
 
-def convert_list_collector_answers(answer_store, list_store, schema, location) -> Optional[List[Answer]]:
-    """For the given location, check for list collector and generate submission payload
+def get_answers_for_add_block(answer_store, list_store, schema, location) -> Optional[List[Answer]]:
+    """For the given list collector location, return a list of answers which match the add_block
 
     Returns:
         A list of answer objects (or None)
