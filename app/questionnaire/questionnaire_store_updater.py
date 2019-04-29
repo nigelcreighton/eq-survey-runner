@@ -32,8 +32,6 @@ class QuestionnaireStoreUpdater:
 
         self.save_answers(form, False)
 
-        return self._current_location
-
     def _update_questionnaire_store_with_form_data(self, form_data):
         answer_ids_for_question = self._schema.get_answer_ids_for_question(self._current_question)
 
