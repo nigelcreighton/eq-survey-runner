@@ -41,4 +41,6 @@ class Location:
 
         :return:
         """
+        if self.list_name:
+            return url_for('questionnaire.get_block', )
         return url_for('questionnaire.get_block', block_id=self.block_id)

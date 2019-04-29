@@ -58,11 +58,11 @@ def build_view_context_for_list_collector(rendered_block, list_store, answer_sto
             list_items.append({
                 'answers': title_answers,
                 'item_title': generate_list_item_title(title_answers, rendered_block['add_block']),
-                'edit_link': url_for('questionnaire.get_list_item_block_id',
+                'edit_link': url_for('questionnaire.get_block',
                                      list_name=list_name,
                                      block_id=rendered_block['edit_block']['id'],
                                      list_item_id=list_item_id),
-                'remove_link': url_for('questionnaire.get_list_item_block_id',
+                'remove_link': url_for('questionnaire.get_block',
                                        list_name=list_name,
                                        block_id=rendered_block['remove_block']['id'],
                                        list_item_id=list_item_id),
@@ -70,7 +70,7 @@ def build_view_context_for_list_collector(rendered_block, list_store, answer_sto
 
     list_collector_context = {
         'list_items': list_items,
-        'add_link': url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['id']),
+        'add_link': url_for('questionnaire.get_block', list_name=rendered_block['populates_list'], block_id=rendered_block['id']),
     }
 
     return {**question_context, **list_collector_context}

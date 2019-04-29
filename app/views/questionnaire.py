@@ -88,48 +88,21 @@ def before_post_submission_request():
     logger.info('questionnaire request', method=request.method, url_path=request.full_path)
 
 
-@questionnaire_blueprint.route('<list_name>/<add_block_id>', methods=['GET'])
-@login_required
-@with_questionnaire_store
-@with_schema
-@full_routing_path_required
-def get_add_list_item(routing_path, schema, questionnaire_store, list_name, add_block_id):
-    return get_block_handler(
-        routing_path,
-        schema,
-        questionnaire_store,
-        add_block_id,
-        list_name,
-    )
-
-
+@questionnaire_blueprint.route('<block_id>', methods=['GET'])
+@questionnaire_blueprint.route('<list_name>/<block_id>', methods=['GET'])
 @questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['GET'])
 @login_required
 @with_questionnaire_store
 @with_schema
 @full_routing_path_required
-def get_list_item_block_id(routing_path, schema, questionnaire_store, list_name, list_item_id, block_id):
+def get_block(routing_path, schema, questionnaire_store, block_id, list_name=None, list_item_id=None):
     return get_block_handler(
         routing_path,
         schema,
         questionnaire_store,
         block_id,
         list_name,
-        list_item_id,
-    )
-
-
-@questionnaire_blueprint.route('<block_id>', methods=['GET'])
-@login_required
-@with_questionnaire_store
-@with_schema
-@full_routing_path_required
-def get_block(routing_path, schema, questionnaire_store, block_id):
-    return get_block_handler(
-        routing_path,
-        schema,
-        questionnaire_store,
-        block_id,
+        list_item_id
     )
 
 
@@ -234,7 +207,7 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
     if block['type'] == 'ListCollector':
         answer_store_updater.save_answers(form)
         if form.data[block['add_answer']['id']] == block['add_answer']['value']:
-            add_url = url_for('questionnaire.get_add_list_item', list_name=rendered_block['populates_list'], add_block_id=rendered_block['add_block']['id'])
+            add_url = url_for('questionnaire.get_block', list_name=rendered_block['populates_list'], block_id=rendered_block['add_block']['id'])
             return add_url
         return
 
@@ -261,43 +234,16 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
 
 
 @questionnaire_blueprint.route('<block_id>', methods=['POST'])
+@questionnaire_blueprint.route('<list_name>/<block_id>', methods=['POST'])
+@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['POST'])
 @login_required
 @with_questionnaire_store
 @with_schema
 @full_routing_path_required
 # pylint: disable=too-many-locals, too-many-return-statements
-def post_block(routing_path, schema, questionnaire_store, block_id):
-
+def post_block(routing_path, schema, questionnaire_store, block_id, list_name=None, list_item_id=None):
     return post_block_handler(
         routing_path,
-        schema,
-        questionnaire_store,
-        block_id,
-    )
-
-
-@questionnaire_blueprint.route('<list_name>/<block_id>', methods=['POST'])
-@login_required
-@with_questionnaire_store
-@with_schema
-def post_add_list_item(schema, questionnaire_store, list_name, block_id):
-    return post_block_handler(
-        None,
-        schema,
-        questionnaire_store,
-        block_id,
-        list_name,
-        None,
-    )
-
-
-@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['POST'])
-@login_required
-@with_questionnaire_store
-@with_schema
-def post_list_item_block(schema, questionnaire_store, list_name, list_item_id, block_id):
-    return post_block_handler(
-        None,
         schema,
         questionnaire_store,
         block_id,
