@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Optional
+from typing import Optional, Dict
 from dataclasses import dataclass
 
 from flask import url_for
@@ -23,13 +23,13 @@ class Location:
         return hash(frozenset(self.__dict__.values()))
 
     @classmethod
-    def from_dict(cls, location_dict: dict):
+    def from_dict(cls, location_dict: Dict):
         block_id = location_dict['block_id']
         list_item_id = location_dict.get('list_item_id')
         list_name = location_dict.get('list_name')
         return cls(block_id, list_name, list_item_id)
 
-    def for_json(self) -> dict:
+    def for_json(self) -> Dict:
         """
         Used to serialise a location to json.
         """

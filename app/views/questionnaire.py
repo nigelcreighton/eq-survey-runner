@@ -88,9 +88,9 @@ def before_post_submission_request():
     logger.info('questionnaire request', method=request.method, url_path=request.full_path)
 
 
-@questionnaire_blueprint.route('<block_id>', methods=['GET'])
-@questionnaire_blueprint.route('<list_name>/<block_id>', methods=['GET'])
-@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['GET'])
+@questionnaire_blueprint.route('<block_id>/', methods=['GET'])
+@questionnaire_blueprint.route('<list_name>/<block_id>/', methods=['GET'])
+@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>/', methods=['GET'])
 @login_required
 @with_questionnaire_store
 @with_schema
@@ -232,9 +232,9 @@ def perform_list_action(schema, metadata, answer_store, current_location, form, 
     return list_collector_url
 
 
-@questionnaire_blueprint.route('<block_id>', methods=['POST'])
-@questionnaire_blueprint.route('<list_name>/<block_id>', methods=['POST'])
-@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>', methods=['POST'])
+@questionnaire_blueprint.route('<block_id>/', methods=['POST'])
+@questionnaire_blueprint.route('<list_name>/<block_id>/', methods=['POST'])
+@questionnaire_blueprint.route('<list_name>/<list_item_id>/<block_id>/', methods=['POST'])
 @login_required
 @with_questionnaire_store
 @with_schema
@@ -251,7 +251,7 @@ def post_block(routing_path, schema, questionnaire_store, block_id, list_name=No
     )
 
 
-@post_submission_blueprint.route('thank-you', methods=['GET'])
+@post_submission_blueprint.route('thank-you/', methods=['GET'])
 @login_required
 @with_schema
 def get_thank_you(schema):
@@ -288,7 +288,7 @@ def get_thank_you(schema):
     return _redirect_to_location(next_location)
 
 
-@post_submission_blueprint.route('thank-you', methods=['POST'])
+@post_submission_blueprint.route('thank-you/', methods=['POST'])
 @login_required
 def post_thank_you():
     if 'action[sign_out]' in request.form:
@@ -297,7 +297,7 @@ def post_thank_you():
     return redirect(url_for('post_submission.get_thank_you'))
 
 
-@post_submission_blueprint.route('view-submission', methods=['GET'])
+@post_submission_blueprint.route('view-submission/', methods=['GET'])
 @login_required
 @with_schema
 def get_view_submission(schema):  # pylint: too-many-locals
@@ -352,7 +352,7 @@ def get_view_submission(schema):  # pylint: too-many-locals
     return redirect(url_for('post_submission.get_thank_you'))
 
 
-@post_submission_blueprint.route('view-submission', methods=['POST'])
+@post_submission_blueprint.route('view-submission/', methods=['POST'])
 @login_required
 def post_view_submission():
     if 'action[sign_out]' in request.form:
