@@ -14,11 +14,13 @@ from botocore.config import Config
 from flask import Flask, url_for, session as cookie_session
 from flask_babel import Babel
 from flask_caching import Cache
+from flask_compress import Compress
 from flask_talisman import Talisman
 from flask_themes2 import Themes
 from flask_wtf.csrf import CSRFProtect
 from google.auth import credentials
 from google.cloud import datastore
+from htmlmin.main import minify
 from sdc.crypto.key_store import KeyStore, validate_required_keys
 from structlog import get_logger
 
@@ -52,6 +54,7 @@ CSP_POLICY = {
 }
 
 cache = Cache()
+compress = Compress()
 
 logger = get_logger()
 
@@ -138,6 +141,8 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
 
     add_safe_health_check(application)
 
+    compress.init_app(application)
+
     if application.config['EQ_DEV_MODE']:
         start_dev_mode(application)
 
@@ -176,6 +181,19 @@ def create_app(setting_overrides=None):  # noqa: C901  pylint: disable=too-compl
         else:
             response.headers['Cache-Control'] = 'max-age=2628000, public'
 
+        return response
+
+    @application.after_request
+    def response_minify(response):  # pylint: disable=unused-variable
+        """
+        minify html response to decrease site traffic
+        """
+        if application.config['EQ_ENABLE_HTML_MINIFY'] and response.content_type == u'text/html; charset=utf-8':
+            response.set_data(
+                minify(response.get_data(as_text=True)),
+            )
+
+            return response
         return response
 
     @application.context_processor
