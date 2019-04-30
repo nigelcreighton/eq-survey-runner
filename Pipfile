@@ -28,6 +28,7 @@ pytest-xdist = "*"
 pytest-sugar = "*"
 snakeviz = "*"
 fakeredis = "*"
+mypy = "*"
 
 [packages]
 colorama = "*"

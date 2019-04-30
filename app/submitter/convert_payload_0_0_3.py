@@ -52,7 +52,7 @@ def get_answers_for_add_block(answer_store, list_store, schema, location) -> Lis
     Returns:
         A list of answer objects (or None)
     """
-    answer_output = []
+    answer_output: List = []
     block = schema.get_block(location.block_id)
     add_block_answer_ids = schema.get_answer_ids_for_block(block['add_block']['id'])
     list_name = block['populates_list']

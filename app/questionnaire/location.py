@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Optional
 from dataclasses import dataclass
 
 from flask import url_for
@@ -15,8 +16,8 @@ class Location:
     """
 
     block_id: str
-    list_name: str = None
-    list_item_id: str = None
+    list_name: Optional[str] = None
+    list_item_id: Optional[str] = None
 
     def __hash__(self):
         return hash(frozenset(self.__dict__.values()))

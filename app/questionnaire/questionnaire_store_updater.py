@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from app.data_model.answer_store import Answer
 
 
@@ -6,7 +6,7 @@ class QuestionnaireStoreUpdater:
     """ Component responsible for any actions that need to happen as a result of updating the answer store
     """
 
-    EMPTY_ANSWER_VALUES = (None, [], '')
+    EMPTY_ANSWER_VALUES: Tuple = (None, [], '')
 
     def __init__(self, current_location, schema, questionnaire_store, current_question):
         self._current_location = current_location
