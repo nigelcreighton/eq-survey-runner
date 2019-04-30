@@ -35,7 +35,8 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
 
     for location in routing_path:
         if schema.get_block(location.block_id)['type'] == 'ListCollector':
-            for answer in get_answers_for_add_block(answer_store, list_store, schema, location):
+            answers_in_add_block = get_answers_for_add_block(answer_store, list_store, schema, location)
+            for answer in answers_in_add_block:
                 answers.add_or_update(answer)
 
         answer_ids = schema.get_answer_ids_for_block(location.block_id)
