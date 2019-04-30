@@ -6,7 +6,7 @@
 
 {% set page_title  = _("Survey feedback") %}
 
-{% block content %}
+{% block main %}
   <form id="feedback-form" method="POST">
     <input id="csrf_token" name="csrf_token" type="hidden" value="{{ csrf_token() }}"/>
 

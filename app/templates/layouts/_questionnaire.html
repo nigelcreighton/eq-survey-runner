@@ -11,7 +11,7 @@
   <button class="u-vh" tabindex="-1" type="submit" name="action[save_continue]">{{_("Save and continue")}}</button>
 {% endblock %}
 
-{% block content %}
+{% block main %}
   {% if previous_location %}
     <div class="u-mb-s">
       <a {{ helpers.track('click', 'Navigation', 'Previous link click', position )}} href="{{ previous_location }}" id="top-previous">{{ _("Previous") }}</a>
