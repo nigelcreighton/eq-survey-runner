@@ -36,19 +36,17 @@ def convert_answers_to_payload_0_0_3(answer_store, list_store, schema, routing_p
     for location in routing_path:
         if schema.get_block(location.block_id)['type'] == 'ListCollector':
             for answer in get_answers_for_add_block(answer_store, list_store, schema, location):
-                if answer:
-                    answers.add_or_update(answer)
+                answers.add_or_update(answer)
 
         answer_ids = schema.get_answer_ids_for_block(location.block_id)
         answers_in_block = answer_store.get_answers_by_answer_id(answer_ids, list_item_id=location.list_item_id)
         for answer_in_block in answers_in_block:
-            if answer_in_block:
-                answers.add_or_update(answer_in_block)
+            answers.add_or_update(answer_in_block)
 
     return list(answers.answer_map.values())
 
 
-def get_answers_for_add_block(answer_store, list_store, schema, location) -> Optional[List[Answer]]:
+def get_answers_for_add_block(answer_store, list_store, schema, location) -> List[Answer]:
     """For the given list collector location, return a list of answers which match the add_block
 
     Returns:
@@ -61,7 +59,7 @@ def get_answers_for_add_block(answer_store, list_store, schema, location) -> Opt
     try:
         list_item_ids = list_store[list_name]
     except KeyError:
-        return
+        return answer_output
 
     for list_item_id in list_item_ids:
         for answer_id in add_block_answer_ids:
