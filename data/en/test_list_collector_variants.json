@@ -24,8 +24,7 @@
         "groups": [{
             "id": "group",
             "title": "List",
-            "blocks": [
-                {
+            "blocks": [{
                     "type": "Question",
                     "id": "you-live-here-block",
                     "question": {
