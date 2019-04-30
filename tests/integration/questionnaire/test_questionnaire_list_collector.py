@@ -98,7 +98,7 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
             'remove-confirmation': 'No'
         })
 
-        self.assertEqualUrl('/questionnaire/list-collector')
+        self.assertEqualUrl('/questionnaire/list-collector/')
 
         # Remove again
 
@@ -119,7 +119,7 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
 
         self.get(self.get_previous_link())
 
-        self.assertEqualUrl('/questionnaire/list-collector')
+        self.assertEqualUrl('/questionnaire/list-collector/')
 
         self.get(john_remove_link)
 
@@ -127,7 +127,7 @@ class TestQuestionnaireListCollector(IntegrationTestCase):
 
         self.get(self.get_previous_link())
 
-        self.assertEqualUrl('/questionnaire/list-collector')
+        self.assertEqualUrl('/questionnaire/list-collector/')
 
     def test_list_collector_submission(self):
         self.launchSurvey('test', 'list_collector')

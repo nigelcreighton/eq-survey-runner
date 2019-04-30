@@ -102,7 +102,7 @@ def get_block(routing_path, schema, questionnaire_store, block_id, list_name=Non
         questionnaire_store,
         block_id,
         list_name,
-        list_item_id
+        list_item_id,
     )
 
 
@@ -188,8 +188,7 @@ def post_block_handler(routing_path, schema, questionnaire_store,  # noqa: C901
         return _render_page(block['type'], context, current_location, schema)
 
     _set_started_at_metadata_if_required(form, collection_metadata)
-    questionnaire_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store,
-                                                     rendered_block.get('question'))
+    questionnaire_store_updater = QuestionnaireStoreUpdater(current_location, schema, questionnaire_store, rendered_block.get('question'))
 
     list_collection_block = block['type'] in ['ListCollector', 'ListAddQuestion', 'ListEditQuestion', 'ListRemoveQuestion']
 

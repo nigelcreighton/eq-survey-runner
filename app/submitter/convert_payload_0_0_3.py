@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 from app.data_model.answer import Answer
 from app.data_model.answer_store import AnswerStore
