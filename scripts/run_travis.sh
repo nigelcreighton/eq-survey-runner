@@ -14,9 +14,6 @@ echo "Running schema tests"
 echo "Running lint tests"
 ./scripts/run_lint.sh
 
-echo "Running mypy"
-./scripts/run_mypy.sh
-
 echo "Running unit tests"
 ./scripts/run_tests_unit.sh
 
