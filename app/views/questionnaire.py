@@ -108,9 +108,22 @@ def get_block(routing_path, schema, questionnaire_store, block_id, list_name=Non
 
 def validate_location(schema, routing_path, list_store, current_location):
     completed_locations = get_completed_blocks(current_user)
-    router = Router(schema, routing_path, current_location, completed_locations)
 
-    if schema.is_block_list_collector_child(current_location.block_id):
+    is_list_collector_child = schema.is_block_list_collector_child(current_location.block_id)
+
+    if is_list_collector_child:
+        parent_block_id = schema.get_list_collector_for_block_id(current_location.block_id)['id']
+        routing_location = Location(block_id=parent_block_id)
+    else:
+        routing_location = current_location
+
+    router = Router(schema, routing_path, routing_location, completed_locations)
+
+    if not router.can_access_location():
+        next_location = router.get_next_location()
+        return _redirect_to_location(next_location)
+
+    if is_list_collector_child:
         list_item_id = current_location.list_item_id
         block = schema.get_block(current_location.block_id)
 
@@ -120,10 +133,6 @@ def validate_location(schema, routing_path, list_store, current_location):
         if list_item_id not in list_store[current_location.list_name]:
             parent_block = schema.get_list_collector_for_block_id(current_location.block_id)
             return redirect(url_for('questionnaire.get_block', block_id=parent_block['id']))
-    else:
-        if not router.can_access_location():
-            next_location = router.get_next_location()
-            return _redirect_to_location(next_location)
 
 
 def get_block_handler(routing_path, schema, questionnaire_store, block_id, list_name=None, list_item_id=None):
